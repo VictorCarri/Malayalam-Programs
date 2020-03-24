@@ -4,6 +4,9 @@
 /* Boost */
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::store, boost::program_options::command_line_parser, boost::program_options::positional_options_description, boost::program_options::invalid_option_value, boost::program_options::unknown_option, boost::program_options::ambiguous_option
 
+/* Our headers */
+#include "Server.hpp" // Main server class
+
 enum ExitCode
 {
 	NORMAL = 0,

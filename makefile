@@ -1,6 +1,6 @@
 exeName=malPlSrv
 cppDir=./cpp
-files=main
+files=Server main
 compiler=g++-8
 objDir=./obj
 objs=$(addprefix $(objDir)/,$(addsuffix .o,$(files)))
@@ -22,6 +22,18 @@ $(objDir)/main.o: $(cppDir)/main.cpp
 	$(compiler) -o $@ -c $^
 
 $(objDir)/main.debug.o: $(cppDir)/main.cpp
+	$(compiler) -o $@ -c $^ $(dbgOpts)
+
+$(objDir)/Server.o: $(cppDir)/Server.cpp
+	$(compiler) -o $@ -c $^
+
+$(objDir)/Server.debug.o: $(cppDir)/Server.cpp
+	$(compiler) -o $@ -c $^ $(dbgOpts)
+
+$(objDir)/IoContextPool.o: $(cppDir)/IoContextPool.cpp
+	$(compiler) -o $@ -c $^
+
+$(objDir)/IoContextPool.debug.o: $(cppDir)/IoContextPool.cpp
 	$(compiler) -o $@ -c $^ $(dbgOpts)
 
 clean:
