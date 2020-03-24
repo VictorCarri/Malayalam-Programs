@@ -35,6 +35,11 @@ class Server : private boost::noncopyable
 		**/
 		void handleStop();
 
+		/**
+		* @desc Initiates an asynchronous accept operation.
+		**/
+		void startAccept();
+
 		IoContextPool iocp; // Pool of io_contexts used for async ops
 		boost::asio::signal_set signals; // Used to receive signals
 		boost::asio::ip::tcp::acceptor acceptor; // Used to listen for incoming connections

@@ -53,7 +53,7 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	acceptor.bind(endPoint);
 	acceptor.listen();
 
-	//startAccept();
+	startAccept();
 }
 
 /**
@@ -70,4 +70,11 @@ void Server::handleStop()
 void Server::run()
 {
 	iocp.run(); // Run the pool
+}
+
+/**
+* @desc Initiates an asynchronous accept operation.
+**/
+void Server::startAccept()
+{
 }
