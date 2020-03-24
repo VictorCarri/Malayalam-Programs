@@ -5,14 +5,17 @@
 #include <stdexcept> // std::runtime_error
 #include <vector> // std::vector
 #include <algorithm> // std::for_each
+#include <memory> // std::shared_ptr
+#include <thread> // std::thread
+//#include <functional> // std::bind
 #ifdef DEBUG
 #include <iostream> // std::clog
 #endif
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::make_work_guard
-#include <boost/thread.hpp> // boost::thread
-#include <boost/shared_ptr.hpp> // boost::shared_ptr
+//#include <boost/thread.hpp> // boost::thread
+//#include <boost/shared_ptr.hpp> // boost::shared_ptr
 #include <boost/bind.hpp> // boost::bind
 
 /* Our headers */
@@ -51,7 +54,8 @@ IoContextPool::IoContextPool(std::size_t poolSize) : nextIoCon(0)
 **/
 void IoContextPool::run()
 {
-	std::vector<boost::shared_ptr<boost::thread>> threads;
+	//std::vector<boost::shared_ptr<boost::thread>> threads;
+	std::vector<std::shared_ptr<std::thread>> threads;
 	#ifdef DEBUG
 	short threadNum = 0;
 	#endif
@@ -63,9 +67,12 @@ void IoContextPool::run()
 	std::for_each(ioContexts.cbegin(), ioContexts.cend(), [&threads](iocPtr ptr)
 	#endif
 		{
-			boost::shared_ptr<boost::thread> thread(
-				new boost::thread(
+			//boost::shared_ptr<boost::thread> thread(
+			std::shared_ptr<std::thread> thread(
+				//new boost::thread(
+				new std::thread(
 					boost::bind(
+					//std::bind(
 						&boost::asio::io_context::run,
 						ptr
 					)
@@ -85,9 +92,11 @@ void IoContextPool::run()
 
 	/* Wait for all threads to exit */
 	#ifdef DEBUG
-	std::for_each(threads.cbegin(), threads.cend(), [&threadNum](boost::shared_ptr<boost::thread> ptr)
+	//std::for_each(threads.cbegin(), threads.cend(), [&threadNum](boost::shared_ptr<boost::thread> ptr)
+	std::for_each(threads.cbegin(), threads.cend(), [&threadNum](std::shared_ptr<std::thread> ptr)
 	#else
-	std::for_each(threads.cbegin(), threads.cend(), [](boost::shared_ptr<boost::thread> ptr)
+	//std::for_each(threads.cbegin(), threads.cend(), [](boost::shared_ptr<boost::thread> ptr)
+	std::for_each(threads.cbegin(), threads.cend(), [](std::shared_ptr<std::thread> ptr)
 	#endif
 		{
 			ptr->join();

@@ -7,11 +7,12 @@
 /* STL */
 #include <vector> // std::vector
 #include <list> // std::list
+#include <memory> // std::shared_ptr
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::executor_work_guard, boost::asio::io_context::executor_type
-#include <boost/shared_ptr.hpp> // boost::shared_ptr
+//#include <boost/shared_ptr.hpp> // boost::shared_ptr
 
 class IoContextPool : private boost::noncopyable
 {
@@ -40,7 +41,7 @@ class IoContextPool : private boost::noncopyable
 
 	private:
 		/* Types */
-		typedef boost::shared_ptr<boost::asio::io_context> iocPtr;
+		typedef std::shared_ptr<boost::asio::io_context> iocPtr;
 		typedef boost::asio::executor_work_guard<boost::asio::io_context::executor_type> iocWork;
 
 		/* Properties */

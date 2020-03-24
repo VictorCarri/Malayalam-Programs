@@ -13,6 +13,7 @@
 
 /* Our headers */
 #include "IoContextPool.hpp" // io_context pool
+//#include "Connection.hpp" // Represents a connection
 
 class Server : private boost::noncopyable
 {
