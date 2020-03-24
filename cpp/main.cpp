@@ -4,6 +4,7 @@
 /* STL */
 #include <iostream> // std::cout
 #include <string> // std::string
+#include <exception> // std::exception
 
 /* Boost */
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::parse_command_line
@@ -71,12 +72,21 @@ int main(int argc, char* argv[])
 	}
 
 	#ifdef DEBUG
-	std::clog << "Port #:" << port << std::endl
-		<< "# of threads: " << threads << std::endl
-		<< "Address: " << address << std::endl;
+	std::clog << "main: Port #:" << port << std::endl
+		<< "\t# of threads: " << threads << std::endl
+		<< "\tAddress: " << address << std::endl;
 	#endif
-	
-	Server s(address, port, threads); // Create the server
+
+	try
+	{	
+		Server s(address, port, threads); // Create the server
+		s.run(); // Run the server until stopped
+	}
+
+	catch (std::exception& e)
+	{
+		std::cerr << "An exception occurred while starting or running the server: " << e.what() << std::endl;
+	}
 
 	return NORMAL;
 }

@@ -9,7 +9,7 @@
 
 /* Boost */
 #include <boost/noncopyable.hpp>
-#include <boost/asio.hpp> // boost::asio::signal_set
+#include <boost/asio.hpp> // boost::asio::signal_set, boost:asio::ip::tcp::acceptor
 
 /* Our headers */
 #include "IoContextPool.hpp" // io_context pool
@@ -24,9 +24,20 @@ class Server : private boost::noncopyable
 		**/
 		explicit Server(const std::string& address, int port, std::size_t numThreads);
 
+		/**
+		* @desc Runs the server's io_context loop.
+		**/
+		void run();
+
 	private:
+		/**
+		* @desc Handles a request to stop the server.
+		**/
+		void handleStop();
+
 		IoContextPool iocp; // Pool of io_contexts used for async ops
-//		boost::asio::signal_set signals; // Used to receive signals
+		boost::asio::signal_set signals; // Used to receive signals
+		boost::asio::ip::tcp::acceptor acceptor; // Used to listen for incoming connections
 };
 
 #endif // SERVER_HPP
