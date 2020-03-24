@@ -3,6 +3,10 @@
 
 /* STL */
 #include <sstream> // std::stringstream
+#ifdef DEBUG
+#include <iostream> // std::clog
+#include <string> // std::string
+#endif
 
 /* Boost */
 #include <boost/bind.hpp> // boost::bind
@@ -41,6 +45,10 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	boost::asio::ip::tcp::resolver resolver(acceptor.get_executor());
 	boost::asio::ip::tcp::endpoint endPoint = *(resolver.resolve(address, portNumSS.str()).begin()); // Use the first endpoint found that corresponds to the given address & port #
 	acceptor.open(endPoint.protocol());
+	#ifdef DEBUG
+	std::string negStr =  acceptor.is_open() ? "" : "n't";
+	std::clog << "Server::Server: acceptor has" << negStr << " opened." << std::endl;
+	#endif
 	acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
 	acceptor.bind(endPoint);
 	acceptor.listen();
