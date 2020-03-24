@@ -1,8 +1,12 @@
+/* C++ versions of C headers */
+#include <cstddef> // std::size_t
+
 /* STL */
 #include <iostream> // std::cout
+#include <string> // std::string
 
 /* Boost */
-#include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::store, boost::program_options::command_line_parser, boost::program_options::positional_options_description, boost::program_options::invalid_option_value, boost::program_options::unknown_option, boost::program_options::ambiguous_option
+#include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::parse_command_line
 
 /* Our headers */
 #include "Server.hpp" // Main server class
@@ -18,28 +22,25 @@ enum ExitCode
 
 int main(int argc, char* argv[])
 {
-	/* Get port arg */
-	boost::program_options::options_description generic("Options");
+	/* Option handling */
+	boost::program_options::options_description opts("Options");
 	boost::program_options::variables_map vm;
-	int port; // Port #
-	boost::program_options::positional_options_description posOpts;
-	boost::program_options::options_description posOptsDesc("Positional options descriptor");
-	boost::program_options::options_description cmdOpts("Command-line options");
 
-	generic.add_options()
-		("help,h", "Print this help message");
-	posOptsDesc.add_options()
-		("port,p", boost::program_options::value<int>(&port)->default_value(50001), "Set the port to listen on.");
-	cmdOpts.add(generic).add(posOptsDesc);
-	posOpts.add("port", -1);
+	/* Server vars */
+	int port; // Port #
+	std::size_t threads; // # of threads
+	std::string address; // Address to run on
+
+	opts.add_options()
+		("help,h", "Print this help message")
+		("port,p", boost::program_options::value<int>(&port)->default_value(50001), "Set the port to listen on.")
+		("threads,t", boost::program_options::value<std::size_t>(&threads)->default_value(5), "Set the number of threads to use.")
+		("address,a", boost::program_options::value<std::string>(&address)->default_value("127.0.0.1"), "Set the address which the server will run on");
 
 	try
 	{
 		boost::program_options::store(
-			boost::program_options::command_line_parser(argc, argv)
-				.options(cmdOpts)
-				.positional(posOpts)
-				.run(),
+			boost::program_options::parse_command_line(argc, argv, opts),
 			vm
 		);
 		boost::program_options::notify(vm);
@@ -65,15 +66,17 @@ int main(int argc, char* argv[])
 
 	if (vm.count("help"))
 	{
-		std::cout << "Usage: " << argv[0] << "[-h|--help] [port number]" << std::endl
-			<< std::endl
-			<< generic << std::endl;
+		std::cout << opts << std::endl;
 		return HELP;
 	}
 
 	#ifdef DEBUG
-	std::clog << "Port #" << port << std::endl;
+	std::clog << "Port #:" << port << std::endl
+		<< "# of threads: " << threads << std::endl
+		<< "Address: " << address << std::endl;
 	#endif
+	
+	Server s(address, port, threads); // Create the server
 
 	return NORMAL;
 }

@@ -4,8 +4,9 @@
 /**
 * @desc Creates a server that listens on the given port, and uses a pool of io_contexts of the given size.
 * @param port Port to listen on.
-* @param ioContextPoolSize Size of the pool of io_contexts to use.
+* @param numThreads # of threads to use.
 **/
-Server::Server(int port, std::size_t ioContextPoolSize) : iocp(ioContextPoolSize)
+Server::Server(const std::string& address, int port, std::size_t numThreads)
+	: iocp(numThreads)
 {
 }
