@@ -10,10 +10,11 @@
 
 /* Boost */
 #include <boost/bind.hpp> // boost::bind
-#include <boost/asio.hpp> // boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::acceptor::reuse_address
+#include <boost/asio.hpp> // boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::acceptor::reuse_address, boost::asio::placeholders::error
 
 /* Our headers */
 #include "Server.hpp" // Class definition
+#include "Connection.hpp" // Connection class
 
 /**
 * @desc Creates a server that listens on the given port, and uses a pool of io_contexts of the given size.
@@ -77,4 +78,32 @@ void Server::run()
 **/
 void Server::startAccept()
 {
+	newConn.reset(
+		new Connection(
+			iocp.getIoc(),
+			reqHandler
+		)
+	);
+	acceptor.async_accept(
+		newConn->socket(),
+		boost::bind(
+			&Server::handleAccept,
+			this,
+			boost::asio::placeholders::error
+		)
+	);
+}
+
+/**
+* @desc Handles completion of an asynchronous accept operation.
+* @param e An error object, if any occurred.
+**/
+void Server::handleAccept(const boost::system::error_code& e)
+{
+	if (!e)
+	{
+		newConn->start(); // Start the new connection
+	}
+
+	startAccept();
 }

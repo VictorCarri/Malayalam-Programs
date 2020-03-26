@@ -10,10 +10,12 @@
 /* Boost */
 #include <boost/noncopyable.hpp>
 #include <boost/asio.hpp> // boost::asio::signal_set, boost:asio::ip::tcp::acceptor
+#include <boost/system/error_code.hpp> // boost::system::error_code
 
 /* Our headers */
 #include "IoContextPool.hpp" // io_context pool
-//#include "Connection.hpp" // Represents a connection
+#include "Connection.hpp" // Represents a connection
+#include "ReqHandler.hpp" // Handles a request
 
 class Server : private boost::noncopyable
 {
@@ -41,9 +43,17 @@ class Server : private boost::noncopyable
 		**/
 		void startAccept();
 
+		/**
+		* @desc Handles completion of an asynchronous accept operation.
+		* @param e An error object, if any occurred.
+		**/
+		void handleAccept(const boost::system::error_code& e);
+
 		IoContextPool iocp; // Pool of io_contexts used for async ops
 		boost::asio::signal_set signals; // Used to receive signals
 		boost::asio::ip::tcp::acceptor acceptor; // Used to listen for incoming connections
+		ConnectionPtr newConn; // Pointer to a new connection
+		ReqHandler reqHandler; // Handdles a request
 };
 
 #endif // SERVER_HPP
