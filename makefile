@@ -1,6 +1,7 @@
 exeName=malPlSrv
 cppDir=./cpp
-files=IoContextPool ReqHandler ReqParser Connection Server main
+#files=IoContextPool ReqHandler ReqParser Connection Server main
+files=IoContextPool Server main
 compiler=g++-8
 objDir=./obj
 objs=$(addprefix $(objDir)/,$(addsuffix .prod.o,$(files)))

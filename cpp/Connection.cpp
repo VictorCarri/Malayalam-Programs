@@ -79,7 +79,8 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 
 		else if (!result) // Malformed request
 		{
-			reply = Reply::stockReply(Reply::badRequest); // Generate a stock reply
+			//reply = Reply::stockReply(Reply::badRequest); // Generate a stock reply
+			reply = Reply::stockReply(reqParser.badStat());
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),

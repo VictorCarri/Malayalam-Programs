@@ -3,12 +3,12 @@
 
 /* STL */
 #include <cstddef> // std::size_t
+#include <array> // std::array
 
 /* Boost */
 #include <boost/enable_shared_from_this.hpp> // boost::enable_shared_from_this
 #include <boost/noncopyable.hpp> // boost::noncopyable
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::ip::tcp::socket
-#include <boost/array.hpp> // boost::array
 #include <boost/system/error_code.hpp> // boost::system::error_code
 #include <boost/shared_ptr.hpp> // boost::shared_ptr
 
@@ -57,7 +57,7 @@ class Connection : public boost::enable_shared_from_this<Connection>,
 
 		boost::asio::ip::tcp::socket socket; // We listen on this
 		ReqHandler& reqHandler; // Parses requests
-		boost::array<wchar_t, 8192> buffer; // Stores data read from the socket
+		std::array<wchar_t, 8192> buffer; // Stores data read from the socket
 		RequestParser reqParser;
 		Request req;
 		Reply rep;
