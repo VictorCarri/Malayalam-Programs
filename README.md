@@ -1,2 +1,3 @@
-# MalayalamPluralisationServer
-An experiment in writing servers. A very simple server that will return the plural form of a Malayalam noun upon receiving a request. Uses a custom protocol.
+#Malayalam Pluralisation Server
+A project to create a server which handles requests to pluralise Malayalam nouns. Written to gain experience in writing servers.
+Also includes test programs for various components of the server.
