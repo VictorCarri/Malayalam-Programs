@@ -8,6 +8,7 @@
 
 /* Our headers */
 #include "Reply.hpp" // Reply::ReasonCode, to indicate why the parser failed
+#include "Request.hpp" // Request class
 #include "ver.hpp" // Protocol version info
 #include "ReqParser.hpp" // Class def'n
 
@@ -397,11 +398,18 @@ boost::tribool ReqParser::consume(Request& req, wchar_t input)
 				switch (prevStat) // What did we parse before this?
 				{
 					case fof_f: // Parsing a "FOF" command
-					case issing_g: // Parsing an "ISSING" command
 					{
-						curStat = parseMalNoun_beg; // Start parsing a Malayalam noun
+						req.setCommand(Request::FOF);
 						break;
 					}
+
+					case issing_g: // Parsing an "ISSING" command
+					{
+						req.setCommand(Request::ISSING);
+						break;
+					}
+
+					curStat = parseMalNoun_beg; // We start parsing a Malayalam noun, in either case
 				}
 			}
 
@@ -414,4 +422,13 @@ boost::tribool ReqParser::consume(Request& req, wchar_t input)
 			break;
 		}
 	} // switch
+}
+
+/**
+* @desc Fetches the reason why the parser couldn't finish parsing a request. Needed by Reply::stockReply in Server.
+* @return A reason code that indicates why the parser couldn't finish.
+**/
+Reply::ReasonCode ReqParser::getFailedReason() const
+{
+	return failedReason;
 }

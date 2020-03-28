@@ -52,7 +52,7 @@ class ReqParser
 		* @desc Fetches the reason why the parser couldn't finish parsing a request. Needed by Reply::stockReply in Server.
 		* @return A reason code that indicates why the parser couldn't finish.
 		**/
-		Reply::ReasonCode badStat() const;
+		Reply::ReasonCode getFailedReason() const;
 
 	private:
 		/**
@@ -64,22 +64,29 @@ class ReqParser
 
 		enum State
 		{
+			/* Reading "MPP" */
 			protocol_name_m = 1, // Expecting 'M' of 'MPP'
 			protocol_name_first_p, // Expecting first 'P' of 'MPP'
 			protocol_name_second_p, // Expecting second 'P' of 'MPP'
+
+			/* Reading version */
 			slash, // Expecting '/' in "MPP/{ver}"
 			major, // Reading major version #
 			minor, // Reading minor version #
 			patch, // Reading patch #
+
+			/* Reading verbs */
 			verb_start, // Reading the first char of the request's verb
 			fof_o, // Expect 'o' of 'FOF'
 			fof_f, // Expect second 'f' of 'FOF'
-			space, // Expecting a space character. Uses the prevStat var. to determine which state to go to next.
 			issing_first_s, // Expecting first 'S' of "ISSING"
 			issing_second_s, // Expecting second 'S' of "ISSING"
 			issing_second_i, // Expecting second 'I' in "ISSING"
 			issing_n, // Expecting 'N' in "ISSING"
-			issing_g // Expecting 'G' in "ISSING"
+			issing_g, // Expecting 'G' in "ISSING"
+
+			/* Other */	
+			space // Expecting a space character. Uses the prevStat var. to determine which state to go to next.
 		};
 
 		State curStat; // Current state
