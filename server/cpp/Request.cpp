@@ -11,7 +11,7 @@ Request::Request() : c(INVALID)
 /**
 * @desc Sets the command which this request
 **/
-void Request::setCommand(Command com)
+void Request::SETCOM_FUNC(Command com)
 {
 	c = com;
 }
@@ -19,7 +19,7 @@ void Request::setCommand(Command com)
 /**
 * @desc Fetches the command associated with this request.
 **/
-Command Request::getCommand() const
+Request::Command Request::GETCOM_FUNC() const
 {
 	return c;
 }

@@ -4,16 +4,22 @@
 /* STL */
 #include <array> // std::array
 #include <sstream> // std::wstringstream
-#include <string> // std::wstring
+#include <string> // std::wstring, std::string
+
+#ifdef DEBUG
+#include <map> // std::map
+#include <iostream> // std::cout, std::wcout, std::endl
+#endif
 
 /* Boost */
 #include <boost/tuple/tuple.hpp> // boost::tuple
 #include <boost/logic/tribool.hpp> // boost::tribool, boost::indeterminate
 #include <boost/locale.hpp> // boost::locale::generator
+#include <boost/logic/tribool_io.hpp>
 
 /* Our headers */
 #include "Request.hpp" // Represents a request
-#include "Reply.hpp" // Reply::ReasonCode (to indicate why the parser failed)
+#include "Reply.hpp" // Reply::FailureCode (to indicate why the parser failed)
 
 /*
 * Parses a request uses a buffer of data obtained by the server.
@@ -24,7 +30,7 @@ class ReqParser
 		/**
 		* Construct ready to parse the request method.
 		**/
-		void ReqParser();
+		ReqParser();
 
 		/**
 		* Reset to initial parser state.
@@ -36,13 +42,28 @@ class ReqParser
 		{
 			while (begin != end)
 			{
+				#ifdef DEBUG
+				std::cout << "ReqParser::parse: Character at begin = ";
+				std::wcout << *begin;
+				std::cout << std::endl;
+				#endif
+
 				boost::tribool res = consume(req, *begin++);
 				
 				if (res || !res)
 				{
+					#ifdef DEBUG
+					std::cout << "ReqParser::parse: returning (" << res << ", " << *begin << ")" << std::endl;
+					#endif
+
 					return boost::make_tuple(res, begin);
 				}
 			}
+
+			#ifdef DEBUG
+			std::cout << "ReqParser::parse: reached end of input." << std::endl
+			<< "\tReturning (" << boost::indeterminate << ", " << *begin << ")" << std::endl;
+			#endif
 
 			boost::tribool res = boost::indeterminate;
 			return boost::make_tuple(res, begin);
@@ -52,7 +73,7 @@ class ReqParser
 		* @desc Fetches the reason why the parser couldn't finish parsing a request. Needed by Reply::stockReply in Server.
 		* @return A reason code that indicates why the parser couldn't finish.
 		**/
-		Reply::ReasonCode getFailedReason() const;
+		Reply::FailureCode getFailedReason() const;
 
 	private:
 		/**
@@ -86,16 +107,23 @@ class ReqParser
 			issing_g, // Expecting 'G' in "ISSING"
 
 			/* Other */	
-			space // Expecting a space character. Uses the prevStat var. to determine which state to go to next.
+			space, // Expecting a space character. Uses the prevStat var. to determine which state to go to next.
+
+			/* Parsing headers */
+			header_start
 		};
 
 		State curStat; // Current state
 		State prevStat; // Previous state
-		Reply::ReasonCode failedReason;
+		Reply::FailureCode failedReason;
 		const std::array<short, 3> version; // Current parser/server version
 		std::array<std::wstringstream, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
 		const std::array<std::wstring, 2> verbs; // Recognised verbs
 		boost::locale::generator gen; // Used to switch between US English and Malayalam locales
+
+		#ifdef DEBUG
+		std::map<State, std::string> stateNames; // Used to name states for debugging
+		#endif
 };
 
 #endif // REQPARSER_HPP

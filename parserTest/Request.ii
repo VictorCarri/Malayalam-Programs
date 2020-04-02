@@ -1,0 +1,67 @@
+# 1 "cpp/Request.cpp"
+# 1 "<built-in>"
+# 1 "<command-line>"
+# 1 "/usr/include/stdc-predef.h" 1 3 4
+# 1 "<command-line>" 2
+# 1 "cpp/Request.cpp"
+
+# 1 "./hpp/Request.hpp" 1
+
+
+
+
+
+
+
+class Request
+{
+ public:
+  enum Command
+  {
+   FOF,
+   ISSING,
+   INVALID
+  };
+
+
+
+
+  Request();
+
+
+
+
+  void setCommand(Command com);
+
+
+
+
+  Command getCommand() const;
+
+ private:
+  Command c;
+};
+# 3 "cpp/Request.cpp" 2
+
+
+
+
+Request::Request() : c(INVALID)
+{
+}
+
+
+
+
+void Request::setCommand(Command com)
+{
+ c = com;
+}
+
+
+
+
+Request::Command Request::getCommand() const
+{
+ return c;
+}
