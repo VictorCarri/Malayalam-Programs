@@ -9,7 +9,7 @@
 //#include <boost/tuple/tuple.hpp> // boost::tie, boost::tuples::ignore
 
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::positional_options_description, boost::program_options::store, boost::program_options::command_line_parser, boost::filesystem::ifstream
-#include <boost/filesystem.hpp> // boost::filesystem::path
+#include <boost/filesystem.hpp> // boost::filesystem::path, boost::filesystem::exists
 
 /* Our headers */
 #include "Request.hpp" // Request object
@@ -27,7 +27,8 @@ enum ExitCode
 	NOINPFILE,
 	COULDNTOPENFILE,
 	BADREQ,
-	NEEDMOREDATA
+	NEEDMOREDATA,
+	INPDNE
 };
 
 int main(int argc, char* argv[])
@@ -46,7 +47,7 @@ int main(int argc, char* argv[])
 	boost::program_options::variables_map vm;
 	boost::program_options::positional_options_description posOpts;
 	boost::program_options::options_description all("All options"); // Needed for parsing, since positional options are converted to named ones, and the options live in separate options_description objects
-	boost::filesystem::path ourPath(argv[1]); // Convert first argument to path
+	boost::filesystem::path ourPath(argv[0]); // Convert first argument to path
 	std::string ourName = ourPath.filename().string(); // Remove any folders and get the program's name
 
 	/* Set up options */	
@@ -73,7 +74,9 @@ int main(int argc, char* argv[])
 
 	if (vm.count("help")) // User asked for help
 	{
-		std::cout << cmd << std::endl;
+		std::cout << "Usage: " << ourName << " [path-to-input-file]" << std::endl
+		<< std::endl
+		<< cmd;
 		return HELP;
 	}
 
@@ -84,6 +87,13 @@ int main(int argc, char* argv[])
 	}
 
 	boost::filesystem::path fp = vm["file"].as<boost::filesystem::path>(); // Fetch path to file to parse
+
+	if (!boost::filesystem::exists(fp)) // Input file DNE
+	{
+		std::cerr << "Input file " << fp << " doesn't eixst." << std::endl;
+		return INPDNE;
+	}
+
 	boost::filesystem::ifstream inpFStrm(fp); // Try to open file
 
 	if (!inpFStrm.is_open()) // File didn't open
