@@ -2,12 +2,12 @@ Requests
 =========
 A request will be of the form:
 	
-	MPP/1.0 {verb}
-	Content-Length: {integer}
-	{arg}\r\n...
+	MPP/1.0.0 {verb}
+	NumBytes: {integer}
+	{arg}...
 
 {verb} refers to the action which the server should perform and {arg} refers to any arguments which the server requires.
-Each line will be separated by \r\n.
+Each line will be separated by \r\n. The arguments are expected to be encoded in UTF-8. The length in bytes is used to ensure that the entire UTF-8 encoded string is read.
 
 Responses
 ==========

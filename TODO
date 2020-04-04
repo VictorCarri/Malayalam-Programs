@@ -1,0 +1,10 @@
+1) Build utility library (vuh).
+2) Separate request parsing and handling classes out into their own library.
+
+Finally, the program will consist of 3 modules:
+-----------------------------------------------
+1) The Server program, which handles low-level networking using Boost.Asio.
+2) The utilities library, which contains general utilities for Unicode, etc.
+3) The Malayalam pluralisation request handling library. It contains classes which deal with pluralising Malayalam nouns.
+
+The utilities library and the general Server program can be re-used to build other servers. Only the request-handling library need be changed.

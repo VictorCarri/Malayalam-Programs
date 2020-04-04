@@ -9,11 +9,12 @@ dbgObjs=$(addprefix $(objDir)/,$(addsuffix .debug.o,$(files)))
 libDirs=$(addprefix -L,/usr/local/lib/boost)
 libs=$(addprefix -l,boost_program_options-mt-x64 boost_thread-mt-x64 pthread)
 dbgLibs=$(addprefix -l,boost_program_options-mt-d-x64 boost_thread-mt-d-x64 pthread)
-dbgOpts=-DDEBUG
+dbgOpts=-DDEBUG -ggdb3
 hdrDir=./hpp
 compOpts=-I$(hdrDir)
+libName=vicunilib.a
 
-all: $(exeName) $(exeName)-debug
+all: $(exeName) $(exeName)-debug 
 
 $(exeName): $(objs)
 	$(compiler) -o $@ $^ $(libDirs) $(libs)
