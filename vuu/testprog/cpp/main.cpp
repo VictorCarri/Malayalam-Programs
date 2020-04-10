@@ -107,12 +107,19 @@ int main(int argc, char* argv[])
 		else
 		{
 			boost::filesystem::ifstream inpStrm(inpFilePath);
+			boost::filesystem::wifstream inpStrmW(inpFilePath); // Testing
+
+			/* Needed to read the entire file in one shot */
 			std::stringstream inpFContsStrm;
 			std::wstringstream inpFContsStrmW;
+
 			inpFContsStrm << inpStrm.rdbuf(); // Read entire file into string
-			inpFContsStrmW << inpStrm.rdbuf(); // Read entire file into wide string
-			std::string fConts = inpFContsStrm.str(); // Extract string from stream
-			std::wstring fContsW = inpFContsStrmW.str(); // Extract string from stream
+			inpFContsStrmW << inpStrmW.rdbuf(); // Read entire file into wide string
+
+			std::string fConts = inpFContsStrm.str(); // Extract narrow string from stream
+			std::wstring fContsW = inpFContsStrmW.str(); // Extract wide string from stream
+
+			/* Print file contents */
 			std::cout << "File contents: " << fConts << std::endl
 			<< "\tString length: " << fConts.length() << std::endl;
 			std::wcout << L"File contents (wide): " << fContsW << std::endl

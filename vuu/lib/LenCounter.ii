@@ -37989,6 +37989,19 @@ namespace vuu
 
 
     void operator()(std::pair<vuu::LenCounter::State, std::string> p);
+
+
+
+
+    StateNamePrinter();
+
+
+
+
+    StateNamePrinter(std::string pref);
+
+   private:
+    std::string prefix;
   };
  };
 };
@@ -38037,7 +38050,7 @@ short vuu::LenCounter::getNumCodePoints() const
 void vuu::LenCounter::operator()(char c)
 {
  std::bitset<8> charBits(static_cast<unsigned long>(c));
-# 107 "cpp/LenCounter.cpp"
+# 103 "cpp/LenCounter.cpp"
  switch (curStat)
  {
   case codepoint_start:
@@ -38221,7 +38234,7 @@ void vuu::LenCounter::operator()(char c)
  }
 
  ++charPos;
-# 313 "cpp/LenCounter.cpp"
+# 309 "cpp/LenCounter.cpp"
 }
 
 
@@ -38236,7 +38249,7 @@ vuu::LenCounter::LenCounter(const vuu::LenCounter& other) :
 
 
 {
-# 385 "cpp/LenCounter.cpp"
+# 364 "cpp/LenCounter.cpp"
 }
 
 

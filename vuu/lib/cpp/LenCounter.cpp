@@ -95,11 +95,7 @@ void vuu::LenCounter::operator()(char c)
 		std::cerr << "vuu::LenCounter::operator(): caught out_of_range after trying to fetch string for state " << static_cast<short>(curStat) << " at start " << std::endl
 		<< "\tmessage = " << stdoor.what() << std::endl;
 		std::cerr << "\tmap = [" << std::endl;
-		std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto curPair)
-			{
-				std::cerr << "\t(" << curPair.first << "," << curPair.second << ")" << std::endl;
-			}
-		);
+		std::for_each(stateNames.cbegin(), stateNames.cend(), vuu::internals::StateNamePrinter("vuu::LenCounter::operator():: catch 1"));
 		std::cerr << "]" << std::endl;
 	}
 	#endif
@@ -327,12 +323,7 @@ vuu::LenCounter::LenCounter(const vuu::LenCounter& other) :
 	#ifdef DEBUG
 	std::cerr << "vuu::LenCounter: copy constructor called." << std::endl;
 	std::cerr << "vuu::LenCounter::copy_constructor: before copying stateNames: stateNames = [";
-	std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto pair)
-		{
-			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
-		}
-	);
-
+	std::for_each(stateNames.cbegin(), stateNames.cend(), vuu::internals::StateNamePrinter("vuu::LenCounter::LenCounter(const vuu::LenCounter& other)"));
 	std::cerr << "]" << std::endl << "\tother.stateNames = [";
 	/*std::for_each(other.stateNames.cbegin(), other.stateNames.cend(), [](auto pair)
 		{
@@ -346,11 +337,7 @@ vuu::LenCounter::LenCounter(const vuu::LenCounter& other) :
 		{
 			std::cerr << "\tother.stateNames.size() (unsigned) = " << other.stateNames.size() << std::endl;
 			std::cerr << "\tother.stateNames.size() (int) = " << static_cast<long long>(other.stateNames.size()) << std::endl;
-
-			for (std::map<State, std::string>::const_iterator it = other.stateNames.cbegin(); it != other.stateNames.cend(); it++)
-			{
-					std::cerr << "()";
-			}
+			std::for_each(other.stateNames.cbegin(), other.stateNames.cend(), vuu::internals::StateNamePrinter("vuu::LenCounter::LenCounter(const vuu::LenCounter& other): if1: if2"));
 		}
 
 		else
@@ -364,23 +351,15 @@ vuu::LenCounter::LenCounter(const vuu::LenCounter& other) :
 		std::cerr << "\tempty" << std::endl;
 	}
 
-	std::cerr << "]";/*
+	std::cerr << "]";
 
 	stateNames = other.stateNames;
 
 	std::cerr << "vuu::LenCounter::copy_constructor: after copying stateNames: stateNames = [" << std::endl;
-	std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto pair)
-		{
-			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
-		}
-	);
+	std::for_each(stateNames.cbegin(), stateNames.cend(), vuu::internals::StateNamePrinter("vuu::LenCounter::LenCounter(const vuu::LenCounter& other): end"));
 	std::cerr << "]" << std::endl << "\tother.stateNames = [" << std::endl;
-	std::for_each(other.stateNames.cbegin(), other.stateNames.cend(), [](auto pair)
-		{
-			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
-		}
-	);
-	std::cerr << "]";*/
+	std::for_each(other.stateNames.cbegin(), other.stateNames.cend(), vuu::internals::StateNamePrinter("vuu::LenCounter::LenCounter(const vuu::LenCounter& other): other.stateNames"));
+	std::cerr << "]";
 	#endif
 }
 

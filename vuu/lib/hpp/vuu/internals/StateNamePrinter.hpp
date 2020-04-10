@@ -24,6 +24,19 @@ namespace vuu
 				* @param p A pair representing the current mapping in the iteration.
 				**/
 				void operator()(std::pair<vuu::LenCounter::State, std::string> p);
+
+				/**
+				* @desc Default constructor. Forwards to constructor that takes std::string, using the prefix "vuu::LenCounter::LenCounter()".
+				**/
+				StateNamePrinter();
+
+				/**
+				* @desc Constructs a StateNamePrinter that prints the given prefix before each message.
+				**/
+				StateNamePrinter(std::string pref);
+
+			private:
+				std::string prefix; // String to print before pairs
 		};
 	};
 };
