@@ -7,12 +7,14 @@
 #include <utility> // std::pair
 
 #ifdef DEBUG
-#include <iostream> // std::cout, std::endl
+#include <iostream> // std::cerr, std::endl
+#include <stdexcept> // std::out_of_range
 #endif
 
 /* Our headers */
 #include "vuu/LenCounter.hpp" // Class def'n
 #include "vuu/InvByteInCodePoint.hpp" // Thrown when operator() detects an invalid byte in a code point
+#include "vuu/internals/StateNamePrinter.hpp" // Functor to print list of state names
 
 /**
 * @desc Constructor. Initialises state.
@@ -23,6 +25,8 @@ vuu::LenCounter::LenCounter() :
 	charPos(0)
 {
 	#ifdef DEBUG
+	std::cerr << "vuu::LenCounter::LenCounter() called." << std::endl;
+
 	/* Set up reflection (names of states) for debugging */
 	stateNames[codepoint_start] = "codepoint_start";
 	stateNames[twobyte_second] = "twobyte_second";
@@ -31,12 +35,14 @@ vuu::LenCounter::LenCounter() :
 	stateNames[fourbyte_second] = "fourbyte_second";
 	stateNames[fourbyte_third] = "fourbyte_third";
 	stateNames[fourbyte_fourth] = "fourbyte_fourth";
+	stateNames[invalid_state] = "invalid_state";
 
-	std::for_each(stateNames.cbegin(), stateNames.cend(), [](std::pair<const State, std::string> curPair)
+	/*std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto curPair)
 		{
-			std::cout << "State value " << static_cast<int>(curPair.first) << " maps to string " << curPair.second << std::endl;
+			std::cerr << "vuu::LenCounter::LenCounter: State value " << static_cast<int>(curPair.first) << " maps to string " << curPair.second << std::endl;
 		}
-	);
+	);*/
+	std::for_each(stateNames.cbegin(), stateNames.cend(), vuu::internals::StateNamePrinter()); // Print the names to be sure that they've been set correctly
 	#endif
 }
 
@@ -46,12 +52,13 @@ vuu::LenCounter::LenCounter() :
 **/
 void vuu::LenCounter::reset()
 {
+	#ifdef DEBUG
+	std::cerr << "vuu::LenCounter::reset called.";
+	#endif
+
 	curStat = codepoint_start;
 	ncp = 0;
 	charPos = 0;
-	#ifdef DEBUG
-	stateNames.clear();
-	#endif
 }
 
 /**
@@ -60,7 +67,7 @@ void vuu::LenCounter::reset()
 short vuu::LenCounter::getNumCodePoints() const
 {
 	#ifdef DEBUG
-	std::cout << "vuu::LenCounter::getNumCodePoints: ncp = " << ncp << std::endl;
+	std::cerr << "vuu::LenCounter::getNumCodePoints: ncp = " << ncp << std::endl;
 	#endif
 	return ncp;
 }
@@ -73,10 +80,28 @@ void vuu::LenCounter::operator()(char c)
 	std::bitset<8> charBits(static_cast<unsigned long>(c)); // Convert char to unsigned long so that bitset's constructor can accept it
 
 	#ifdef DEBUG	
-	std::cout << "vuu::LenCounter::operator(): current byte = " << c << std::endl
+	std::cerr << "vuu::LenCounter::operator(): current byte = " << c << std::endl
 	<< "\tBits = " << charBits << std::endl
 	<< "\tByte value as int = " << charBits.to_ulong() << std::endl
-	<< "\tState at start = " << stateNames[curStat] << std::endl << std::endl;
+	<< "\tCurrent state = " << static_cast<short>(curStat) << std::endl;
+
+	try
+	{
+		std::cerr << "\tState at start = " << stateNames.at(curStat) << std::endl << std::endl;
+	}
+
+	catch (std::out_of_range& stdoor)
+	{
+		std::cerr << "vuu::LenCounter::operator(): caught out_of_range after trying to fetch string for state " << static_cast<short>(curStat) << " at start " << std::endl
+		<< "\tmessage = " << stdoor.what() << std::endl;
+		std::cerr << "\tmap = [" << std::endl;
+		std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto curPair)
+			{
+				std::cerr << "\t(" << curPair.first << "," << curPair.second << ")" << std::endl;
+			}
+		);
+		std::cerr << "]" << std::endl;
+	}
 	#endif
 
 	switch (curStat)
@@ -86,7 +111,7 @@ void vuu::LenCounter::operator()(char c)
 			if (!charBits.test(7)) // Byte 1: 0xxxxxxx
 			{
 				#ifdef DEBUG
-				std::cout << "\tSingle-byte codepoint" << std::endl;
+				std::cerr << "\tSingle-byte codepoint" << std::endl;
 				#endif
 				++ncp; // Single-byte code-point
 			}
@@ -94,7 +119,7 @@ void vuu::LenCounter::operator()(char c)
 			else if (charBits.test(7) && charBits.test(6) && !charBits.test(5)) // Byte 1: 110xxxxx
 			{
 				#ifdef DEBUG
-				std::cout << "\t2-byte codepoint" << std::endl;
+				std::cerr << "\t2-byte codepoint" << std::endl;
 				#endif
 				curStat = twobyte_second; // Waiting for the second byte of a 2-byte code point
 			}
@@ -102,7 +127,7 @@ void vuu::LenCounter::operator()(char c)
 			else if (charBits.test(7) && charBits.test(6) && charBits.test(5) && !charBits.test(4)) // Byte 1: 1110xxxx
 			{
 				#ifdef DEBUG
-				std::cout << "\t3-byte codepoint" << std::endl;
+				std::cerr << "\t3-byte codepoint" << std::endl;
 				#endif
 				curStat = threebyte_second; // Waiting for the second byte of a 3-byte character
 			}
@@ -110,7 +135,7 @@ void vuu::LenCounter::operator()(char c)
 			else if (charBits.test(7) && charBits.test(6) && charBits.test(5) && charBits.test(4) && !charBits.test(3)) // Byte 1: 11110xxx
 			{
 				#ifdef DEBUG
-				std::cout << "\t4-byte codepoint" << std::endl;
+				std::cerr << "\t4-byte codepoint" << std::endl;
 				#endif
 				curStat = fourbyte_second; // Waiting for the second byte of a 4-byte code point
 			}
@@ -264,8 +289,25 @@ void vuu::LenCounter::operator()(char c)
 	++charPos; // We always increment the character (byte) position, regardless of the # of code-points read so far
 
 	#ifdef DEBUG
-	std::cout << "\tvuu::LenCounter::operator(): state at end = " << stateNames[curStat] << std::endl
-	<< "\tCharacter counter @ end = " << charPos << std::endl
+	try
+	{
+		std::cerr << "vuu::LenCounter::operator(): state at end = " << stateNames.at(curStat) << std::endl;
+	}
+
+	catch (std::out_of_range& stdoor)
+	{
+		std::cerr << "vuu::LenCounter::operator(): caught out_of_range while trying to print state at end." << std::endl
+		<< "\tMessage = " << stdoor.what() << std::endl;
+		std::cerr << "\tmap = [" << std::endl;
+		std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto curPair)
+			{
+				std::cerr << "\t(" << curPair.first << "," << curPair.second << ")" << std::endl;
+			}
+		);
+		std::cerr << "]" << std::endl;
+	}
+
+	std::cerr << "vuu::LenCounter::operator(): Character counter @ end = " << charPos << std::endl
 	<< "\t# of code-points @ end = " << ncp << std::endl;
 	#endif
 }
@@ -279,9 +321,67 @@ vuu::LenCounter::LenCounter(const vuu::LenCounter& other) :
 	ncp(other.ncp),
 	charPos(other.charPos)
 	#ifdef DEBUG
-	, stateNames(other.stateNames)
+	,stateNames(other.stateNames)
 	#endif
 {
+	#ifdef DEBUG
+	std::cerr << "vuu::LenCounter: copy constructor called." << std::endl;
+	std::cerr << "vuu::LenCounter::copy_constructor: before copying stateNames: stateNames = [";
+	std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto pair)
+		{
+			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
+		}
+	);
+
+	std::cerr << "]" << std::endl << "\tother.stateNames = [";
+	/*std::for_each(other.stateNames.cbegin(), other.stateNames.cend(), [](auto pair)
+		{
+			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
+		}
+	);*/
+
+	if (!other.stateNames.empty())
+	{
+		if (other.stateNames.cbegin() != other.stateNames.cend())
+		{
+			std::cerr << "\tother.stateNames.size() (unsigned) = " << other.stateNames.size() << std::endl;
+			std::cerr << "\tother.stateNames.size() (int) = " << static_cast<long long>(other.stateNames.size()) << std::endl;
+
+			for (std::map<State, std::string>::const_iterator it = other.stateNames.cbegin(); it != other.stateNames.cend(); it++)
+			{
+					std::cerr << "()";
+			}
+		}
+
+		else
+		{
+			std::cerr << "No elements in map (begin() == end())" << std::endl;
+		}
+	}
+
+	else
+	{
+		std::cerr << "\tempty" << std::endl;
+	}
+
+	std::cerr << "]";/*
+
+	stateNames = other.stateNames;
+
+	std::cerr << "vuu::LenCounter::copy_constructor: after copying stateNames: stateNames = [" << std::endl;
+	std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto pair)
+		{
+			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
+		}
+	);
+	std::cerr << "]" << std::endl << "\tother.stateNames = [" << std::endl;
+	std::for_each(other.stateNames.cbegin(), other.stateNames.cend(), [](auto pair)
+		{
+			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
+		}
+	);
+	std::cerr << "]";*/
+	#endif
 }
 
 /**
@@ -293,9 +393,15 @@ vuu::LenCounter::LenCounter(vuu::LenCounter&& other) :
 	ncp(std::exchange(other.ncp, -1)),
 	charPos(std::exchange(other.charPos, -1))
 	#ifdef DEBUG
-	, stateNames(std::exchange(other.stateNames, std::map<State, std::string>()))
+	//, stateNames(std::exchange(other.stateNames, std::map<State, std::string>()))
+	, stateNames(other.stateNames)
 	#endif
 {
+	#ifdef DEBUG
+	std::cerr << "vuu::LenCounter: move constructor called." << std::endl;
+	/* Trying to use the move constructor with std::exchange failed, so I'll try copying and clearing the other object's map 
+	stateNames = other.stateNames;*/
+	#endif
 }
 
 /**
@@ -305,6 +411,10 @@ vuu::LenCounter::LenCounter(vuu::LenCounter&& other) :
 **/
 vuu::LenCounter& vuu::LenCounter::operator=(const vuu::LenCounter& other)
 {
+	#ifdef DEBUG
+	std::cerr << "vuu::LenCounter: copy assignment operator called." << std::endl;
+	#endif
+
 	if (this != &other)
 	{
 		curStat = other.curStat;
@@ -325,13 +435,18 @@ vuu::LenCounter& vuu::LenCounter::operator=(const vuu::LenCounter& other)
 */
 vuu::LenCounter& vuu::LenCounter::operator=(vuu::LenCounter&& other)
 {
+	#ifdef DEBUG
+	std::cerr << "vuu::LenCounter: move assignment operator called." << std::endl;
+	#endif
+
 	if (this != &other)
 	{
 		curStat = std::exchange(other.curStat, invalid_state);
 		ncp = std::exchange(other.ncp, -1);
 		charPos = std::exchange(other.charPos, -1);
 		#ifdef DEBUG
-		stateNames = std::exchange(other.stateNames, std::map<State, std::string>());
+		//stateNames = std::exchange(other.stateNames, std::map<State, std::string>());
+		stateNames = other.stateNames;
 		#endif
 		other.curStat = invalid_state;
 	}

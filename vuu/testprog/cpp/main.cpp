@@ -7,7 +7,7 @@
 /* Boost */
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::command_line_parser, boost::program_options::positional_options_description, boost::program_options::notify
 #include <boost/filesystem.hpp> // boost::filesystem::path, boost::filesystem::exists, boost::filesystem::ifstream
-#include <boost/locale.hpp> // boost::locale::generator, boost::locale::normalize
+//#include <boost/locale.hpp> // boost::locale::generator, boost::locale::normalize
 
 /* Our headers */
 #include "vuu/LenCounter.hpp" // Functor that counts the # of Unicode chars. in a string
@@ -45,14 +45,14 @@ int main(int argc, char* argv[])
 	#endif
 
 	/* Locale vars */
-	boost::locale::generator gen;
+	//boost::locale::generator gen;
 	vuu::LenCounter ulc; // Functor that counts the # of Unicode characters in an std::string
-	vuu::LenCounter ulc2; // Functor that counts the # of Unicode characters in an std::wstring
+	std::clog << "main: finished constructing ulc" << std::endl;
 
 	/* Set up locales */
-	gen.locale_cache_enabled(true);
+	/*gen.locale_cache_enabled(true);
 	gen("en_US.UTF-8"); // Add US locale
-	gen("ml_IN.UTF-8"); // Add Malayalam locale
+	gen("ml_IN.UTF-8"); // Add Malayalam locale*/
 
 	/* Declare options */
 	dispOpts.add_options()
@@ -118,11 +118,11 @@ int main(int argc, char* argv[])
 			std::wcout << L"File contents (wide): " << fContsW << std::endl
 			<< L"\tString length (wide): " << fContsW.length() << std::endl;
 
-			/* Normalize file contents for Malayalam */
+			/* Normalize file contents for Malayalam
 			std::string normFConts = boost::locale::normalize(fConts, boost::locale::norm_default, gen("ml_IN.UTF-8"));
 			std::wstring normFContsW = boost::locale::normalize(fContsW, boost::locale::norm_default, gen("ml_IN.UTF-8"));
 			std::cout.imbue(gen("ml_IN.UTF-8"));
-			std::wcout.imbue(gen("ml_IN.UTF-8"));
+			std::wcout.imbue(gen("ml_IN.UTF-8"));*/
 				
 			try
 			{
@@ -138,11 +138,11 @@ int main(int argc, char* argv[])
 				return COUNTERR;
 			}
 
-			std::cout << ourName << ": file contents (normalized): " << normFConts << std::endl
+			/*std::cout << ourName << ": file contents (normalized): " << normFConts << std::endl
 			<< "\tNumber of UTF-8 codepoints in the string: " << ulc.getNumCodePoints() << std::endl;
 			std::wcout << ourNameW << ": file contents (normalized, wide): " << normFContsW << std::endl
 			<< "\tNumber of UTF-8 codepoints in the string: " << ulc.getNumCodePoints() << std::endl;
-			//<< "\tString length: " << normFConts.length() << std::endl;
+			//<< "\tString length: " << normFConts.length() << std::endl;*/
 		}
 	}
 

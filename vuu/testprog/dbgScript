@@ -1,7 +1,4 @@
-#!/bin/bash
-
-for inpFile in ./inputs/* # Loop through each input
-do
-	./malStrLen-debug $inpFile
-	echo --------------------------------------------------------------------------------------------------------
-done
+set args --help
+run
+set args ./inputs/1
+run

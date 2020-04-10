@@ -64,8 +64,10 @@ namespace vuu
 			* @return This.
 			*/
 			LenCounter& operator=(LenCounter&& other);
-	
-		private:
+
+			/**
+			* The length-counter's current state.
+			**/
 			enum State
 			{
 				codepoint_start, // Expecting the first byte of the next codepoint
@@ -77,7 +79,8 @@ namespace vuu
 				fourbyte_fourth, // Expecting the fourth byte of a 4-byte codepoint
 				invalid_state // Invalid state for move constructor & assignment operator
 			};
-			
+	
+		private:
 			State curStat; // Current state
 			short ncp; // # of code points
 			short charPos; // Current position in CHAR stream, NOT code-point index

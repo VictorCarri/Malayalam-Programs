@@ -1,0 +1,4 @@
+#!/bin/bash
+
+time make
+gdb -x dbgScript ./malLenCounter-debug-dynamic
