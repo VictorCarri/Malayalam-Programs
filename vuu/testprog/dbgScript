@@ -1,7 +1,0 @@
-#!/bin/bash
-
-for inpFile in ./inputs/* # Loop through each input
-do
-	./malStrLen-debug $inpFile
-	echo --------------------------------------------------------------------------------------------------------
-done
