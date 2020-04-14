@@ -1,2 +1,0 @@
-This library handles the logic of the Malayalam Pluralisation Protocol.
-This directory also contains a test program that uses the logic library to parse a test "request".

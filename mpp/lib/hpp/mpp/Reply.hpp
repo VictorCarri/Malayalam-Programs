@@ -1,0 +1,75 @@
+#ifndef MPP_REPLY_HPP
+#define MPP_REPLY_HPP
+
+/* STL */
+#include <string> // std::string
+#include <vector> // std::vector
+#include <forward_list> // std::forward_list
+
+/* Boost */
+#include <boost/asio.hpp> // boost::asio::const_buffer
+
+/* Our header */
+#include "mpp/Header.hpp" // mpp::Header, to represent response headers
+
+namespace mpp
+{
+	/*
+	* Represents a reply to a request.
+	*/
+	class Reply
+	{
+		public:
+			enum Status // Reply status
+			{
+				/* OK (2xx) codes */
+				singular = 200, // Positive response to an ISSING query
+				plural, // Negative response to an ISSING query
+				pluralForm, // Responding to a FOF query with the plural form of singular input
+				singularForm, // Responding to a FOF query with the singular form of plural input
+
+				/* Client error (4xx) codes */
+				badReq = 400, // Malformed request
+				badMajor, // Bad major #
+				badMinor, // Bad minor #
+				badPatch, // Bad patch #
+				unknownVerb, // Unrecognised MPP verb
+				invMalChar, // Invalid Malayalam characters in input
+				invBool, // Invalid Boolean given in FOF query
+
+				/* Other */
+				invalid = -1 // Used when a Reply is default-constructed.
+			};
+	
+			/**
+			* @desc Sets a reply's status.
+			**/
+			void setStatus(Status s);
+
+			/**
+			* @desc Converts the Reply into a vector of buffers that Boost.Asio can send over the network.
+			*	The buffers don't own the underlying memory blocks.
+			*	Therefore, the Reply object must remain valid and
+			*	unchanged until the write operation has completed.
+			**/
+			std::vector<boost::asio::const_buffer> toBuffers();
+
+			/**
+			* @name Default constructor.
+			* @desc Constructs an invalid reply and sets up the status text map.
+			**/
+			Reply();
+
+			/**
+			* @desc Adds the given Header object to this Reply object's list of headers.
+			**/
+			void addHeader(mpp::Header toAdd);
+	
+		private:
+			std::map<Status, std::string> statText; // Text for each status
+			Status stat; // This reply's status
+			std::forward_list<mpp::Header> headers; // List of headers to send with the reply
+	};
+};
+
+#endif // MPP_REPLY_HPP

@@ -12,11 +12,11 @@
 #include <boost/system/error_code.hpp> // boost::system::error_code
 #include <boost/shared_ptr.hpp> // boost::shared_ptr
 
-/* Our headers */
-#include "ReqHandler.hpp" // Request handler
-#include "ReqParser.hpp" // Request parser
-#include "Request.hpp" // Represents a request
-#include "Reply.hpp" // Represents a reply
+/* Our headers - Malayalam Pluralisation Protocol library */
+#include "mpp/ReqHandler.hpp" // Request handler
+#include "mpp/ReqParser.hpp" // Request parser
+#include "mpp/Request.hpp" // Represents a request
+#include "mpp/Reply.hpp" // Represents a reply
 
 class Connection : public boost::enable_shared_from_this<Connection>,
 			private boost::noncopyable
@@ -27,13 +27,13 @@ class Connection : public boost::enable_shared_from_this<Connection>,
 		* @param io_context The io_context to use.
 		* @param handler The request handler object to use.
 		**/
-		explicit Connection(boost::asio::io_context& io_context, ReqHandler& handler);
+		explicit Connection(boost::asio::io_context& io_context, mpp::ReqHandler& handler);
 	
 		/**
 		* @desc Fetches the socket associated with this Connection.
 		* @return The socket associated with this Connection.
 		**/	
-		boost::asio::ip::tcp::socket& socket();
+		boost::asio::ip::tcp::socket& getSocket();
 
 		/**
 		* @desc Starts the first asynchronous operation for the connection.
@@ -56,11 +56,11 @@ class Connection : public boost::enable_shared_from_this<Connection>,
 		void handleWrite(const boost::system::error_code& e);
 
 		boost::asio::ip::tcp::socket socket; // We listen on this
-		ReqHandler& reqHandler; // Parses requests
+		mpp::ReqHandler& reqHandler; // Parses requests
 		std::array<wchar_t, 8192> buffer; // Stores data read from the socket
-		RequestParser reqParser;
-		Request req;
-		Reply rep;
+		mpp::ReqParser reqParser;
+		mpp::Request req;
+		mpp::Reply rep;
 };
 
 typedef boost::shared_ptr<Connection> ConnectionPtr;

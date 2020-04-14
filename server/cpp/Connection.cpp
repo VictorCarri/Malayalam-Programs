@@ -3,9 +3,10 @@
 #include <boost/logic/tribool.hpp> // boost::tribool
 #include <boost/tuple/tuple.hpp> // boost::tie, boost::tuples::ignore
 #include <boost/system/error_code.hpp> // boost::system::error_code
+#include <boost/bind.hpp> // boost::bind
 
 /* Our headers */
-#include "ReqHandler.hpp" // Request handler class
+#include "mpp/ReqHandler.hpp" // Request handler class
 #include "Connection.hpp" // Class def
 
 /**
@@ -13,7 +14,7 @@
 * @param io_context The io_context to use.
 * @param handler The request handler object to use.
 **/
-Connection::Connection(boost::asio::io_context& io_context, ReqHandler& handler) :
+Connection::Connection(boost::asio::io_context& io_context, mpp::ReqHandler& handler) :
 	socket(io_context),
 	reqHandler(handler)
 {
@@ -23,7 +24,7 @@ Connection::Connection(boost::asio::io_context& io_context, ReqHandler& handler)
 * @desc Fetches the socket associated with this Connection.
 * @return The socket associated with this Connection.
 **/	
-boost::asio::ip::tcp::socket& Connection::socket()
+boost::asio::ip::tcp::socket& Connection::getSocket()
 {
 	return socket;
 }
@@ -38,7 +39,7 @@ void Connection::start()
 			buffer
 		),
 		boost::bind(
-			&Connection::handle_read,
+			&Connection::handleRead,
 			shared_from_this(),
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred
@@ -60,12 +61,12 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 		boost::tie(result, boost::tuples::ignore) = reqParser.parse(
 			req,
 			buffer.data(),
-			buffer.data() + bytes_transferred
+			buffer.data() + bytesTransferred
 		);
 
 		if (result) // The parser successfully parsed an entire request
 		{
-			rep.setFailedReason(reqParser.getFailedReason());
+			rep.setStatus(reqParser.getStatus());
 			reqHandler.handleReq(req, rep); // Handle a request - generate a reply according to what the client requested
 			boost::asio::async_write(
 				socket,
@@ -81,12 +82,12 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 		else if (!result) // Malformed request
 		{
 			//reply = Reply::stockReply(Reply::badRequest); // Generate a stock reply
-			reply = Reply::stockReply(reqParser.badStat());
+			rep = mpp::Reply::stockReply(reqParser.getStatus()); // Generate a stock reply using the error code which the parser identified
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
 				boost::bind(
-					&Connection::handle_write,
+					&Connection::handleWrite,
 					shared_from_this(),
 					boost::asio::placeholders::error
 				)
@@ -125,7 +126,7 @@ void Connection::handleWrite(const boost::system::error_code& e)
 	{
 		/* Close the connection gracefully */
 		boost::system::error_code ignoredEc;
-		socket.shutdown(boost::asio::ip::tcp::socket:shutdown_both);
+		socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 	}
 
 	/*
