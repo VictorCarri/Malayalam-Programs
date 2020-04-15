@@ -9,6 +9,7 @@
 /* Our headers */
 #include "mpp/Reply.hpp" // Class def'n
 #include "mpp/ver.hpp" // MPP protocol version
+#include "functors/HeaderBufferAdder.hpp"
 
 /**
 * @name Default constructor.
@@ -57,7 +58,7 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 {
 	std::vector<boost::asio::const_buffer> buffers;
 	buffers.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
-	std::for_each(headers.cbegin(), headers.cend(), HeaderAdder(&buffers, headers)); // Add one buffer containing the header's text for each header
+	std::for_each(headers.cbegin(), headers.cend(), mpp::functors::HeaderBufferAdder(&buffers)); // Add one buffer containing the header's text for each header
 }
 
 /**

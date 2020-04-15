@@ -27,6 +27,30 @@ namespace mpp
 			**/
 			std::string getValue() const;
 
+			/**
+			* @desc Copy constructor.
+			* @param other The other Header object to copy values from.
+			**/
+			Header(const Header& other);
+
+			/**
+			* @desc Move constructor.
+			* @param other The other Header object to move values from.
+			**/
+			Header(Header&& other);
+
+			/**
+			* @desc Copy assignment operator.
+			* @param other The other Header object to copy values from.
+			**/
+			Header& operator=(const Header& other);
+
+			/**
+			* @desc Move assignment operator.
+			* @param other THe other Header object to move values from.
+			**/
+			Header& operator=(Header&& other);
+
 		private:
 			std::string _name;
 			std::string _value;

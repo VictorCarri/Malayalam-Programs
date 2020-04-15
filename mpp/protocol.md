@@ -3,8 +3,8 @@ Requests
 A request will be of the form:
 	
 	MPP/1.0{space}{verb}\r\n
-	Content-Length:{space}{integer}
-	{arg}\r\n...
+	Content-Length:{space}{integer}\r\n\r\n
+	{arg}\r\n\r\n...
 
 {verb} refers to the action which the server should perform and {arg} refers to any arguments which the server requires.
 Each line will be separated by \r\n.
