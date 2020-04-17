@@ -64,11 +64,46 @@ namespace mpp
 			* @desc Adds the given Header object to this Reply object's list of headers.
 			**/
 			void addHeader(mpp::Header toAdd);
+
+			/**
+			* @desc Copy constructor.
+			* @param other Other Reply object to copy from.
+			**/
+			Reply(const Reply& other);
+
+			/**
+			* @desc Copy assignment operator.
+			* @param other Other Reply object to copy from.
+			* @return this
+			**/
+			Reply& operator=(const Reply& other);
+
+			/**
+			* @desc Move constructor.
+			* @param other Other Reply object to move from.
+			**/
+			Reply(Reply&& other);
+
+			/**
+			* @desc Move assignment operator.
+			* @param other Other Reply object to move from.
+			* @return this
+			**/
+			Reply& operator=(Reply&& other);
+
+			/**
+			* @desc Fetches the string associated with the given status.
+			* @param s THe status to fetch a string for.
+			**/
+			std::string getStatText(Status s);
 	
 		private:
 			std::map<Status, std::string> statText; // Text for each status
 			Status stat; // This reply's status
 			std::forward_list<mpp::Header> headers; // List of headers to send with the reply
+			//const char crlf[] = { '\r', '\n' };
+			const char crlf[2];
+			std::string content;
 	};
 };
 

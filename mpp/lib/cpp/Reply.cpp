@@ -2,6 +2,7 @@
 #include <string> // std::string
 #include <sstream> // std::ostringstream
 #include <algorithm> // std::for_each
+#include <utility> // std::exchange, std::move
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
@@ -9,13 +10,18 @@
 /* Our headers */
 #include "mpp/Reply.hpp" // Class def'n
 #include "mpp/ver.hpp" // MPP protocol version
-#include "functors/HeaderBufferAdder.hpp"
+#include "mpp/functors/HeaderBufferAdder.hpp"
 
 /**
 * @name Default constructor.
 * @desc Constructs an invalid reply and sets up the status text map.
 **/
-mpp::Reply::Reply() : stat(invalid)
+mpp::Reply::Reply() :
+	stat(invalid),
+	headers{},
+	statText{},
+	content(""),
+	crlf {'\r', '\n'}
 {
 	std::ostringstream verSS; // Used to build version string
 	verSS << "MPP/" << mpp::VER_MAJOR << mpp::VER_MINOR << mpp::VER_PATCH << " ";
@@ -59,6 +65,8 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 	std::vector<boost::asio::const_buffer> buffers;
 	buffers.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
 	std::for_each(headers.cbegin(), headers.cend(), mpp::functors::HeaderBufferAdder(&buffers)); // Add one buffer containing the header's text for each header
+	buffers.push_back(boost::asio::buffer(crlf));
+	buffers.push_back(content);
 }
 
 /**
@@ -67,4 +75,73 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 void mpp::Reply::addHeader(mpp::Header toAdd)
 {
 	headers.push_front(toAdd);
+}
+
+/**
+* @desc Copy constructor.
+* @param other Other Reply object to copy from.
+**/
+mpp::Reply::Reply(const Reply& other) :
+	statText(other.statText),
+	stat(other.stat),
+	headers(other.headers),
+	content(other.content)
+{
+}
+
+/**
+* @desc Copy assignment operator.
+* @param other Other Reply object to copy from.
+* @return this
+**/
+mpp::Reply& operator=(const mpp::Reply& other)
+{
+	if (&other == this)
+		return *this;
+
+	statText = other.statText;
+	stat = other.stat;
+	headers = other.headers;
+	content = other.content;
+
+	return *this;
+}
+
+/**
+* @desc Move constructor.
+* @param other Other Reply object to move from.
+**/
+mpp::Reply::Reply(Reply&& other) :
+	statText(std::move(other.statText)),
+	stat(std::exchange(other.stat, invalid)),
+	headers(std::move(other.headers)),
+	content(std::move(other.content))
+{
+}
+
+/**
+* @desc Move assignment operator.
+* @param other Other Reply object to move from.
+* @return this
+**/
+mpp::Reply& mpp::Reply::operator=(mpp::Reply&& other)
+{
+	if (&other == this)
+		return *this;
+
+	statText = std::move(other.statText);
+	stat = std::exchange(other.stat, invalid);
+	headers = std::move(other.headers);
+	content = std::move(other.content);
+
+	return *this;
+}
+
+/**
+* @desc Fetches the string associated with the given status.
+* @param s THe status to fetch a string for.
+**/
+std::string mpp::Reply::getStatText(mpp::Reply::Status s)
+{
+	return statText[s];
 }

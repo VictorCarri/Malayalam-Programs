@@ -12,11 +12,16 @@
 #include <boost/asio.hpp> // boost::asio::signal_set, boost:asio::ip::tcp::acceptor
 #include <boost/system/error_code.hpp> // boost::system::error_code
 
-/* Our headers */
-#include "IoContextPool.hpp" // io_context pool
-#include "Connection.hpp" // Represents a connection
-#include "ReqHandler.hpp" // Handles a request
+/* MPP headers */
+#include "mpp/ReqHandler.hpp" // Handles a request
 
+/* Our headers */
+#include "IoContextPool.hpp" // IoContextPool
+#include "Connection.hpp" // ConnectionPtr
+
+/**
+* This class defines the MPP server and everything to do with it.
+**/
 class Server : private boost::noncopyable
 {
 	public:
@@ -53,7 +58,7 @@ class Server : private boost::noncopyable
 		boost::asio::signal_set signals; // Used to receive signals
 		boost::asio::ip::tcp::acceptor acceptor; // Used to listen for incoming connections
 		ConnectionPtr newConn; // Pointer to a new connection
-		ReqHandler reqHandler; // Handdles a request
+		mpp::ReqHandler reqHandler; // Handdles a request
 };
 
 #endif // SERVER_HPP

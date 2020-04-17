@@ -18,14 +18,21 @@ namespace mpp
 		{
 			public:
 				/**
-				* @desc Constructor. Stores a reference to the
+				* @desc Constructor. Stores a reference to the vector to be modified.
+				* @param bufs A reference to the vector to be modified.
 				**/
 				HeaderBufferAdder(std::vector<boost::asio::const_buffer>& bufs);
 
+				/**
+				* @desc Function call operator. Adds the given Header object $h to the vector of buffers $bufs.
+				* @param h The Header to add to the vector of buffers.
+				**/
 				void operator()(mpp::Header h);
 
 			private:
 				std::vector<boost::asio::const_buffer>& buffers; // A reference to the vector that we modify
+				char nameValSep[2];
+				char crlf[2];
 		};
 	};
 };

@@ -1,6 +1,6 @@
 exeName=malPlSrv
 cppDir=./cpp
-files=IoContextPool Connection Server main
+files=$(addprefix functors/,$(addprefix Thread,Creator Joiner) IOCStopper) IoContextPool Connection Server main
 compiler=g++-8
 objDir=./obj
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))

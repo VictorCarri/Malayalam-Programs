@@ -5,20 +5,17 @@
 #include <stdexcept> // std::runtime_error
 #include <vector> // std::vector
 #include <algorithm> // std::for_each
-#include <memory> // std::shared_ptr
-#include <thread> // std::thread
-//#include <functional> // std::bind
 #ifdef DEBUG
 #include <iostream> // std::clog
 #endif
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::make_work_guard
-//#include <boost/thread.hpp> // boost::thread
-//#include <boost/shared_ptr.hpp> // boost::shared_ptr
-#include <boost/bind.hpp> // boost::bind
 
 /* Our headers */
+#include "functors/ThreadCreator.hpp" // functors::ThreadCreator, to create the Threads we need
+#include "functors/ThreadJoiner.hpp" // functors::ThreadJoiner, to wait for threads to join
+#include "functors/IOCStopper.hpp" // functors::IOCStopper, to stop all threads
 #include "IoContextPool.hpp" // Class def
 
 /**
@@ -29,7 +26,7 @@ IoContextPool::IoContextPool(std::size_t poolSize) : nextIoCon(0)
 {
 	if (poolSize <= 0) // We need a positive integer
 	{
-		throw std::runtime_error("io_context pool size is <= 0.");
+		throw std::runtime_error("IoContextPool::IoContextPool(std::size_t poolSize): pool size is <= 0.");
 	}
 	
 	/*
@@ -54,23 +51,22 @@ IoContextPool::IoContextPool(std::size_t poolSize) : nextIoCon(0)
 **/
 void IoContextPool::run()
 {
-	//std::vector<boost::shared_ptr<boost::thread>> threads;
-	std::vector<std::shared_ptr<std::thread>> threads;
-	#ifdef DEBUG
+	std::vector<SHARED_PTR<THREAD_CLASS>> threads;
+	/*#ifdef DEBUG
 	short threadNum = 0;
 	#endif
 
-	/* Create a pool of threads to run each io_context */
-	#ifdef DEBUG
+	*//* Create a pool of threads to run each io_context */
+	/*#ifdef DEBUG
 	std::for_each(ioContexts.cbegin(), ioContexts.cend(), [&threads, &threadNum](iocPtr ptr)
 	#else
 	std::for_each(ioContexts.cbegin(), ioContexts.cend(), [&threads](iocPtr ptr)
 	#endif
 		{
-			//boost::shared_ptr<boost::thread> thread(
-			std::shared_ptr<std::thread> thread(
-				//new boost::thread(
-				new std::thread(
+			boost::shared_ptr<boost::thread> thread(
+			//std::shared_ptr<std::thread> thread(
+				new boost::thread(
+				//new std::thread(
 					boost::bind(
 					//std::bind(
 						&boost::asio::io_context::run,
@@ -88,15 +84,17 @@ void IoContextPool::run()
 
 	#ifdef DEBUG
 	threadNum = 0; // Reset index for next loop
-	#endif
+	#endif*/
+	std::for_each(ioContexts.cbegin(), ioContexts.cend(), functors::ThreadCreator(&threads)); // Create the threads
 
 	/* Wait for all threads to exit */
-	#ifdef DEBUG
-	//std::for_each(threads.cbegin(), threads.cend(), [&threadNum](boost::shared_ptr<boost::thread> ptr)
-	std::for_each(threads.cbegin(), threads.cend(), [&threadNum](std::shared_ptr<std::thread> ptr)
+	/*#ifdef DEBUG
+	std::for_each(threads.cbegin(), threads.cend(), [&threadNum](boost::shared_ptr<boost::thread> ptr)
+	//std::for_each(threads.cbegin(), threads.cend(), [&threadNum](std::shared_ptr<std::thread> ptr)
 	#else
-	//std::for_each(threads.cbegin(), threads.cend(), [](boost::shared_ptr<boost::thread> ptr)
-	std::for_each(threads.cbegin(), threads.cend(), [](std::shared_ptr<std::thread> ptr)
+	std::for_each(threads.cbegin(), threads.cend(), [](boost::shared_ptr<boost::thread> ptr)
+	//std::for_each(threads.cbegin(), threads.cend(), [](std::shared_ptr<std::thread> ptr)
+	//std::for_each(threads.cbegin(), threads.cend(), [](std::shared_ptr<boost::thread> ptr)
 	#endif
 		{
 			ptr->join();
@@ -105,7 +103,8 @@ void IoContextPool::run()
 			++threadNum;
 			#endif
 		}
-	);
+	);*/
+	std::for_each(threads.cbegin(), threads.cend(), functors::ThreadJoiner());
 }
 
 /**
@@ -118,7 +117,7 @@ void IoContextPool::stop()
 	#endif
 
 	// Explicitly stop all io_contexts
-	#ifdef DEBUG
+	/*#ifdef DEBUG
 	std::for_each(ioContexts.cbegin(), ioContexts.cend(), [&threadNum](iocPtr ptr)
 	#else
 	std::for_each(ioContexts.cbegin(), ioContexts.cend(), [](iocPtr ptr)
@@ -130,7 +129,8 @@ void IoContextPool::stop()
 			++threadNum;
 			#endif
 		}
-	);
+	);*/
+	std::for_each(ioContexts.cbegin(), ioContexts.cend(), functors::IOCStopper());
 }
 
 /**
@@ -143,7 +143,8 @@ boost::asio::io_context& IoContextPool::getIoc()
 	#ifdef DEBUG
 	std::clog << "IoContextPool::getIoc: current index is " << nextIoCon << std::endl;
 	#endif
-	boost::asio::io_context& ioc = *ioContexts[nextIoCon];
+	//boost::asio::io_context& ioc = *ioContexts[nextIoCon];
+	boost::asio::io_context& ioc = *ioContexts.at(nextIoCon);
 	nextIoCon = (nextIoCon + 1) % ioContexts.size(); // Increment index, but reset to 0 if it passes the size of the vector
 	#ifdef DEBUG
 	std::clog << "IoContextPool::getIoc: index after increment & mod is " << nextIoCon << std::endl;

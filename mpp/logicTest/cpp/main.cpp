@@ -12,10 +12,10 @@
 #include <boost/filesystem.hpp> // boost::filesystem::path, boost::filesystem::exists
 
 /* Our headers */
-#include "Request.hpp" // Request object
-#include "Reply.hpp" // Reply::FailureCode
-#include "ReqParser.hpp" // Request parser object
-#include "CharPrinter.hpp" // Character printer functor
+#include "mpp/Request.hpp" // Request object
+#include "mpp/Reply.hpp" // Reply::FailureCode
+#include "mpp/ReqParser.hpp" // Request parser object
+#include "mpp/CharPrinter.hpp" // Character printer functor
 
 #define COMLEN 100 // Length of a command
 #define INPLEN 200 // Length of input
@@ -33,8 +33,8 @@ enum ExitCode
 
 int main(int argc, char* argv[])
 {
-	Request req; // Test object
-	ReqParser reqParser; // Parses a request
+	mpp::Request req; // Test object
+	mpp::ReqParser reqParser; // Parses a request
 	/*int curInd = 0; // Current index into buffer
 	std::array<char, COMLEN> command; // Holds a command for use with getline
 	std::array<char, INPLEN> input; // Holds input string
@@ -119,8 +119,9 @@ int main(int argc, char* argv[])
 		else if (!result)
 		{
 			std::cout << ourName << ": Error occurred while parsing request." << std::endl;
-			Reply::FailureCode errReason = reqParser.getFailedReason();
-			std::string reasonStr = Reply::getFCString(errReason);
+			mpp::Reply::FailureCode errReason = reqParser.getFailedReason();
+			mpp::Reply temp;
+			std::string reasonStr = temp.getStatText(errReason);
 			std::cout << reasonStr << std::endl;
 			return BADREQ;
 		}

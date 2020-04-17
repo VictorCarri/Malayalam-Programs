@@ -1,11 +1,11 @@
 cppDir=./cpp
 compiler=g++-8
 objDir=./obj
-objs=$(addprefix $(objDir)/,$(addsuffix .o,Reply ReqParser Request CharPrinter main))
+objs=$(addprefix $(objDir)/,$(addsuffix .o,main))
 hdrDir=./hpp
 compOpts=-I$(hdrDir) -save-temps -DDEBUG -ggdb3
 exeName=parserTest
-libDirs=$(addprefix -L/usr/local/lib/,boost icu)
+libDirs=$(addprefix -L,$(addprefix /usr/local/lib/,boost icu) /home/victor/lib)
 libs=$(addprefix -l,boost_program_options-mt-d-x64 boost_locale-mt-d-x64 boost_filesystem-mt-d-x64 $(addprefix icu,data i18n io test tu uc))
 
 $(exeName): $(objs)
@@ -13,8 +13,6 @@ $(exeName): $(objs)
 
 $(objDir)/%.o: $(cppDir)/%.cpp
 	$(compiler) -o $@ -c $^ $(compOpts)
-
-#$(cppDir)/ReqParser.cpp: $(cppDir)/ReqParser.hpp
 
 clean:
 	rm -f $(exeName) $(objs)

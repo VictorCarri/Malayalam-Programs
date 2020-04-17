@@ -18,6 +18,9 @@
 #include "mpp/Request.hpp" // Represents a request
 #include "mpp/Reply.hpp" // Represents a reply
 
+/**
+* This class is templated so that any protocol's classes can be used with this.
+**/
 class Connection : public boost::enable_shared_from_this<Connection>,
 			private boost::noncopyable
 {
@@ -62,6 +65,3 @@ class Connection : public boost::enable_shared_from_this<Connection>,
 		mpp::Request req;
 		mpp::Reply rep;
 };
-
-typedef boost::shared_ptr<Connection> ConnectionPtr;
-#endif // CONNECTION_HPP

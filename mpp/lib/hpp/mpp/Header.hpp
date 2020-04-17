@@ -51,6 +51,11 @@ namespace mpp
 			**/
 			Header& operator=(Header&& other);
 
+			/**
+			* @desc Default constructor.
+			**/
+			Header();
+
 		private:
 			std::string _name;
 			std::string _value;
