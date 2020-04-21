@@ -10,9 +10,10 @@
 
 /* Boost */
 #include <boost/bind.hpp> // boost::bind
-#include <boost/asio.hpp> // boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::acceptor::reuse_address, boost::asio::placeholders::error
+//#include <boost/asio.hpp> // boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::acceptor::reuse_address, boost::asio::placeholders::error
 
 /* Our headers */
+#include "BindFunc.hpp" // Defines the macro BIND_FUNCTION, that resolves to either boost::bind or std::bind
 #include "Connection.hpp" // Connection class
 #include "Server.hpp" // Class definition
 
@@ -37,7 +38,8 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	#ifdef SIGQUIT
 	signals.add(SIGQUIT);
 	#endif
-	signals.async_wait(boost::bind(&Server::handleStop, this));
+	//signals.async_wait(boost::bind(&Server::handleStop, this));
+	signals.async_wait(BIND_FUNCTION(&Server::handleStop, this));
 
 	/* Convert the port # to an std::string */
 	std::stringstream portNumSS;
@@ -87,7 +89,8 @@ void Server::startAccept()
 	);
 	acceptor.async_accept(
 		newConn->socket(),
-		boost::bind(
+		//boost::bind(
+		BIND_FUNCTION(
 			&Server::handleAccept,
 			this,
 			boost::asio::placeholders::error

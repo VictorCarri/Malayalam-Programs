@@ -1,10 +1,14 @@
 /* Standard C++ */
-#include <locale> // std::isdigit, std::isspace, std::isalpha, std::toupper
-#include <algorithm> // std::find_if
+#include <locale> // std::isdigit, std::isspace, std::isalpha, std::toupper, std::tolower, std::isalnum
+#include <algorithm> // std::find_if, std::for_each
 #include <string> // std:wstring
+#include <exception> // std::runtime_error
+#include <sstream> // std::ostringstream
+#include <memory> // std::make_unique
 
 #ifdef DEBUG
 #include <iostream> // std::cout, std::wcout
+#include <ostream> // std::wostream
 #endif
 
 /* Boost */
@@ -14,6 +18,10 @@
 #include "mpp/Reply.hpp" // Reply::FailureCode, to indicate why the parser failed
 #include "mpp/Request.hpp" // Request class
 #include "mpp/ver.hpp" // Protocol version info
+#include "mpp/functors/Printer.hpp" // Functor that prints each item in a list. It is ASSUMED that the object passed to operator() implements operator<<
+#include "mpp/functors/VerbChecker.hpp" // Functor that checks if a given character matches the first character of a given verb
+#include "mpp/functors/PtrResetter.hpp" // Functor that resets pointers
+#include "mpp/Header.hpp" // Represents a request header
 #include "mpp/ReqParser.hpp" // Class def'n
 
 /**
@@ -21,7 +29,11 @@
 **/
 mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start state
 	version {mpp::VER_MAJOR, mpp::VER_MINOR, mpp::VER_PATCH},
-	verbs {L"ISSING", L"FOF"}
+	verbs {L"ISSING", L"FOF"},
+	nrns(1),
+	pNounSS(new std::stringstream),
+	pSSHeaderName(new std::stringstream),
+	pSSHeaderVal(new std::stringstream)
 {
 	/*version = {VER_MAJOR, VER_MINOR, VER_PATCH}; // Initialise version info
 	verbs = {L"ISSING", L"FOF"}; // Initialise array of recognised verbs*/
@@ -43,17 +55,18 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	stateNames[issing_second_i] = "issing_second_i";
 	stateNames[issing_n] = "issing_n";
 	stateNames[issing_g] = "issing_g";
-	stateNames[space] = "space";
-	stateNames[header_start] = "header_start";
+	stateNames[backslash_r_after_verb] = "backslash_r_after_verb";
+	stateNames[backslash_n_after_verb] = "backslash_n_after_verb";
 
 	std::cout << "ReqParser::ReqParser: starting state = " << stateNames[curStat] << std::endl
 	<< "Version = " << version.at(0) << "." << version.at(1) << "." << version.at(2) << std::endl
 	<< "Recognised verbs = ";
-	std::for_each(verbs.cbegin(), verbs.cend()-1, [](std::wstring s)
+	/*std::for_each(verbs.cbegin(), verbs.cend()-1, [](std::wstring s)
 		{
 			std::wcout << s << L",";
 		}
-	);
+	);*/
+	std::for_each(verbs.cbegin(), verbs.cend()-1, mpp::functors::Printer<std::wstring, std::wostream>(std::wcout));
 	std::wcout << verbs.at(verbs.size()-1) << std::endl;
 	#endif
 	
@@ -61,6 +74,12 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	gen.locale_cache_enabled(true);
 	gen("en_US.UTF-8"); // Add US English
 	gen("ml_IN.UTF-8"); // Add Malayalam
+
+	/* Create stringstream pointers */
+	for (short i = 0; i < verSS.size(); i++)
+	{
+		verSS[i] = std::make_unique<std::wstringstream>(); // Create a pointer to a stringstream
+	}
 }
 
 /**
@@ -73,6 +92,11 @@ void mpp::ReqParser::reset()
 	#ifdef DEBUG
 	std::cout << "ReqParser::reset: reset to state " << stateNames[curStat] << std::endl;
 	#endif
+
+	std::for_each(verSS.begin(), verSS.end(), PtrResetter()); // Reset the unique_ptrs
+	pSSHeaderName.reset(new std::stringstream); // Reset the header stringstream
+	pSSHeaderVal.reset(new std::stringstream); // Reset the header stringstream
+	pNounSS.reset(new std::stringstream);
 }
 
 /**
@@ -177,7 +201,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 		{
 			if (std::isdigit(input, usLoc)) // The current character is a digit
 			{
-				verSS[0] << input; // Append it to the end of the current version #
+				*verSS[0] << input; // Append it to the end of the current version #
 				toReturn = boost::indeterminate; // Keep parsing
 			}
 
@@ -188,7 +212,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 				#endif
 
 				short readVerNum; // Holds the version # which we read, for comparison
-				verSS[0] >> readVerNum; // Convert string to num
+				*verSS[0] >> readVerNum; // Convert string to num
 	
 				#ifdef DEBUG
 				std::cout << "ReqParser::consume->case major: readVerNum = " << readVerNum << ", version[0] = " << version[0] << std::endl;
@@ -224,14 +248,14 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 				#ifdef DEBUG
 				#endif
 
-				verSS[1] << input; // Append it to the end of the current version #
+				*verSS[1] << input; // Append it to the end of the current version #
 				toReturn = boost::indeterminate; // Keep parsing
 			}
 
 			else if (input == '.') // Finished reading minor #
 			{
 				short readVerNum; // Holds the version # which we read, for comparison
-				verSS[1] >> readVerNum; // Convert string to num
+				*verSS[1] >> readVerNum; // Convert string to num
 
 				#ifdef DEBUG
 				std::cout << "ReqParser::consume: minor ver # = " << readVerNum << std::endl;
@@ -268,7 +292,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 				std::cout << "' is a digit in the locale " << usLoc.name() << std::endl;
 				#endif
 
-				verSS[2] << input; // Append it to the end of the current version #
+				*verSS[2] << input; // Append it to the end of the current version #
 				toReturn = boost::indeterminate; // Keep parsing
 			}
 
@@ -280,7 +304,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 				#endif
 
 				short readVerNum; // Holds the version # which we read, for comparison
-				verSS[2] >> readVerNum; // Convert string to num
+				*verSS[2] >> readVerNum; // Convert string to num
 
 				#ifdef DEBUG
 				std::cout << "ReqParser::consume: patch # = " << readVerNum << std::endl;
@@ -331,7 +355,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 				std::wcout << L"ReqParser::consume: uppercase input is '" << upper << "'" << std::endl;
 				#endif
 
-				std::array<std::wstring, 2>::const_iterator verbIt = std::find_if(verbs.cbegin(), verbs.cend(), [=](std::wstring verb)
+/*				std::array<std::wstring, 2>::const_iterator verbIt = std::find_if(verbs.cbegin(), verbs.cend(), [=](std::wstring verb)
 					{
 						#ifdef DEBUG
 						std::wcout << L"ReqParser::consume: comparing first character of verb \"" << verb << L"\" to uppercase char '" << upper << L"'" << std::endl;
@@ -339,10 +363,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 
 						if (verb[0] == upper) // Found a match
 						{
-							#ifdef DEBUG
-							std::wcout << L"ReqParser::consume: matched verb \"" << verb << "\"" << std::endl;
-							#endif
-
+							#ifdef DEBUG std::wcout << L"ReqParser::consume: matched verb \"" << verb << "\"" << std::endl; #endif 
 							return true;
 						}
 			
@@ -355,7 +376,13 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 							return false;
 						}
 					}
-				);
+				);*/
+
+				#ifdef DEBUG
+				std::array<std::wstring, 2>::const_iterator verbIt = std::find_if(verbs.cbegin(), verbs.cend(), mpp::functors::VerbChecker(upper, "ReqParser::consume")); // Use a name to label debugging messages. This constructor of VerbChecker only exists in debug builds
+				#else
+				std::array<std::wstring, 2>::const_iterator verbIt = std::find_if(verbs.cbegin(), verbs.cend(), mpp::functors::VerbChecker(upper));
+				#endif
 
 				if (verbIt == verbs.cend()) // No matching verb found
 				{
@@ -444,7 +471,8 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 		{
 			if (std::toupper(input, usLoc) == L'F') // Correct
 			{
-				curStat = space; // Need to skip the space which follows
+				req.SETCOM_FUNC(Request::FOF); // We have received a valid command, so we can set it
+				curStat = backslash_r_after_verb;
 				toReturn = boost::indeterminate;
 			}
 
@@ -541,7 +569,8 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 		{
 			if (std::toupper(input, usLoc) == L'G') // Correct
 			{
-				curStat = space; // A space should follow this command
+				req.SETCOM_FUNC(Request::ISSING); // We have received a valid command, so we can set it
+				curStat = backslash_r_after_verb; // Expecting a \r
 				toReturn = boost::indeterminate;
 			}
 
@@ -554,50 +583,145 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 			break;
 		}
 
-		case space: // Expecting a space char.
+		case backslash_r_after_verb: // Expecting '\r' after verb
 		{
-			#ifdef DEBUG
-			std::cout << "ReqParser::consume: at start of state \"" << stateNames[curStat] << "\"" << std::endl;
-			#endif
-
-			if (std::isspace(input, usLoc)) // Space character
+			if (input == '\r') // Correct
 			{
-				#ifdef DEBUG
-				std::wcout << "ReqParser::consume->switch(curStat)->case space: input (" << input << ") is a space character in the US locale." << std::endl;
-				#endif
-
-				switch (prevStat) // What did we parse before this?
-				{
-					case fof_f: // Parsing a "FOF" command
-					{
-						req.setCommand(Request::FOF);
-						break;
-					}
-
-					case issing_g: // Parsing an "ISSING" command
-					{
-						req.setCommand(Request::ISSING);
-						break;
-					}
-				}
-
-				curStat = header_start;
-				toReturn = boost::indeterminate; // Need to continue parsing
+				curStat = backslash_n_after_verb;
+				toReturn = boost::indeterminate;
 			}
 
 			else // Error
 			{
 				status = Reply::badReq;
 				toReturn = false;
-
-				#ifdef DEBUG
-				std::wcout << "ReqParser::consume->switch(curStat)->case space: input (" << input << ") isn't a space character in the US locale." << std::endl
-				<< "\ttoReturn = " << toReturn << std::endl;
-				#endif
 			}
 
 			break;
-		} // case space
+		}
+
+		case backslash_n_after_verb: // Expecting '\n' after the verb
+		{
+			if (input == '\n') // Correct
+			{
+				curStat = header_name; // Reading a header name
+			}
+
+			else // Error
+			{
+				status = Reply::badReq;
+				toReturn = false;
+			}
+
+			break;
+		}
+
+		case header_name: // Reading the header's name
+		{
+			if (std::isalpha(input, usLoc) || input == L'-') // The header must contain only [a-zA-Z] and '-'
+			{
+				(*pSSHeaderName) << input; // Insert the input into the stream
+			}
+
+			else if (input == L':') // End of the header name
+			{
+				curStat = space_after_header_name; // Expect a single space
+			}
+
+			else if (input == L'\r') // Start of a second \r\n sequence after headers - headers are over
+			{
+				curStat = backslash_n_after_headers; // Expect a second \n as part of the \r\n\r\n sequence that separates headers from content
+			}
+
+			else // Invalid char.
+			{
+				status = Reply::badReq;
+				toReturn = false;
+			}
+
+			break;
+		}
+
+		case space_after_header_name:
+		{
+			if (std::isspace(input, usLoc)) // Found a space
+			{
+				curStat = header_value; // Read the header's value next
+			}
+
+			else // Invalid char.
+			{
+				status = Reply::badReq;
+				toReturn = false;
+			}
+
+			break;
+		}
+
+		case header_value:
+		{
+			if (input == L'\r') // End of header's value
+			{
+				/* We can create and add the header now */
+				req.addHeader(pSSHeaderName->str(), pSSHeaderVal->str()); // Pass the Request object the name and value. It will create and add the Header object internally
+				curStat = backslash_n_after_header_value; // Need to read a \n to terminate the header's value
+
+				/* We need to know the length to read the noun, so check if this header is the content-length header */
+				if (pSSHeaderName->str() == "Content-Length") // Yes, we need this header
+				{
+					(*pSSHeaderVal) >> mNBytes; // Read the # of bytes
+				}
+			}
+
+			else // Part of header's value
+			{
+				(*pSSHeaderVal) << input; // Save it
+			}
+
+			break;
+		}
+
+		case backslash_n_after_header_value: // Expecting \n
+		{
+			if (input == L'\n') // Found it
+			{
+				curStat = header_name; // In case there are more headers
+			}
+
+			else // Error
+			{
+				status = Reply::badReq;
+				toReturn = false;
+			}
+
+			break;
+		}
+
+		case backslash_n_after_headers: // Expecting final \n in "\r\n\r\n" sequence after final header value
+		{
+			if (input == L'\n') // Found it
+			{
+				curStat = noun; // Reading the bytes of the Malayalam noun
+			}
+
+			else // Error
+			{
+				status = Reply::badReq;
+				toReturn = false;
+			}
+			break;
+		}
+
+		case noun: // Reading the Malayalam noun
+		{
+			if (mNBytes > 0) // Still reading
+			{
+				(*pNounSS) << input;
+				--mNBytes; // Count this byte
+			}
+
+			break;
+		}
 	} // switch
 
 	#ifdef DEBUG

@@ -1,6 +1,10 @@
 #ifndef MPP_REQUEST_HPP
 #define MPP_REQUEST_HPP
 
+/* STL */
+#include <map> // std::map
+#include <string> // std::string
+
 /* Because I keep switching */
 #define GETCOM_FUNC getCommand
 #define SETCOM_FUNC setCommand
@@ -31,9 +35,37 @@ namespace mpp
 			* @desc Fetches the command associated with this request.
 			**/
 			Command GETCOM_FUNC() const;
+
+			/**
+			* @desc Creates and adds a Header to this request with the given name and value.
+			* @param name The header's name.
+			* @param value The header's value.
+			**/
+			void addHeader(std::string name, std::string value);
+
+			/**
+			* @desc Attempts to find a Header by the given name.
+			* @throws mpp::exceptions::UnknownHeader if a Header with the given name isn't found.
+			* @return The header with the given name.
+			**/
+			Header findHeader(std::string name);
+
+			/**
+			* @desc Stores the given noun in the Request object to be pluralised later.
+			* @param noun The noun to store.
+			**/
+			void setNoun(std::string noun);
+
+			/**
+			* @desc Fetches the noun associated with this request.
+			* @return This request's noun.
+			**/
+			std::string getNoun() const;
 	
 		private:
 			Command c; // The command which this request asks the server to perform
+			std::map<std::string, Header> headers; // A list of request headers
+			std::string noun; // The noun given with this request
 	};
 };
 

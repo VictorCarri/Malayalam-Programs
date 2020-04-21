@@ -3,12 +3,35 @@ Requests
 A request will be of the form:
 	
 	MPP/1.0{space}{verb}\r\n
-	Content-Length:{space}{integer}\r\n\r\n
-	{arg}\r\n\r\n...
+	{headerName}:{space}{string}\r\n...
+	\r\n
+	{arg}
 
 {verb} refers to the action which the server should perform and {arg} refers to any arguments which the server requires.
-Each line will be separated by \r\n.
-Content-Length contains the length of {arg} IN BYTES, NOT codepoints!
+Each line will be separated by \r\n. The protocol/verb & header lines will be separated from the body (Malayalam noun) by 2 \r\n sequences.
+The parser will read $ContentLength BYTES after the final \r\n\r\n sequence for the value.
+
+Headers
+-------
+
+Header Name	|	Header Value
+----------------|-------------------------------------------------------------
+Content-Length	|	Length of the Malayalam noun in BYTES, NOT codepoints! 
+
+An attempt to specify it in BNR form:
+
+Request -> protLine headers argument
+protLine -> "MPP/1.0.0" space verb lineTerm
+space -> ' ' | '\t';
+verb -> "ISSING" | "FOF";
+lineTerm -> "\r\n";
+headers -> header header\* lineTerm
+header -> name ':' space string lineTerm
+string -> [char]+
+char -> [a-zA-Z0-9-] # any character except \r or \n
+argument -> [byte]+
+byte -> 0 | 1 | ... | 255
+
 
 Responses
 ==========

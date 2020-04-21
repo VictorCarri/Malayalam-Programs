@@ -5,6 +5,7 @@
 #include <array> // std::array
 #include <sstream> // std::wstringstream
 #include <string> // std::wstring, std::string
+#include <memory> // std::unique_ptr
 
 #ifdef DEBUG
 #include <map> // std::map
@@ -84,7 +85,14 @@ namespace mpp
 			* @param input The next character of input.
 			**/
 			boost::tribool consume(Request& req, wchar_t input);
-	
+
+			/**
+			* @desc Converts all ASCII chars. in the given UTF-8 string to lowercase.
+			* @param input The string to convert.
+			* @return The string with all ASCII chars. converted to lowercase.
+			**/
+			std::string toLowerStr(std::string input);
+
 			enum State
 			{
 				/* Reading "MPP" */
@@ -107,26 +115,39 @@ namespace mpp
 				issing_second_i, // Expecting second 'I' in "ISSING"
 				issing_n, // Expecting 'N' in "ISSING"
 				issing_g, // Expecting 'G' in "ISSING"
-	
-				/* Other */	
-				space, // Expecting a space character. Uses the prevStat var. to determine which state to go to next.
-	
-				/* Parsing headers */
-				header_start
+		
+				/* Reading the line terminator after the verb */
+				backslash_r_after_verb, // \r
+				backslash_n_after_verb // \n
+
+				/* Reading the header's name */
+				header_name,
+				space_after_header_name,
+				header_value,
+				backslash_n_after_header_value,
+
+				/* Finishing the headers */
+				backslash_n_after_headers // Read "\r\n\r" so far - need to read another \n to indicate the end of the headers
+
+				/* Reading the Malayalam noun */
+				noun
 			};
 	
 			State curStat; // Current state
 			State prevStat; // Previous state
 			mpp::Reply::Status status;
 			const std::array<short, 3> version; // Current parser/server version
-			std::array<std::wstringstream, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
+			std::array<std::unique_ptr<std::wstringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
 			const std::array<std::wstring, 2> verbs; // Recognised verbs
 			boost::locale::generator gen; // Used to switch between US English and Malayalam locales
+			std::unique_ptr<std::stringstream> pSSHeaderName; // Use a pointer so that we can easily reset the stringstream
+			std::unique_ptr<std::stringstream> pSSHeaderVal; // Use a pointer so that we can easily reset the stringstream
+			int mNBytes; // # of bytes in Malayalam noun.
+			std::unique_ptr<std::stringstream> pNounSS; // Pointer to noun stringstream
 	
 			#ifdef DEBUG
 			std::map<State, std::string> stateNames; // Used to name states for debugging
-			#endif
-	};
+			#endif };
 };
 
 #endif // MPP_REQPARSER_HPP

@@ -43,9 +43,7 @@ mpp::Header::Header(const mpp::Header& other) : _name(other._name), _value(other
 * @desc Move constructor.
 * @param other The other Header object to move values from.
 **/
-mpp::Header::Header(mpp::Header&& other) :
-	_name(std::move(other._name))
-	_value(std::move(other._value))
+mpp::Header::Header(mpp::Header&& other) : _name(std::move(other._name)), _value(std::move(other._value))
 {
 }
 
