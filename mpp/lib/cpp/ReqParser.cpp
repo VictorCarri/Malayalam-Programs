@@ -5,6 +5,7 @@
 #include <exception> // std::runtime_error
 #include <sstream> // std::ostringstream
 #include <memory> // std::make_unique
+#include <any> // std::any
 
 #ifdef DEBUG
 #include <iostream> // std::cout, std::wcout
@@ -605,6 +606,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 			if (input == '\n') // Correct
 			{
 				curStat = header_name; // Reading a header name
+				toReturn = boost::indeterminate;
 			}
 
 			else // Error
@@ -626,6 +628,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 			else if (input == L':') // End of the header name
 			{
 				curStat = space_after_header_name; // Expect a single space
+				toReturn = boost::indeterminate;
 			}
 
 			else if (input == L'\r') // Start of a second \r\n sequence after headers - headers are over
@@ -647,6 +650,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 			if (std::isspace(input, usLoc)) // Found a space
 			{
 				curStat = header_value; // Read the header's value next
+				toReturn = boost::indeterminate;
 			}
 
 			else // Invalid char.
@@ -663,12 +667,15 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 			if (input == L'\r') // End of header's value
 			{
 				/* We can create and add the header now */
-				req.addHeader(pSSHeaderName->str(), pSSHeaderVal->str()); // Pass the Request object the name and value. It will create and add the Header object internally
 				curStat = backslash_n_after_header_value; // Need to read a \n to terminate the header's value
+				toReturn = boost::indeterminate;
 
 				/* We need to know the length to read the noun, so check if this header is the content-length header */
 				if (pSSHeaderName->str() == "Content-Length") // Yes, we need this header
 				{
+					unsigned long long length; // Length as a long
+					(*pSSHeaderName) >> length; // Read the length
+					req.addHeader(pSSHeaderName->str(), std::any(length)); // Pass the Request object the name and value. It will create and add the Header object internally.
 					(*pSSHeaderVal) >> mNBytes; // Read the # of bytes
 				}
 			}
@@ -686,6 +693,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 			if (input == L'\n') // Found it
 			{
 				curStat = header_name; // In case there are more headers
+				toReturn = boost::indeterminate;
 			}
 
 			else // Error
@@ -718,6 +726,18 @@ boost::tribool mpp::ReqParser::consume(Request& req, wchar_t input)
 			{
 				(*pNounSS) << input;
 				--mNBytes; // Count this byte
+
+				if (mNBytes == 0) // Read the entire noun
+				{
+					req.setNoun(pNounSS->str()); // Store the noun (as UTF-8 bytes) in the request
+					toReturn = true; // We have successfully parsed an entire request
+				}
+			}
+
+			else if (mNBytes < 0) // More data than specified
+			{
+				status = Reply::badReq;
+				toReturn = false;
 			}
 
 			break;

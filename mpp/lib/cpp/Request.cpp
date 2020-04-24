@@ -1,11 +1,14 @@
 /* STL */
 #include <string> // std::string
+#include <algorithm> // std::find_if
+#include <any> // std::any
 #include <sstream> // std::stringstream
 
 /* Our headers */
 #include "mpp/Header.hpp" // Header class
-#include "mpp/Request.hpp" // Class definition
 #include "mpp/exceptions/UnknownHeader.hpp" // Thrown when an unknown header is requested
+#include "mpp/functors/HeaderFinder.hpp" // Functor that finds a header with the given name
+#include "mpp/Request.hpp" // Class definition
 
 /**
 * @desc Default constructor. Initialises the command to an invalid one.
@@ -35,9 +38,9 @@ mpp::Request::Command mpp::Request::GETCOM_FUNC() const
 * @param name The header's name.
 * @param value The header's value.
 **/
-void mpp::Request::addHeader(std::string name, std::string value)
+void mpp::Request::addHeader(std::string name, std::any value)
 {
-	headers.emplace(name, mpp::Header(name, value)); // Map the name to the header so that we can find it by its name later
+	headers.emplace_front(name, value);
 }
 
 /**
@@ -47,16 +50,18 @@ void mpp::Request::addHeader(std::string name, std::string value)
 **/
 mpp::Header mpp::Request::findHeader(std::string name)
 {
-	if (headers.contains(name)) // We have this header
+	std::forward_list<mpp::Header>::const_iterator it = std::find_if(headers.cbegin(), headers.cend(), mpp::functors::HeaderFinder(name));
+	
+	if (it == headers.cend()) // No such header
 	{
-		return headers.at(name); // Return the header object
+		std::stringstream ess;
+		ess << "Unknown header \"" << name << "\" requested." << std::endl;
+		throw mpp::exceptions::UnknownHeader(ess.str());
 	}
 
-	else // No such header
+	else
 	{
-		std::stringstream ess; // To generate the error text
-		ess << "Request: unknown header \"" << name << "\" requested";
-		throw mpp::exceptions::UnknownHeader(ess.str());
+		return *it; // Return the header that was found
 	}
 }
 

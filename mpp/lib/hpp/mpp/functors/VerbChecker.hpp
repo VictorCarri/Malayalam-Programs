@@ -11,28 +11,55 @@ namespace mpp
 		class VerbChecker
 		{
 			public:
-				#ifndef DEBUG
-				/**
-				* @desc Constructor. Stores the character to check for as the first character of the verb.
-				* @param upr The uppercase character to check for as the first character of each verb string.
-				**/
-				VerbChecker(wchar_t upr);
-
-				#else
+				#ifdef DEBUG
 				/**
 				* @desc Constructor. Stores the character to check for as the first character of the verb.
 				* @param upr The uppercase character to check for as the first character of each verb string.
 				* @param nm THe name to use when printing debug messages.
 				**/
 				VerbChecker(wchar_t upr, std::wstring nm);
+
+				#else
+
+				/**
+				* @desc Constructor. Stores the character to check for as the first character of the verb.
+				* @param upr The uppercase character to check for as the first character of each verb string.
+				**/
+				VerbChecker(wchar_t upr);
 				#endif
 	
+				/**
+				* @desc Copy constructor.
+				* @param other The other functor to copy from.
+				**/
+				VerbChecker(const VerbChecker& other);
+
 				/**
 				* @desc Determines whether or not the current verb's first character is $upper.
 				* @param verb The current verb to check.
 				* @return True if the verb's first character matches $upper, false otherwise.
 				**/	
 				bool operator()(std::wstring verb);
+
+				/**
+				* @desc Move constructor.
+				* @param other The other VerbChecker to move from.
+				**/
+				VerbChecker(VerbChecker&& other);
+
+				/**
+				* @desc Move assignment operator.
+				* @param other The other VerbChecker to move from.
+				* @return A reference to this VerbChecker to allow chaining.
+				**/
+				VerbChecker& operator=(VerbChecker&& other);
+
+				/**
+				* @desc Copy assignment operator.
+				* @param other The other VerbChecker to move from.
+				* @return A reference to this VerbChecker to allow chaining.
+				**/
+				VerbChecker& operator=(const VerbChecker& other);
 
 			private:
 				wchar_t upper; // The uppercase string to search for

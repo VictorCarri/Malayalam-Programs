@@ -2,8 +2,9 @@
 #define MPP_REQUEST_HPP
 
 /* STL */
-#include <map> // std::map
+#include <forward_list> // std::forward_list
 #include <string> // std::string
+#include <any> // std::any
 
 /* Because I keep switching */
 #define GETCOM_FUNC getCommand
@@ -41,7 +42,7 @@ namespace mpp
 			* @param name The header's name.
 			* @param value The header's value.
 			**/
-			void addHeader(std::string name, std::string value);
+			void addHeader(std::string name, std::any value);
 
 			/**
 			* @desc Attempts to find a Header by the given name.
@@ -64,7 +65,7 @@ namespace mpp
 	
 		private:
 			Command c; // The command which this request asks the server to perform
-			std::map<std::string, Header> headers; // A list of request headers
+			std::forward_list<Header> headers; // A list of request headers
 			std::string noun; // The noun given with this request
 	};
 };

@@ -3,6 +3,7 @@
 
 /* STL */
 #include <string> // std::string
+#include <any> // std::any to store the value
 
 namespace mpp
 {
@@ -13,7 +14,7 @@ namespace mpp
 			* @name Constructor.
 			* @desc Contructs a Header with the given name and value.
 			**/
-			Header(std::string name, std::string value);
+			Header(std::string name, std::any value);
 
 			/**
 			* @desc Fetches this header's name.
@@ -25,7 +26,7 @@ namespace mpp
 			* @desc Fetches this header's value.
 			* @return This header's value.
 			**/
-			std::string getValue() const;
+			std::any getValue() const;
 
 			/**
 			* @desc Copy constructor.
@@ -58,7 +59,7 @@ namespace mpp
 
 		private:
 			std::string _name;
-			std::string _value;
+			std::any _value;
 	};
 };
 

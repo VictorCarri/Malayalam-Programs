@@ -3,6 +3,7 @@
 
 /* Standard C++ */
 #include <vector> // std::vector
+#include <array> // std::array
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
@@ -29,10 +30,38 @@ namespace mpp
 				**/
 				void operator()(mpp::Header h);
 
+				/**
+				* @desc Copy constructor.
+				* @param other The other functor to copy from.
+				**/
+				HeaderBufferAdder(const HeaderBufferAdder& other);
+
+				/**
+				* @desc Move constructor.
+				* @param other The other functor to move from.
+				**/
+				HeaderBufferAdder(HeaderBufferAdder&& other);
+
+				/**
+				* @desc Copy assignment operator.
+				* @param other The other functor to copy from.
+				* @return A reference to this functor.
+				**/
+				HeaderBufferAdder& operator=(const HeaderBufferAdder& other);
+
+				/**
+				* @desc Move assignment operator.
+				* @param other The other functor to copy from.
+				* @return A reference to this functor.
+				**/
+				HeaderBufferAdder& operator=(const HeaderBufferAdder& other);
+
 			private:
 				std::vector<boost::asio::const_buffer>& buffers; // A reference to the vector that we modify
-				char nameValSep[2];
-				char crlf[2];
+				/*char nameValSep[2];
+				char crlf[2];*/
+				std::array<char, 2> nameValSep;
+				std::array<char, 2> crlf;
 		};
 	};
 };
