@@ -15,7 +15,7 @@ dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-
 buildDir=./build
 
 # Directory where library should be installed
-instDir=~/lib
+instDir=~/lib/mpp
 
 all: $(addprefix $(buildDir)/,lib$(libName)-debug.so lib$(libName).so lib$(libName).a lib$(libName)-debug.a)
 	rm -rf ~/include/$(libName)

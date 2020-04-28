@@ -16,7 +16,7 @@ statOpts=$(compOpts)
 dynOpts=-fPIC $(compOpts)
 
 # Where the library should be installed
-instDir=~/lib
+instDir=~/lib/vuu
 
 all: $(dbgLibs) $(prodLibs)
 

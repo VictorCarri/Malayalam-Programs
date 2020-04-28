@@ -5,14 +5,14 @@ dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-
 icuOpts=-DU_DISABLE_RENAMING=1 -DUCONFIG_ENABLE_PLUGINS=1
 compLevel=0
 compOpts=$(addprefix -I,./hpp /usr/local/include) $(icuOpts) -O$(compLevel)
-libDirs=$(addprefix -L,/home/victor/lib/malplsrv $(addprefix /usr/local/lib/,boost icu))
+libDirs=$(addprefix -L,/home/victor/lib/vuu $(addprefix /usr/local/lib/,boost icu))
 icuLibs=$(addprefix icu,data i18n io test tu uc)
 
 # Libraries which all builds need
 commonLibs=$(icuLibs) pthread dl
 
 dbgLibs=$(addprefix -l,vuu-debug $(addprefix boost_,$(addsuffix -mt-d-x64,program_options filesystem locale thread)) $(commonLibs))
-prodLibs=$(addprefix -l,vuu-prod $(addprefix boost_,$(addsuffix -mt-x64,program_options filesystem locale thread)) $(commonLibs))
+prodLibs=$(addprefix -l,vuu $(addprefix boost_,$(addsuffix -mt-x64,program_options filesystem locale thread)) $(commonLibs))
 cppDir=./cpp
 
 ## Set up objects for each type of build ##
