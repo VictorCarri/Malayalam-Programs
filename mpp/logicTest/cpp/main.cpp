@@ -4,10 +4,6 @@
 //#include <array> // std::array
 #include <sstream> // std::stringstream
 
-/* Boost */
-//#include <boost/logic/tribool.hpp> // boost::tribool
-//#include <boost/tuple/tuple.hpp> // boost::tie, boost::tuples::ignore
-
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::positional_options_description, boost::program_options::store, boost::program_options::command_line_parser, boost::filesystem::ifstream
 #include <boost/filesystem.hpp> // boost::filesystem::path, boost::filesystem::exists
 
@@ -15,7 +11,6 @@
 #include "mpp/Request.hpp" // Request object
 #include "mpp/Reply.hpp" // Reply::FailureCode
 #include "mpp/ReqParser.hpp" // Request parser object
-#include "mpp/CharPrinter.hpp" // Character printer functor
 
 #define COMLEN 100 // Length of a command
 #define INPLEN 200 // Length of input
@@ -35,11 +30,6 @@ int main(int argc, char* argv[])
 {
 	mpp::Request req; // Test object
 	mpp::ReqParser reqParser; // Parses a request
-	/*int curInd = 0; // Current index into buffer
-	std::array<char, COMLEN> command; // Holds a command for use with getline
-	std::array<char, INPLEN> input; // Holds input string
-	CharPrinter cp; // Functor that prints characters
-	bool running = true;*/
 
 	/* Vars for version that reads input from a file */
 	boost::program_options::options_description cmd("Command-line options");
@@ -119,9 +109,9 @@ int main(int argc, char* argv[])
 		else if (!result)
 		{
 			std::cout << ourName << ": Error occurred while parsing request." << std::endl;
-			mpp::Reply::FailureCode errReason = reqParser.getFailedReason();
+			mpp::Reply::Status stat = reqParser.getStatus();
 			mpp::Reply temp;
-			std::string reasonStr = temp.getStatText(errReason);
+			std::string reasonStr = temp.getStatText(stat);
 			std::cout << reasonStr << std::endl;
 			return BADREQ;
 		}

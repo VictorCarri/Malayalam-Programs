@@ -4,6 +4,9 @@
 /* STL */
 #include <string> // std::string
 
+/* Our headers */
+#include "mpp/Header.hpp" // Header class
+
 namespace mpp
 {
 	namespace functors
@@ -25,7 +28,7 @@ namespace mpp
 				* @param h The header to check the name of.
 				* @return True if the header's name matches $name, false otherwise.
 				**/	
-				bool operator()(const Header h);
+				bool operator()(const mpp::Header h);
 
 				/**
 				* @desc Copy constructor.

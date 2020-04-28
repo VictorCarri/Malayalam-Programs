@@ -64,9 +64,11 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 {
 	std::vector<boost::asio::const_buffer> buffers;
 	buffers.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
-	std::for_each(headers.cbegin(), headers.cend(), mpp::functors::HeaderBufferAdder(&buffers)); // Add one buffer containing the header's text for each header
+	//std::for_each(headers.cbegin(), headers.cend(), mpp::functors::HeaderBufferAdder(&buffers)); // Add one buffer containing the header's text for each header
+	std::for_each(headers.cbegin(), headers.cend(), mpp::functors::HeaderBufferAdder(buffers)); // Add one buffer containing the header's text for each header
 	buffers.push_back(boost::asio::buffer(crlf));
-	buffers.push_back(content);
+	buffers.push_back(boost::asio::buffer(content));
+	return buffers;
 }
 
 /**
@@ -81,11 +83,11 @@ void mpp::Reply::addHeader(mpp::Header toAdd)
 * @desc Copy constructor.
 * @param other Other Reply object to copy from.
 **/
-mpp::Reply::Reply(const Reply& other) :
-	statText(other.statText),
+mpp::Reply::Reply(const Reply& other) : statText(other.statText),
 	stat(other.stat),
 	headers(other.headers),
-	content(other.content)
+	content(other.content),
+	crlf(other.crlf)
 {
 }
 
@@ -94,7 +96,7 @@ mpp::Reply::Reply(const Reply& other) :
 * @param other Other Reply object to copy from.
 * @return this
 **/
-mpp::Reply& operator=(const mpp::Reply& other)
+mpp::Reply& mpp::Reply::operator=(const mpp::Reply& other)
 {
 	if (&other == this)
 		return *this;
@@ -111,11 +113,11 @@ mpp::Reply& operator=(const mpp::Reply& other)
 * @desc Move constructor.
 * @param other Other Reply object to move from.
 **/
-mpp::Reply::Reply(Reply&& other) :
-	statText(std::move(other.statText)),
+mpp::Reply::Reply(Reply&& other) : statText(std::move(other.statText)),
 	stat(std::exchange(other.stat, invalid)),
 	headers(std::move(other.headers)),
-	content(std::move(other.content))
+	content(std::move(other.content)),
+	crlf(std::move(other.crlf))
 {
 }
 

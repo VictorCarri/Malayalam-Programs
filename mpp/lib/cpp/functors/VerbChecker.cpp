@@ -1,8 +1,8 @@
 /* STL */
-#include <string> // std::wstring
+#include <string> // std::string
 #include <utility> // std::move
 #ifdef DEBUG
-#include <iostream> // std::wcout
+#include <iostream> // std::cout
 #endif
 
 /* Our headers */
@@ -14,7 +14,7 @@
 * @param upr The uppercase character to check for as the first character of each verb string.
 * @param nm THe name to use when printing debug messages.
 **/
-mpp::functors::VerbChecker::VerbChecker(wchar_t upr, std::wstring nm) : upper(upr), name(nm)
+mpp::functors::VerbChecker::VerbChecker(char upr, std::string nm) : upper(upr), name(nm)
 {
 }
 
@@ -23,7 +23,7 @@ mpp::functors::VerbChecker::VerbChecker(wchar_t upr, std::wstring nm) : upper(up
 * @desc Constructor. Stores the character to check for as the first character of the verb.
 * @param upr The uppercase character to check for as the first character of each verb string.
 **/
-mpp::functors::VerbChecker::VerbChecker(wchar_t upr) : upper(upr)
+mpp::functors::VerbChecker::VerbChecker(char upr) : upper(upr)
 {
 }
 #endif
@@ -33,16 +33,16 @@ mpp::functors::VerbChecker::VerbChecker(wchar_t upr) : upper(upr)
 * @param verb The current verb to check.
 * @return True if the verb's first character matches $upper, false otherwise.
 **/	
-bool mpp::functors::VerbChecker::operator()(std::wstring verb)
+bool mpp::functors::VerbChecker::operator()(std::string verb)
 {
 	#ifdef DEBUG
-	std::wcout << name << L": comparing first character of verb \"" << verb << L"\" to uppercase char '" << upper << L"'" << std::endl;
+	std::cout << name << ": comparing first character of verb \"" << verb << "\" to uppercase char '" << upper << "'" << std::endl;
 	#endif
 
 	if (verb[0] == upper) // Found a match
 	{
 		#ifdef DEBUG
-		std::wcout << name << L": matched verb \"" << verb << "\"" << std::endl;
+		std::cout << name << ": matched verb \"" << verb << "\"" << std::endl;
 		#endif
 
 		return true;
@@ -51,7 +51,7 @@ bool mpp::functors::VerbChecker::operator()(std::wstring verb)
 	else
 	{
 		#ifdef DEBUG
-		std::wcout << name << L": didn't match verb \"" << verb << "\"" << std::endl;
+		std::cout << name << ": didn't match verb \"" << verb << "\"" << std::endl;
 		#endif
 
 		return false;
@@ -93,7 +93,7 @@ mpp::functors::VerbChecker& mpp::functors::VerbChecker::operator=(mpp::functors:
 	{
 		upper = other.upper;
 		#ifdef DEBUG
-		name = std::move(other.name)
+		name = std::move(other.name);
 		#endif
 	}
 

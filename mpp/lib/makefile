@@ -1,14 +1,14 @@
 cppDir=./cpp
 compiler=g++-8
 objDir=./obj
-files=$(addprefix functors/,$(addsuffix er,HeaderBufferAdd VerbCheck PtrResett HeaderFind)) exceptions/UnknownHeader Header Reply Request ReqParser ReqHandler
+files=$(addprefix functors/,$(addsuffix er,HeaderBufferAdd VerbCheck HeaderFind PtrResett)) $(addprefix exceptions/,UnknownHeader BadHeaderValue) Header Reply Request ReqParser ReqHandler
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
 dbgDynObjs=$(addprefix $(objDir)/debug/dynamic/,$(addsuffix .o,$(files)))
 prodStatObjs=$(addprefix $(objDir)/production/static/,$(addsuffix .o,$(files)))
 prodDynObjs=$(addprefix $(objDir)/production/dynamic/,$(addsuffix .o,$(files)))
 libName=mpp
 hppDir=./hpp
-compOpts=$(addprefix -O,3 s) -I$(hppDir) -save-temps
+compOpts=$(addprefix -O,3 s) -I$(hppDir) -save-temps -std=gnu++17
 dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-points) -Og -fvar-tracking-assignments
 
 # Directory where the libraries will be built
@@ -50,7 +50,6 @@ $(buildDir)/lib$(libName)-debug.a: $(dbgStatObjs)
 	cp $@ $(instDir)
 
 clean: $(addprefix clean_,debug production)
-	rm -f $(buildDir)/*
 	rm -rf $(instDir)/*
 	rm -f *.{ii,s}
 
@@ -59,15 +58,19 @@ clean_debug: $(addprefix clean_debug_,static dynamic)
 clean_production: $(addprefix clean_production_,static dynamic)
 
 clean_debug_static:
-	rm -f $(objDir)/debug/static/*
+	find $(objDir)/debug/static/* -type f -exec rm {} \;
+	rm -f $(buildDir)/lib$(libName)-debug.a
 
 clean_debug_dynamic:
-	rm -f $(objDir)/debug/dynamic/*
+	find $(objDir)/debug/dynamic/* -type f -exec rm {} \;
+	rm -f $(buildDir)/lib$(libName)-debug.so
 
 clean_production_dynamic:
-	rm -f $(objDir)/production/dynamic/*
+	find $(objDir)/production/dynamic/* -type f -exec rm {} \;
+	rm -f $(buildDir)/lib$(libName).so
 
 clean_production_static:
-	rm -f $(objDir)/production/static/*
+	find $(objDir)/production/static/* -type f -exec rm {} \;
+	rm -f $(buildDir)/lib$(libName).a
 
 rebuild: clean all

@@ -6,6 +6,9 @@
 #include <string> // std::string
 #include <any> // std::any
 
+/* Our headers */
+#include "mpp/Header.hpp" // Header class
+
 /* Because I keep switching */
 #define GETCOM_FUNC getCommand
 #define SETCOM_FUNC setCommand
@@ -65,7 +68,7 @@ namespace mpp
 	
 		private:
 			Command c; // The command which this request asks the server to perform
-			std::forward_list<Header> headers; // A list of request headers
+			std::forward_list<mpp::Header> headers; // A list of request headers
 			std::string noun; // The noun given with this request
 	};
 };

@@ -2,7 +2,7 @@
 #define MPP_FUNCTORS_VERBCHECKER_HPP
 
 /* STL */
-#include <string> // std::wstring
+#include <string> // std::string
 
 namespace mpp
 {
@@ -17,7 +17,7 @@ namespace mpp
 				* @param upr The uppercase character to check for as the first character of each verb string.
 				* @param nm THe name to use when printing debug messages.
 				**/
-				VerbChecker(wchar_t upr, std::wstring nm);
+				VerbChecker(char upr, std::string nm);
 
 				#else
 
@@ -25,7 +25,7 @@ namespace mpp
 				* @desc Constructor. Stores the character to check for as the first character of the verb.
 				* @param upr The uppercase character to check for as the first character of each verb string.
 				**/
-				VerbChecker(wchar_t upr);
+				VerbChecker(char upr);
 				#endif
 	
 				/**
@@ -39,7 +39,7 @@ namespace mpp
 				* @param verb The current verb to check.
 				* @return True if the verb's first character matches $upper, false otherwise.
 				**/	
-				bool operator()(std::wstring verb);
+				bool operator()(std::string verb);
 
 				/**
 				* @desc Move constructor.
@@ -62,9 +62,9 @@ namespace mpp
 				VerbChecker& operator=(const VerbChecker& other);
 
 			private:
-				wchar_t upper; // The uppercase string to search for
+				char upper; // The uppercase string to search for
 				#ifdef DEBUG
-				std::wstring name; // The name to use when printing debugging info.
+				std::string name; // The name to use when printing debugging info.
 				#endif
 		};
 	};

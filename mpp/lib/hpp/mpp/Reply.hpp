@@ -5,6 +5,7 @@
 #include <string> // std::string
 #include <vector> // std::vector
 #include <forward_list> // std::forward_list
+#include <array> // std::array
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
@@ -102,7 +103,7 @@ namespace mpp
 			Status stat; // This reply's status
 			std::forward_list<mpp::Header> headers; // List of headers to send with the reply
 			//const char crlf[] = { '\r', '\n' };
-			const char crlf[2];
+			const std::array<char, 2> crlf;
 			std::string content;
 	};
 };

@@ -3,8 +3,8 @@
 
 /* STL */
 #include <array> // std::array
-#include <sstream> // std::wstringstream
-#include <string> // std::wstring, std::string
+#include <sstream> // std::stringstream
+#include <string> // std::string
 #include <memory> // std::unique_ptr
 
 #ifdef DEBUG
@@ -84,7 +84,7 @@ namespace mpp
 			* @param req The request object to set parameters on.
 			* @param input The next character of input.
 			**/
-			boost::tribool consume(Request& req, wchar_t input);
+			boost::tribool consume(Request& req, char input);
 
 			/**
 			* @desc Converts all ASCII chars. in the given UTF-8 string to lowercase.
@@ -118,7 +118,7 @@ namespace mpp
 		
 				/* Reading the line terminator after the verb */
 				backslash_r_after_verb, // \r
-				backslash_n_after_verb // \n
+				backslash_n_after_verb, // \n
 
 				/* Reading the header's name */
 				header_name,
@@ -127,7 +127,7 @@ namespace mpp
 				backslash_n_after_header_value,
 
 				/* Finishing the headers */
-				backslash_n_after_headers // Read "\r\n\r" so far - need to read another \n to indicate the end of the headers
+				backslash_n_after_headers, // Read "\r\n\r" so far - need to read another \n to indicate the end of the headers
 
 				/* Reading the Malayalam noun */
 				noun
@@ -137,8 +137,8 @@ namespace mpp
 			State prevStat; // Previous state
 			mpp::Reply::Status status;
 			const std::array<short, 3> version; // Current parser/server version
-			std::array<std::unique_ptr<std::wstringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
-			const std::array<std::wstring, 2> verbs; // Recognised verbs
+			std::array<std::unique_ptr<std::stringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
+			const std::array<std::string, 2> verbs; // Recognised verbs
 			boost::locale::generator gen; // Used to switch between US English and Malayalam locales
 			std::unique_ptr<std::stringstream> pSSHeaderName; // Use a pointer so that we can easily reset the stringstream
 			std::unique_ptr<std::stringstream> pSSHeaderVal; // Use a pointer so that we can easily reset the stringstream
@@ -147,7 +147,8 @@ namespace mpp
 	
 			#ifdef DEBUG
 			std::map<State, std::string> stateNames; // Used to name states for debugging
-			#endif };
-};
+			#endif
+	}; // class ReqParser
+}; // namespace mpp
 
 #endif // MPP_REQPARSER_HPP

@@ -10,6 +10,7 @@ A request will be of the form:
 {verb} refers to the action which the server should perform and {arg} refers to any arguments which the server requires.
 Each line will be separated by \r\n. The protocol/verb & header lines will be separated from the body (Malayalam noun) by 2 \r\n sequences.
 The parser will read $ContentLength BYTES after the final \r\n\r\n sequence for the value.
+The protocol and header lines will be in ASCII. Only the argument will be encoded in UTF-8 (the default), although I may extend the server to process other encodings later.
 
 Headers
 -------

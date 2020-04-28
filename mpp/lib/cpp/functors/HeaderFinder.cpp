@@ -1,7 +1,9 @@
 /* STL */
 #include <utility> // std::move
+#include <string> // std::string
 
 /* Our headers */
+#include "mpp/Header.hpp" // Header class
 #include "mpp/functors/HeaderFinder.hpp" // Class def'n
 
 /**
@@ -17,7 +19,7 @@ mpp::functors::HeaderFinder::HeaderFinder(std::string nm) : name(nm)
 * @param h The header to check the name of.
 * @return True if the header's name matches $name, false otherwise.
 **/	
-bool mpp::functors::HeaderFinder::operator()(const Header h)
+bool mpp::functors::HeaderFinder::operator()(const mpp::Header h)
 {
 	return h.getName() == name; // Check if the header's name matches what we were constructed with
 }
@@ -26,7 +28,7 @@ bool mpp::functors::HeaderFinder::operator()(const Header h)
 * @desc Copy constructor.
 * @param other The other functor to copy from.
 **/
-mpp::functors::HeaderFinder(const mpp::functors::HeaderFinder& other) : name(other.name)
+mpp::functors::HeaderFinder::HeaderFinder(const mpp::functors::HeaderFinder& other) : name(other.name)
 {
 }
 
@@ -49,7 +51,7 @@ mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(const mpp::f
 * @desc Move constructor.
 * @param other The other functor to move from.
 **/
-mpp::functors::HeaderFinder(mpp::functors::HeaderFinder&& other) : name(std::move(other.name))
+mpp::functors::HeaderFinder::HeaderFinder(mpp::functors::HeaderFinder&& other) : name(std::move(other.name))
 {
 }
 
@@ -64,4 +66,6 @@ mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(mpp::functor
 	{
 		name = std::move(other.name);
 	}
+
+	return *this;
 }

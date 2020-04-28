@@ -3,7 +3,7 @@
 
 /* STL */
 #include <memory> // std::unique_ptr
-#include <sstream> // std::wstringstream
+#include <sstream> // std::stringstream
 
 namespace mpp
 {
@@ -16,7 +16,7 @@ namespace mpp
 				* @desc Resets the given pointer (replaces the stringstream inside with a new one).
 				* @param ptr The pointer to reset.
 				**/
-				void operator()(std::unique_ptr<std::wstringstream> ptr);
+				void operator()(std::unique_ptr<std::stringstream>& ptr);
 		};
 	};
 };

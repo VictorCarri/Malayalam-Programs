@@ -54,7 +54,7 @@ namespace mpp
 				* @param other The other functor to copy from.
 				* @return A reference to this functor.
 				**/
-				HeaderBufferAdder& operator=(const HeaderBufferAdder& other);
+				HeaderBufferAdder& operator=(HeaderBufferAdder&& other);
 
 			private:
 				std::vector<boost::asio::const_buffer>& buffers; // A reference to the vector that we modify
