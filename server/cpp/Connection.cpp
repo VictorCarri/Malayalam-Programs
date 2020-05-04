@@ -66,7 +66,7 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 
 		if (result) // The parser successfully parsed an entire request
 		{
-			rep.setStatus(reqParser.getStatus());
+			//rep.setStatus(reqParser.getStatus());
 			reqHandler.handleReq(req, rep); // Handle a request - generate a reply according to what the client requested
 			boost::asio::async_write(
 				socket,

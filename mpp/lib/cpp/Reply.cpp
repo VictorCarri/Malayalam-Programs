@@ -145,5 +145,14 @@ mpp::Reply& mpp::Reply::operator=(mpp::Reply&& other)
 **/
 std::string mpp::Reply::getStatText(mpp::Reply::Status s)
 {
-	return statText[s];
+	return statText->at(s);
+}
+
+/**
+* @desc Sets the content to send with the reply.
+* @param c The content to store in this reply.
+**/
+void mpp::Reply::setContent(std::string c)
+{
+	content = c;
 }

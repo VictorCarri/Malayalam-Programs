@@ -1,6 +1,9 @@
 #ifndef MPP_REQHANDLER_HPP
 #define MPP_REQHANDLER_HPP
 
+/* Standard C++ */
+#include <string> // std::string
+
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
 
@@ -22,6 +25,14 @@ namespace mpp
 			* @param rep The respnse object to set parameters on to generate a response.
 			**/
 			void handleReq(const Request& req, Reply& rep);
+
+		private:
+			/**
+			* @desc Determines whether the given Malayalam noun is singular or not.
+			* @param noun The noun to check.
+			* @return True if the noun is singular, false otherwise.
+			**/
+			bool isSingular(std::string noun);
 	};
 };
 

@@ -2,7 +2,7 @@ Requests
 =========
 A request will be of the form:
 	
-	MPP/1.0{space}{verb}\r\n
+	MPP/{version}{space}{verb}\r\n
 	{headerName}:{space}{string}\r\n...
 	\r\n
 	{arg}
@@ -17,7 +17,9 @@ Headers
 
 Header Name	|	Header Value
 ----------------|-------------------------------------------------------------
-Content-Length	|	Length of the Malayalam noun in BYTES, NOT codepoints! 
+Content-Length	|	Length of the Malayalam noun in BYTES, NOT codepoints!
+------------------------------------------------------------------------------
+Content-Type	|	Type of the input (text/plain;charset=utf-8)
 
 An attempt to specify it in BNR form:
 

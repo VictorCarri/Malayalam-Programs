@@ -97,6 +97,12 @@ namespace mpp
 			* @param s THe status to fetch a string for.
 			**/
 			std::string getStatText(Status s);
+
+			/**
+			* @desc Sets the content to send with the reply.
+			* @param c The content to store in this reply.
+			**/
+			void setContent(std::string c);
 	
 		private:
 			std::map<Status, std::string> statText; // Text for each status
