@@ -68,7 +68,7 @@ void functors::IOCStopper::operator()(functors::IOCStopper::iocPtr ptr)
 {
 	ptr->stop(); // Stop the given thread
 	#ifdef DEBUG
-	std::clog << "functors::IOCStopper::operator(): stopped thread #" << n << std::endl;
-	++n; // Increment counter for next call
+	std::clog << "functors::IOCStopper::operator(): stopped io_context #" << n << std::endl;
 	#endif
+	++n; // Increment counter for next call
 }

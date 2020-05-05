@@ -4,6 +4,9 @@
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::io_context
 
+/* Our headers */
+#include "SharedPtr.hpp" // SHARED_PTR macro
+
 namespace functors
 {
 	/*
@@ -52,10 +55,7 @@ namespace functors
 		private:
 			/* Types */
 			typedef SHARED_PTR<boost::asio::io_context> iocPtr;
-
-			#ifdef DEBUG
 			int n; // Counter for thread # in debug messages
-			#endif
 
 	}; // class IOCStopper
 }; // namespace functors

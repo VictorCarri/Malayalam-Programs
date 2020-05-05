@@ -38,7 +38,6 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	#ifdef SIGQUIT
 	signals.add(SIGQUIT);
 	#endif
-	//signals.async_wait(boost::bind(&Server::handleStop, this));
 	signals.async_wait(BIND_FUNCTION(&Server::handleStop, this));
 
 	/* Convert the port # to an std::string */
@@ -50,8 +49,16 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	boost::asio::ip::tcp::endpoint endPoint = *(resolver.resolve(address, portNumSS.str()).begin()); // Use the first endpoint found that corresponds to the given address & port #
 	acceptor.open(endPoint.protocol());
 	#ifdef DEBUG
-	std::string negStr =  acceptor.is_open() ? "" : "n't";
-	std::clog << "Server::Server: acceptor has" << negStr << " opened." << std::endl;
+	if (acceptor.is_open())
+	{
+		std::cout << "Server::Server: listening on " << address << ":" << port << std::endl
+		<< "\tusing " << numThreads << " threads" << std::endl;
+	}
+
+	else
+	{
+		std::cout << "Server::Server: acceptor failed to open." << std::endl;
+	}
 	#endif
 	acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
 	acceptor.bind(endPoint);
@@ -89,7 +96,6 @@ void Server::startAccept()
 	);
 	acceptor.async_accept(
 		newConn->socket(),
-		//boost::bind(
 		BIND_FUNCTION(
 			&Server::handleAccept,
 			this,

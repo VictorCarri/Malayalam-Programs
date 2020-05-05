@@ -13,6 +13,8 @@
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::make_work_guard
 
 /* Our headers */
+#include "SharedPtr.hpp" // SHARED_PTR macro
+#include "ThreadClass.hpp" // THREAD_CLASS macro
 #include "functors/ThreadCreator.hpp" // functors::ThreadCreator, to create the Threads we need
 #include "functors/ThreadJoiner.hpp" // functors::ThreadJoiner, to wait for threads to join
 #include "functors/IOCStopper.hpp" // functors::IOCStopper, to stop all threads

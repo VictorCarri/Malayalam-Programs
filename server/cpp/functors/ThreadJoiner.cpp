@@ -69,6 +69,6 @@ void functors::ThreadJoiner::operator()(SHARED_PTR<THREAD_CLASS> ptr)
 	ptr->join(); // Wait for this thread to join
 	#ifdef DEBUG
 	std::clog << "functors::ThreadJoiner::operator(): thread #" << n << " has joined" << std::endl;
-	++n;
 	#endif
+	++n;
 }

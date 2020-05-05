@@ -3,9 +3,9 @@
 #include <boost/logic/tribool.hpp> // boost::tribool
 #include <boost/tuple/tuple.hpp> // boost::tie, boost::tuples::ignore
 #include <boost/system/error_code.hpp> // boost::system::error_code
-#include <boost/bind.hpp> // boost::bind
 
 /* Our headers */
+#include "BindFunc.hpp" // BIND_FUNCTION macro
 #include "mpp/ReqHandler.hpp" // Request handler class
 #include "Connection.hpp" // Class def
 
@@ -38,7 +38,8 @@ void Connection::start()
 		boost::asio::buffer(
 			buffer
 		),
-		boost::bind(
+		//boost::bind(
+		BIND_FUNCTION(
 			&Connection::handleRead,
 			shared_from_this(),
 			boost::asio::placeholders::error,

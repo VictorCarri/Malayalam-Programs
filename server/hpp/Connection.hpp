@@ -4,6 +4,8 @@
 /* STL */
 #include <cstddef> // std::size_t
 #include <array> // std::array
+//#include <memory> // std::enable_shared_from_this
+//#include <system_error> // std::error_code
 
 /* Boost */
 #include <boost/enable_shared_from_this.hpp> // boost::enable_shared_from_this
@@ -22,6 +24,7 @@
 * This class is templated so that any protocol's classes can be used with this.
 **/
 class Connection : public boost::enable_shared_from_this<Connection>,
+//class Connection : public std::enable_shared_from_this<Connection>,
 			private boost::noncopyable
 {
 	public:
@@ -51,16 +54,18 @@ class Connection : public boost::enable_shared_from_this<Connection>,
 		* @param bytesTransferred # of bytes transferred during the read.
 		**/
 		void handleRead(const boost::system::error_code& e, std::size_t bytesTransferred);
+		//void handleRead(const std::error_code& e, std::size_t bytesTransferred);
 
 		/**
 		* @desc Handles completion of a write operation.
 		* @param e Describes what error occurred, if any.
 		**/
 		void handleWrite(const boost::system::error_code& e);
+		//void handleWrite(const std::error_code& e);
 
 		boost::asio::ip::tcp::socket socket; // We listen on this
 		mpp::ReqHandler& reqHandler; // Parses requests
-		std::array<wchar_t, 8192> buffer; // Stores data read from the socket
+		std::array<char, 8192> buffer; // Stores data read from the socket
 		mpp::ReqParser reqParser;
 		mpp::Request req;
 		mpp::Reply rep;

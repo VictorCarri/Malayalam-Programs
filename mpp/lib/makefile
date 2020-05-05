@@ -1,7 +1,7 @@
 cppDir=./cpp
 compiler=g++-8
 objDir=./obj
-files=$(addprefix functors/,$(addsuffix er,HeaderBufferAdd VerbCheck HeaderFind PtrResett)) $(addprefix exceptions/,UnknownHeader BadHeaderValue) Header Reply Request ReqParser ReqHandler
+files=$(addprefix functors/,$(addsuffix er,HeaderBufferAdd VerbCheck HeaderFind PtrResett SingMatch)) $(addprefix exceptions/,UnknownHeader BadHeaderValue) Header Reply Request ReqParser ReqHandler
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
 dbgDynObjs=$(addprefix $(objDir)/debug/dynamic/,$(addsuffix .o,$(files)))
 prodStatObjs=$(addprefix $(objDir)/production/static/,$(addsuffix .o,$(files)))

@@ -45,9 +45,7 @@ namespace functors
 		void operator()(SHARED_PTR<THREAD_CLASS> ptr);
 
 		private:
-			#ifdef DEBUG
 			int n; // # of current thread
-			#endif
 	};
 };
 

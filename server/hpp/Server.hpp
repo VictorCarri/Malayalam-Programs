@@ -6,9 +6,10 @@
 
 /* STL */
 #include <string> // std::string
+//#include <system_error> // std::error_code
 
 /* Boost */
-#include <boost/noncopyable.hpp>
+#include <boost/noncopyable.hpp> // boost::noncopyable
 #include <boost/asio.hpp> // boost::asio::signal_set, boost:asio::ip::tcp::acceptor
 #include <boost/system/error_code.hpp> // boost::system::error_code
 
@@ -53,6 +54,7 @@ class Server : private boost::noncopyable
 		* @param e An error object, if any occurred.
 		**/
 		void handleAccept(const boost::system::error_code& e);
+		//void handleAccept(const std::error_code& e);
 
 		IoContextPool iocp; // Pool of io_contexts used for async ops
 		boost::asio::signal_set signals; // Used to receive signals
