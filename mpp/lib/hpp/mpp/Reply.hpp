@@ -70,27 +70,27 @@ namespace mpp
 			* @desc Copy constructor.
 			* @param other Other Reply object to copy from.
 			**/
-			Reply(const Reply& other);
+			//Reply(const Reply& other);
 
 			/**
 			* @desc Copy assignment operator.
 			* @param other Other Reply object to copy from.
 			* @return this
 			**/
-			Reply& operator=(const Reply& other);
+			//Reply& operator=(const Reply& other);
 
 			/**
 			* @desc Move constructor.
 			* @param other Other Reply object to move from.
 			**/
-			Reply(Reply&& other);
+			//Reply(Reply&& other);
 
 			/**
 			* @desc Move assignment operator.
 			* @param other Other Reply object to move from.
 			* @return this
 			**/
-			Reply& operator=(Reply&& other);
+			//Reply& operator=(Reply&& other);
 
 			/**
 			* @desc Fetches the string associated with the given status.

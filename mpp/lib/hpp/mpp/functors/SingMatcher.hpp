@@ -33,6 +33,19 @@ namespace mpp
 				**/
 				bool operator()(const boost::u32regex& reg, boost::smatch& what);
 
+				/**
+				* @desc Copy constructor.
+				* @param other The other SingMatcher to copy from.
+				**/
+				//SingMatcher(const SingMatcher& other);
+
+				/**
+				* @desc Copy assignment operator.
+				* @param other The other SingMatcher to copy from.
+				* @return This, to allow chaining.
+				**/
+				//SingMatcher& operator=(const SingMatcher& other);
+
 			private:
 				std::string n; // The noun to match
 		};

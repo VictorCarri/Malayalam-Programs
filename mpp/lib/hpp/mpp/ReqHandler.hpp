@@ -7,7 +7,7 @@
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
-#include <boost/regex.hpp> // boost::smatch
+#include <boost/regex.hpp>
 #include <boost/regex/icu.hpp> // boost::u32regex
 
 /* Our headers */
@@ -30,7 +30,7 @@ namespace mpp
 			void handleReq(const Request& req, Reply& rep);
 
 			/**
-			* @desc Initialises internal member variables.
+			* @desc Constructor. Initialises internal member variables.
 			**/
 			ReqHandler();
 
@@ -42,9 +42,21 @@ namespace mpp
 			**/
 			bool isSingular(std::string noun);
 
-			std::array<bool, 6> matchRes; // Stores whether or not the regex @ a particular index matched the noun.
-			std::array<boost::smatch, 6> what; // Stores what matched a particular regex
-			std::array<boost::u32regex, 6> singRegs; // Stores the regexes for each class of singular noun
+			/**
+			* @desc Determines whether the given noun is singular or not. Then, it generates the opposite form.
+			* @param noun The noun to check.
+			* @return A string containing the opposite form (plural if input is singular, singular if input is plural).
+			**/
+			std::string findOppForm(std::string noun);
+
+			/**
+			* @desc Pluralises the given noun. The noun is ASSUMED to be singular.
+			* @param singNoun The singular noun to pluralise.
+			* @return The plural form of the noun.
+			**/
+			std::string pluralise(std::string singNoun);
+
+			std::array<boost::u32regex, 6> singRegs; // Stores the regexes that match each class of singular noun
 	};
 };
 

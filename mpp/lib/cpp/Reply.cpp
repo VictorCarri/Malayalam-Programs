@@ -82,20 +82,18 @@ void mpp::Reply::addHeader(mpp::Header toAdd)
 /**
 * @desc Copy constructor.
 * @param other Other Reply object to copy from.
-**/
 mpp::Reply::Reply(const Reply& other) : statText(other.statText),
 	stat(other.stat),
 	headers(other.headers),
 	content(other.content),
 	crlf(other.crlf)
 {
-}
+}*/
 
 /**
 * @desc Copy assignment operator.
 * @param other Other Reply object to copy from.
 * @return this
-**/
 mpp::Reply& mpp::Reply::operator=(const mpp::Reply& other)
 {
 	if (&other == this)
@@ -107,25 +105,23 @@ mpp::Reply& mpp::Reply::operator=(const mpp::Reply& other)
 	content = other.content;
 
 	return *this;
-}
+}*/
 
 /**
 * @desc Move constructor.
 * @param other Other Reply object to move from.
-**/
 mpp::Reply::Reply(Reply&& other) : statText(std::move(other.statText)),
 	stat(std::exchange(other.stat, invalid)),
 	headers(std::move(other.headers)),
 	content(std::move(other.content)),
 	crlf(std::move(other.crlf))
 {
-}
+}*/
 
 /**
 * @desc Move assignment operator.
 * @param other Other Reply object to move from.
 * @return this
-**/
 mpp::Reply& mpp::Reply::operator=(mpp::Reply&& other)
 {
 	if (&other == this)
@@ -137,7 +133,7 @@ mpp::Reply& mpp::Reply::operator=(mpp::Reply&& other)
 	content = std::move(other.content);
 
 	return *this;
-}
+}*/
 
 /**
 * @desc Fetches the string associated with the given status.

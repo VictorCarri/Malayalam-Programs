@@ -75,20 +75,59 @@ bool mpp::ReqHandler::isSingular(std::string noun)
 		matchRes[i] = boost::u32regex_match(noun, what[i], regexes[i]);
 	}*/
 
+	std::array<boost::smatch, 6> what; // What matched (unused)
+	std::array<bool, 6> matchRes; // Whether or not each regex matched
 	std::transform(singRegs.cbegin(), singRegs.cend(), what.begin(), matchRes.begin(), mpp::functors::SingMatcher(noun)); // Run boost::u32regex_match on each regex, storing the results in what and the boolean return values in matchRes
 	return std::accumulate(matchRes.cbegin(), matchRes.cend(), false, std::logical_or()); // OR all of the bools together to see if any of the regexes matched, and return the result
 }
 
 /**
-* @desc Initialises internal member variables.
+* @desc Constructor. Initialises internal member variables.
 **/
-mpp::ReqHandler::ReqHandler()
+mpp::ReqHandler::ReqHandler() :
+	singRegs {
+	boost::make_u32regex("\u0d7b$"), // Ends in a final ൻ
+	boost::make_u32regex("\u0d02$"), // Ends in a final ം
+	boost::make_u32regex("\u0d31\u0d4d$"), // Ends in a final -റ്
+	boost::make_u32regex("\u0d1f\u0d4d$"), // Ends in a final -ട്
+	boost::make_u32regex("\u0d7e$"), // Ends in a final -ശ
+	boost::make_u32regex("\u0d4d$") // Ends in a schwa
+	}
 {
 	/* Setup regexes */
-	singRegs[0] = boost::make_u32regex("\u0d7b$"); // Ends in a final ൻ
+	/*singRegs[0] = boost::make_u32regex("\u0d7b$"); // Ends in a final ൻ
 	singRegs[1] = boost::make_u32regex("\u0d02$"); // Ends in a final ം
 	singRegs[2] = boost::make_u32regex("\u0d31\u0d4d$"); // Ends in a final -റ്
 	singRegs[3] = boost::make_u32regex("\u0d1f\u0d4d$"); // Ends in a final -ട്
 	singRegs[4] = boost::make_u32regex("\u0d7e$"); // Ends in a final -ശ
-	singRegs[5] = boost::make_u32regex("\u0d4d$"); // Ends in a schwa
+	singRegs[5] = boost::make_u32regex("\u0d4d$"); // Ends in a schwa*/
+}
+
+/**
+* @desc Determines whether the given noun is singular or not. Then, it generates the opposite form.
+* @param noun The noun to check.
+* @return A string containing the opposite form (plural if input is singular, singular if input is plural).
+**/
+std::string mpp::ReqHandler::findOppForm(std::string noun)
+{
+	if (isSingular(noun)) // Need to find the plural form
+	{
+		return pluralize(noun);
+	}
+
+	else // Need to find the singular form
+	{
+		return singularize(noun);
+	}
+}
+
+/**
+* @desc Pluralises the given noun. The noun is ASSUMED to be singular.
+* @param singNoun The singular noun to pluralise.
+* @return The plural form of the noun.
+**/
+std::string mpp::ReqHandler::pluralise(std::string singNoun)
+{
+	std::array<boost::smatch, 6> what; // What matched (unused)
+	std::array<bool, 6> matchRes; // Whether or not each regex matched
 }

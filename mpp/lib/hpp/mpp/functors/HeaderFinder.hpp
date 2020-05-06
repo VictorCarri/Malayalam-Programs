@@ -34,27 +34,27 @@ namespace mpp
 				* @desc Copy constructor.
 				* @param other The other functor to copy from.
 				**/
-				HeaderFinder(const HeaderFinder& other);
+				//HeaderFinder(const HeaderFinder& other);
 
 				/**
 				* @desc Copy assignment operator.
 				* @param other The other functor to copy from.
 				* @return *this, to allow chaining.
 				**/
-				HeaderFinder& operator=(const HeaderFinder& other);
+				//HeaderFinder& operator=(const HeaderFinder& other);
 	
 				/**
 				* @desc Move constructor.
 				* @param other The other functor to move from.
 				**/
-				HeaderFinder(HeaderFinder&& other);
+				//HeaderFinder(HeaderFinder&& other);
 
 				/**
 				* @desc Move assignment operator.
 				* @param other The other functor to move from.
 				* @return *this, to allow chaining.
 				**/
-				HeaderFinder& operator=(HeaderFinder&& other);
+				//HeaderFinder& operator=(HeaderFinder&& other);
 
 			private:
 				std::string name;

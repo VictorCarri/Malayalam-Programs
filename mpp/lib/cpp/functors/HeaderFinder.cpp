@@ -28,16 +28,16 @@ bool mpp::functors::HeaderFinder::operator()(const mpp::Header h)
 * @desc Copy constructor.
 * @param other The other functor to copy from.
 **/
-mpp::functors::HeaderFinder::HeaderFinder(const mpp::functors::HeaderFinder& other) : name(other.name)
+/*mpp::functors::HeaderFinder::HeaderFinder(const mpp::functors::HeaderFinder& other) : name(other.name)
 {
-}
+}*/
 
 /**
 * @desc Copy assignment operator.
 * @param other The other functor to copy from.
 * @return *this, to allow chaining.
 **/
-mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(const mpp::functors::HeaderFinder& other)
+/*mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(const mpp::functors::HeaderFinder& other)
 {
 	if (this != &other) // Avoid self-assignment
 	{
@@ -45,22 +45,22 @@ mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(const mpp::f
 	}
 
 	return *this;
-}
+}*/
 
 /**
 * @desc Move constructor.
 * @param other The other functor to move from.
 **/
-mpp::functors::HeaderFinder::HeaderFinder(mpp::functors::HeaderFinder&& other) : name(std::move(other.name))
+/*mpp::functors::HeaderFinder::HeaderFinder(mpp::functors::HeaderFinder&& other) : name(std::move(other.name))
 {
-}
+}*/
 
 /**
 * @desc Move assignment operator.
 * @param other The other functor to move from.
 * @return *this, to allow chaining.
 **/
-mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(mpp::functors::HeaderFinder&& other)
+/*mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(mpp::functors::HeaderFinder&& other)
 {
 	if (this != &other)
 	{
@@ -68,4 +68,4 @@ mpp::functors::HeaderFinder& mpp::functors::HeaderFinder::operator=(mpp::functor
 	}
 
 	return *this;
-}
+}*/

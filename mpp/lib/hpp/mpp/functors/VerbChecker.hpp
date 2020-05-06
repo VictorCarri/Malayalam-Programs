@@ -32,7 +32,7 @@ namespace mpp
 				* @desc Copy constructor.
 				* @param other The other functor to copy from.
 				**/
-				VerbChecker(const VerbChecker& other);
+				//VerbChecker(const VerbChecker& other);
 
 				/**
 				* @desc Determines whether or not the current verb's first character is $upper.
@@ -45,21 +45,21 @@ namespace mpp
 				* @desc Move constructor.
 				* @param other The other VerbChecker to move from.
 				**/
-				VerbChecker(VerbChecker&& other);
+				//VerbChecker(VerbChecker&& other);
 
 				/**
 				* @desc Move assignment operator.
 				* @param other The other VerbChecker to move from.
 				* @return A reference to this VerbChecker to allow chaining.
 				**/
-				VerbChecker& operator=(VerbChecker&& other);
+				//VerbChecker& operator=(VerbChecker&& other);
 
 				/**
 				* @desc Copy assignment operator.
 				* @param other The other VerbChecker to move from.
 				* @return A reference to this VerbChecker to allow chaining.
 				**/
-				VerbChecker& operator=(const VerbChecker& other);
+				//VerbChecker& operator=(const VerbChecker& other);
 
 			private:
 				char upper; // The uppercase string to search for

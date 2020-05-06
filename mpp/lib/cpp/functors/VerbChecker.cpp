@@ -61,32 +61,29 @@ bool mpp::functors::VerbChecker::operator()(std::string verb)
 /**
 * @desc Copy constructor.
 * @param other The other functor to copy from.
-**/
 #ifdef DEBUG
 mpp::functors::VerbChecker::VerbChecker(const mpp::functors::VerbChecker& other) : upper(other.upper), name(other.name)
 #else
 mpp::functors::VerbChecker::VerbChecker(const mpp::functors::VerbChecker& other) : upper(other.upper)
 #endif
 {
-}
+}*/
 
 /**
 * @desc Move constructor.
 * @param other The other VerbChecker to move from.
-**/
 #ifdef DEBUG
 mpp::functors::VerbChecker::VerbChecker(mpp::functors::VerbChecker&& other) : upper(other.upper), name(std::move(other.name))
 #else
 mpp::functors::VerbChecker::VerbChecker(mpp::functors::VerbChecker&& other) : upper(other.upper)
 #endif
 {
-}
+}*/
 
 /**
 * @desc Move assignment operator.
 * @param other The other VerbChecker to move from.
 * @return A reference to this VerbChecker to allow chaining.
-**/
 mpp::functors::VerbChecker& mpp::functors::VerbChecker::operator=(mpp::functors::VerbChecker&& other)
 {
 	if (this != &other)
@@ -98,13 +95,12 @@ mpp::functors::VerbChecker& mpp::functors::VerbChecker::operator=(mpp::functors:
 	}
 
 	return *this;
-}
+}*/
 
 /**
 * @desc Copy assignment operator.
 * @param other The other VerbChecker to move from.
 * @return A reference to this VerbChecker to allow chaining.
-**/
 mpp::functors::VerbChecker& mpp::functors::VerbChecker::operator=(const mpp::functors::VerbChecker& other)
 {
 	if (this != &other)
@@ -116,4 +112,4 @@ mpp::functors::VerbChecker& mpp::functors::VerbChecker::operator=(const mpp::fun
 	}
 
 	return *this;
-}
+}*/
