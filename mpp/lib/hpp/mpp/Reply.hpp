@@ -108,8 +108,8 @@ namespace mpp
 			std::map<Status, std::string> statText; // Text for each status
 			Status stat; // This reply's status
 			std::forward_list<mpp::Header> headers; // List of headers to send with the reply
-			//const char crlf[] = { '\r', '\n' };
-			const std::array<char, 2> crlf;
+			const std::array<char, 2> crlf; // CR/LF sequence to be used in the reply
+			const std::array<char, 2> nameValSep; // Separates a header name from its value
 			std::string content;
 	};
 };

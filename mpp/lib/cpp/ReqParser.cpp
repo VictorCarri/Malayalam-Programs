@@ -1,12 +1,13 @@
 /* Standard C++ */
 #include <locale> // std::isdigit, std::isspace, std::isalpha, std::toupper, std::tolower, std::isalnum
-#include <algorithm> // std::find_if, std::for_each
+#include <algorithm> // std::find_if, std::for_each, std::copy, std::for_each
 #include <string> // std:wstring, std::string
 #include <exception> // std::runtime_error
 #include <sstream> // std::ostringstream, std::stringstream
 #include <memory> // std::make_unique
 #include <any> // std::any
 #include <bitset> // std::bitset
+#include <iterator> // std::ostream_iterator
 
 #ifdef DEBUG
 #include <iostream> // std::cout, std::cout
@@ -20,10 +21,9 @@
 #include "mpp/Reply.hpp" // Reply::FailureCode, to indicate why the parser failed
 #include "mpp/Request.hpp" // Request class
 #include "mpp/ver.hpp" // Protocol version info
-#include "mpp/functors/Printer.hpp" // Functor that prints each item in a list. It is ASSUMED that the object passed to operator() implements operator<<
-#include "mpp/functors/VerbChecker.hpp" // Functor that checks if a given character matches the first character of a given verb
-#include "mpp/functors/PtrResetter.hpp" // Functor that resets pointers
 #include "mpp/Header.hpp" // Represents a request header
+#include "mpp/functors/PtrResetter.hpp" // Resets pointers to stringstreams
+#include "mpp/functors/Printer.hpp" // Class template that prints items
 #include "mpp/ReqParser.hpp" // Class def'n
 
 /**
@@ -36,9 +36,6 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	pSSHeaderName(new std::stringstream),
 	pSSHeaderVal(new std::stringstream)
 {
-	/*version = {VER_MAJOR, VER_MINOR, VER_PATCH}; // Initialise version info
-	verbs = {"ISSING", "FOF"}; // Initialise array of recognised verbs*/
-
 	#ifdef DEBUG
 	/* Set up map of states to state names */
 	stateNames[protocol_name_m] = "protocol_name_m";
@@ -68,11 +65,6 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	std::cout << "mpp::ReqParser::ReqParser: starting state = " << stateNames[curStat] << std::endl
 	<< "Version = " << version.at(0) << "." << version.at(1) << "." << version.at(2) << std::endl
 	<< "Recognised verbs = ";
-	/*std::for_each(verbs.cbegin(), verbs.cend()-1, [](std::string s)
-		{
-			std::cout << s << ",";
-		}
-	);*/
 	std::for_each(verbs.cbegin(), verbs.cend()-1, mpp::functors::Printer<std::string, std::ostream>(std::cout));
 	std::cout << verbs.at(verbs.size()-1) << std::endl;
 	#endif
@@ -87,6 +79,7 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	{
 		verSS[i] = std::make_unique<std::stringstream>(); // Create a pointer to a stringstream
 	}
+	//std::fill(verSS.begin(), verSS.end(), std::make_unique<std::stringstream>()); // Initialise the array of stringstreams for each version #
 }
 
 /**
@@ -100,7 +93,13 @@ void mpp::ReqParser::reset()
 	std::cout << "mpp::ReqParser::reset: reset to state " << stateNames[curStat] << std::endl;
 	#endif
 
-	std::for_each(verSS.begin(), verSS.end(), mpp::functors::PtrResetter()); // Reset the unique_ptrs
+	//std::for_each(verSS.begin(), verSS.end(), mpp::functors::PtrResetter()); // Need to use std::for_each the pointers to stringstreams - a for loop doesn't work
+
+	for (auto& ptr : verSS)
+	{
+		ptr.reset(new std::stringstream);
+	}
+
 	pSSHeaderName.reset(new std::stringstream); // Reset the header stringstream
 	pSSHeaderVal.reset(new std::stringstream); // Reset the header stringstream
 	pNounSS.reset(new std::stringstream);
@@ -423,7 +422,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 				std::cout << "mpp::ReqParser::consume: verb_start: uppercase input is '" << upper << "'" << std::endl;
 				#endif
 
-/*				std::array<std::string, 2>::const_iterator verbIt = std::find_if(verbs.cbegin(), verbs.cend(), [=](std::string verb)
+				auto verbIt = std::find_if(verbs.cbegin(), verbs.cend(), [=](std::string verb) -> bool
 					{
 						#ifdef DEBUG
 						std::cout << "mpp::ReqParser::consume: comparing first character of verb \"" << verb << "\" to uppercase char '" << upper << "'" << std::endl;
@@ -431,7 +430,9 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 						if (verb[0] == upper) // Found a match
 						{
-							#ifdef DEBUG std::cout << "mpp::ReqParser::consume: matched verb \"" << verb << "\"" << std::endl; #endif 
+							#ifdef DEBUG
+							std::cout << "mpp::ReqParser::consume: matched verb \"" << verb << "\"" << std::endl;
+							#endif 
 							return true;
 						}
 			
@@ -444,13 +445,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 							return false;
 						}
 					}
-				);*/
-
-				#ifdef DEBUG
-				std::array<std::string, 2>::const_iterator verbIt = std::find_if(verbs.cbegin(), verbs.cend(), mpp::functors::VerbChecker(upper, "mpp::ReqParser::consume")); // Use a name to label debugging messages. This constructor of VerbChecker only exists in debug builds
-				#else
-				std::array<std::string, 2>::const_iterator verbIt = std::find_if(verbs.cbegin(), verbs.cend(), mpp::functors::VerbChecker(upper));
-				#endif
+				);
 
 				if (verbIt == verbs.cend()) // No matching verb found
 				{

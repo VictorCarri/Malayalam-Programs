@@ -1,16 +1,16 @@
 /* STL */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
-#include <algorithm> // std::for_each
 #include <utility> // std::exchange, std::move
+#include <any> // std::any_cast, std::bad_any_cast
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
 
 /* Our headers */
-#include "mpp/Reply.hpp" // Class def'n
 #include "mpp/ver.hpp" // MPP protocol version
-#include "mpp/functors/HeaderBufferAdder.hpp"
+#include "mpp/exceptions/BadHeaderValue.hpp" // Exception thrown when the type of a header's value doesn't match the expected one
+#include "mpp/Reply.hpp" // Class def'n
 
 /**
 * @name Default constructor.
@@ -21,7 +21,8 @@ mpp::Reply::Reply() :
 	headers{},
 	statText{},
 	content(""),
-	crlf {'\r', '\n'}
+	crlf {'\r', '\n'},
+	nameValSep {':', ' '}
 {
 	std::ostringstream verSS; // Used to build version string
 	verSS << "MPP/" << mpp::VER_MAJOR << mpp::VER_MINOR << mpp::VER_PATCH << " ";
@@ -64,8 +65,57 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 {
 	std::vector<boost::asio::const_buffer> buffers;
 	buffers.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
-	//std::for_each(headers.cbegin(), headers.cend(), mpp::functors::HeaderBufferAdder(&buffers)); // Add one buffer containing the header's text for each header
-	std::for_each(headers.cbegin(), headers.cend(), mpp::functors::HeaderBufferAdder(buffers)); // Add one buffer containing the header's text for each header
+
+	for (mpp::Header h : headers)
+	{
+		buffers.push_back(boost::asio::buffer(h.getName()));
+		buffers.push_back(boost::asio::buffer(nameValSep));
+		std::string val; // Used to store the value to push back
+	
+		/* Determine what type the value has, and cast it appropriately */
+		if (h.getName() == "Content-Length") // Int value
+		{
+			int length;
+	
+			try
+			{
+				length = std::any_cast<int>(h.getValue()); // Fetch the length
+				std::ostringstream convSS; // Used to convert int to str
+				convSS << length;
+				val = convSS.str();
+			}
+	
+			catch (std::bad_any_cast& stdbace) // Rethrow it as a library error
+			{
+				std::ostringstream ess;
+				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
+				<< "Error: " << stdbace.what() << std::endl;
+				mpp::exceptions::BadHeaderValue toThrow(ess.str());
+				throw toThrow;
+			}
+		}
+	
+		else // String value
+		{
+			try
+			{
+				val = std::any_cast<std::string>(h.getValue()); // Fetch the string value
+			}
+	
+			catch (std::bad_any_cast& stdbace) // Rethrow it as a library error
+			{
+				std::ostringstream ess;
+				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
+				<< "Error: " << stdbace.what() << std::endl;
+				mpp::exceptions::BadHeaderValue toThrow(ess.str());
+				throw toThrow;
+			}
+		}
+	
+		buffers.push_back(boost::asio::buffer(val)); // Push back the value computed above
+		buffers.push_back(boost::asio::buffer(crlf));
+	}
+
 	buffers.push_back(boost::asio::buffer(crlf));
 	buffers.push_back(boost::asio::buffer(content));
 	return buffers;
@@ -141,7 +191,7 @@ mpp::Reply& mpp::Reply::operator=(mpp::Reply&& other)
 **/
 std::string mpp::Reply::getStatText(mpp::Reply::Status s)
 {
-	return statText->at(s);
+	return statText.at(s);
 }
 
 /**

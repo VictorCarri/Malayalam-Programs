@@ -16,6 +16,8 @@
 #define __ATOMIC_RELEASE 3
 #define __ATOMIC_ACQ_REL 4
 #define __ATOMIC_CONSUME 1
+#define __pic__ 2
+#define __PIC__ 2
 #define __OPTIMIZE__ 1
 #define __FINITE_MATH_ONLY__ 0
 #define _LP64 1
@@ -43705,71 +43707,6 @@ namespace mpp
  };
 };
 # 10 "cpp/Request.cpp" 2
-# 1 "./hpp/mpp/functors/HeaderFinder.hpp" 1
-
-#define MPP_FUNCTORS_HEADERFINDER_HPP 
-
-
-
-
-
-
-
-namespace mpp
-{
- namespace functors
- {
-
-
-
-  class HeaderFinder
-  {
-   public:
-
-
-
-
-    HeaderFinder(std::string nm);
-
-
-
-
-
-
-    bool operator()(const mpp::Header h);
-
-
-
-
-
-    HeaderFinder(const HeaderFinder& other);
-
-
-
-
-
-
-    HeaderFinder& operator=(const HeaderFinder& other);
-
-
-
-
-
-    HeaderFinder(HeaderFinder&& other);
-
-
-
-
-
-
-    HeaderFinder& operator=(HeaderFinder&& other);
-
-   private:
-    std::string name;
-  };
- };
-};
-# 11 "cpp/Request.cpp" 2
 # 1 "./hpp/mpp/Request.hpp" 1
 
 #define MPP_REQUEST_HPP 
@@ -45417,7 +45354,7 @@ namespace mpp
    std::string noun;
  };
 };
-# 12 "cpp/Request.cpp" 2
+# 11 "cpp/Request.cpp" 2
 
 
 
@@ -45459,7 +45396,11 @@ void mpp::Request::addHeader(std::string name, std::any value)
 
 mpp::Header mpp::Request::findHeader(std::string name)
 {
- std::forward_list<mpp::Header>::const_iterator it = std::find_if(headers.cbegin(), headers.cend(), mpp::functors::HeaderFinder(name));
+ auto it = std::find_if(headers.cbegin(), headers.cend(), [=](mpp::Header h) -> bool
+  {
+   return h.getName() == name;
+  }
+ );
 
  if (it == headers.cend())
  {

@@ -7,7 +7,6 @@
 /* Our headers */
 #include "mpp/Header.hpp" // Header class
 #include "mpp/exceptions/UnknownHeader.hpp" // Thrown when an unknown header is requested
-#include "mpp/functors/HeaderFinder.hpp" // Functor that finds a header with the given name
 #include "mpp/Request.hpp" // Class definition
 
 /**
@@ -50,7 +49,11 @@ void mpp::Request::addHeader(std::string name, std::any value)
 **/
 mpp::Header mpp::Request::findHeader(std::string name)
 {
-	std::forward_list<mpp::Header>::const_iterator it = std::find_if(headers.cbegin(), headers.cend(), mpp::functors::HeaderFinder(name));
+	auto it = std::find_if(headers.cbegin(), headers.cend(), [=](mpp::Header h) -> bool
+		{
+			return h.getName() == name;
+		}
+	);
 	
 	if (it == headers.cend()) // No such header
 	{

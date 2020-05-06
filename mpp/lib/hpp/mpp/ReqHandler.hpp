@@ -17,7 +17,7 @@
 namespace mpp
 {
 	/*
-	* Responsible for handling a request. Parses the request into a Request object and uses the Reply class to generate a reply.
+	* Responsible for handling a request. Examines the Request object to determine how to respond, and sets parameters on the Reply object accordingly.
 	*/
 	class ReqHandler : private boost::noncopyable
 	{
@@ -55,8 +55,6 @@ namespace mpp
 			* @return The plural form of the noun.
 			**/
 			std::string pluralise(std::string singNoun);
-
-			std::array<boost::u32regex, 6> singRegs; // Stores the regexes that match each class of singular noun
 	};
 };
 
