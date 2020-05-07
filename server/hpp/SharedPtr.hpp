@@ -3,7 +3,7 @@
 
 /*
 * This header defines a macro that resolves to either the STL or Boost implementation of shared_ptr, depending on the compile-time attribute USE_STD_SHARED_PTR.
-* It defaults to std::shared_ptr
+* It defaults to boost::shared_ptr.
 */
 #ifdef USE_STD_SHARED_PTR
 

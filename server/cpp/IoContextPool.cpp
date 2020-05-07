@@ -7,6 +7,7 @@
 #ifdef DEBUG
 #include <iostream> // std::clog
 #endif
+#include <sstream> // std::stringstream
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::make_work_guard
@@ -26,7 +27,9 @@ IoContextPool::IoContextPool(std::size_t poolSize) : nextIoCon(0)
 {
 	if (poolSize <= 0) // We need a positive integer
 	{
-		throw std::runtime_error("IoContextPool::IoContextPool(std::size_t poolSize): pool size is <= 0.");
+		std::stringstream ess;
+		ess << "IoContextPool::IoContextPool(std::size_t poolSize): pool size (" << poolSize << ") is <= 0.";
+		throw std::runtime_error(ess.str());
 	}
 	
 	/*

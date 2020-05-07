@@ -8,6 +8,7 @@
 #include <any> // std::any
 #include <bitset> // std::bitset
 #include <iterator> // std::ostream_iterator
+#include <utility> // std::pair
 
 #ifdef DEBUG
 #include <iostream> // std::cout, std::cout
@@ -31,7 +32,10 @@
 **/
 mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start state
 	version {mpp::VER_MAJOR, mpp::VER_MINOR, mpp::VER_PATCH},
-	verbs {"ISSING", "FOF"},
+	verbInfo {
+		{"ISSING", issing_first_s},
+		{"FOF", fof_o}
+	},
 	pNounSS(new std::stringstream),
 	pSSHeaderName(new std::stringstream),
 	pSSHeaderVal(new std::stringstream)
@@ -65,7 +69,7 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	std::cout << "mpp::ReqParser::ReqParser: starting state = " << stateNames[curStat] << std::endl
 	<< "Version = " << version.at(0) << "." << version.at(1) << "." << version.at(2) << std::endl
 	<< "Recognised verbs = ";
-	std::for_each(verbs.cbegin(), verbs.cend()-1, mpp::functors::Printer<std::string, std::ostream>(std::cout));
+	std::for_each(verbs.begin(), verbs.end()-1, mpp::functors::Printer< std::pair<std::string, State>, std::ostream>(std::cout));
 	std::cout << verbs.at(verbs.size()-1) << std::endl;
 	#endif
 	

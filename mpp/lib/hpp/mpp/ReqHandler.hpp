@@ -28,33 +28,6 @@ namespace mpp
 			* @param rep The respnse object to set parameters on to generate a response.
 			**/
 			void handleReq(const Request& req, Reply& rep);
-
-			/**
-			* @desc Constructor. Initialises internal member variables.
-			**/
-			ReqHandler();
-
-		private:
-			/**
-			* @desc Determines whether the given Malayalam noun is singular or not.
-			* @param noun The noun to check.
-			* @return True if the noun is singular, false otherwise.
-			**/
-			bool isSingular(std::string noun);
-
-			/**
-			* @desc Determines whether the given noun is singular or not. Then, it generates the opposite form.
-			* @param noun The noun to check.
-			* @return A string containing the opposite form (plural if input is singular, singular if input is plural).
-			**/
-			std::string findOppForm(std::string noun);
-
-			/**
-			* @desc Pluralises the given noun. The noun is ASSUMED to be singular.
-			* @param singNoun The singular noun to pluralise.
-			* @return The plural form of the noun.
-			**/
-			std::string pluralise(std::string singNoun);
 	};
 };
 
