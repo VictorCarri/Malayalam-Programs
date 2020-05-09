@@ -1,7 +1,7 @@
 libName=vuu
 dbgLibs=$(addprefix lib,$(addprefix $(libName)-debug,.a .so))
 prodLibs=$(addprefix lib,$(addprefix $(libName),.a .so))
-files=internals/StateNamePrinter InvByteInCodePoint LenCounter 
+files=internals/StateNamePrinter InvByteInCodePoint LenCounter UTF8Validator
 objDir=./obj
 statDbgObjs=$(addprefix $(objDir)/static/debug/,$(addsuffix .o,$(files)))
 dynDbgObjs=$(addprefix $(objDir)/dynamic/debug/,$(addsuffix .o,$(files)))
