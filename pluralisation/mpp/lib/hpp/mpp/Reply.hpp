@@ -35,8 +35,7 @@ namespace mpp
 				badMinor, // Bad minor #
 				badPatch, // Bad patch #
 				unknownVerb, // Unrecognised MPP verb
-				invMalChar, // Invalid Malayalam characters in input
-				invBool, // Invalid Boolean given in FOF query
+				invUTF8, // Invalid UTF-8 characters in input
 
 				/* Other */
 				invalid = -1 // Used when a Reply is default-constructed.

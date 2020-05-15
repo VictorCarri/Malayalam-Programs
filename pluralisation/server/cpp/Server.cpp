@@ -26,7 +26,7 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	: 	iocp(numThreads),
 		signals(iocp.getIoc()),
 		acceptor(iocp.getIoc()),
-		reqHandler()
+		reqHandler("~/info/pluraliser.dbinfo") // Pass the request-handler the path to the DB config file
 {
 	/*
 	* Register to handle signals that indicate that the server should exit.

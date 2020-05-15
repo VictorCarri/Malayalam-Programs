@@ -1,6 +1,6 @@
 /* Standard C++ */
 #include <locale> // std::isdigit, std::isspace, std::isalpha, std::toupper, std::tolower, std::isalnum
-#include <algorithm> // std::find_if, std::for_each, std::copy, std::for_each
+#include <algorithm> // std::find_if, std::for_each, std::copy, std::all_of
 #include <string> // std:wstring, std::string
 #include <exception> // std::runtime_error
 #include <sstream> // std::ostringstream, std::stringstream
@@ -17,6 +17,9 @@
 
 /* Boost */
 #include <boost/logic/tribool.hpp> // boost::tribool, boost::indeterminate
+
+/* My Unicode utilities library */
+#include "vuu/UTF8Validator.hpp" // vuu::UTF8Validator, to ensure that a string contains valid UTF-8
 
 /* Our headers */
 #include "mpp/Reply.hpp" // Reply::FailureCode, to indicate why the parser failed
@@ -933,12 +936,24 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 				if (mNBytes == 0) // Read the entire noun
 				{
-					req.setNoun(pNounSS->str()); // Store the noun (as UTF-8 bytes) in the request
-					toReturn = true; // We have successfully parsed an entire request
+					/* Ensure that the noun contains valid UTF-8 */
+					std::string noun = pNounSS->str(); // Fetch the contents of the stringstream as a string
 
-					#ifdef DEBUG
-					std::cout << "ReqParser::consume: successfully parsed noun \"" << req.getNoun() << "\"" << std::endl;
-					#endif
+					if (std::all_of(noun.cbegin(), noun.cend(), vuu::UTF8Validator())) // The noun is valid UTF-8
+					{
+						req.setNoun(pNounSS->str()); // Store the noun (as UTF-8 bytes) in the request
+						toReturn = true; // We have successfully parsed an entire request
+
+						#ifdef DEBUG
+						std::cout << "ReqParser::consume: successfully parsed noun \"" << req.getNoun() << "\"" << std::endl;
+						#endif
+					}
+
+					else // The noun contains invalid UTF-8
+					{
+						toReturn = false;
+						status = Reply::invUTF8;
+					}
 				}
 
 				else // Some bytes still remain

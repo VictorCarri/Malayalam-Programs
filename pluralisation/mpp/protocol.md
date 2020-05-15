@@ -65,7 +65,7 @@ If {noun} contains non-Malayalam characters, the response:
 
 will be returned.
 
-FOF {str noun} {bool isSingular}
+FOF {noun: "str"}
 ----------------------------------------
 Finds the opposite form of the given noun. If it is singular, the plural form is returned. Otherwise, the singular form is returned. Possible responses:
 
@@ -77,10 +77,6 @@ or
 If {noun} contains invalid Malayalam code points, the response:
 	
 	MPP/1.0 405 Invalid Malayalam Codepoints in Input
-
-will be returned. If {isSingular} is not one of the strings "true" or "false", the response
-
-	MPP/1.0 406 Invalid Boolean
 
 will be returned.
 
