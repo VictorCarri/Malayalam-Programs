@@ -14,7 +14,7 @@ namespace mpp
 		/**
 		* @desc Thrown if some sort of DB-related error occurs.
 		**/
-		class DBError : public Exception
+		class DBError : public virtual Exception
 		{
 			public:
 				/**

@@ -1,14 +1,14 @@
 cppDir=./cpp
 compiler=g++-8
 objDir=./obj
-files=functors/PtrResetter $(addprefix exceptions/,Exception UnknownHeader BadHeaderValue $(addprefix MissingDB,ConfFile Info)) $(addprefix data/,DBInfo) Header Reply Request ReqParser ReqHandler
+files=functors/PtrResetter $(addprefix exceptions/,Exception BadHeaderValue DBError $(addprefix MissingDB,ConfFile Info) UnknownHeader) $(addprefix data/,DBInfo) Header Reply Request ReqParser ReqHandler
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
 dbgDynObjs=$(addprefix $(objDir)/debug/dynamic/,$(addsuffix .o,$(files)))
 prodStatObjs=$(addprefix $(objDir)/production/static/,$(addsuffix .o,$(files)))
 prodDynObjs=$(addprefix $(objDir)/production/dynamic/,$(addsuffix .o,$(files)))
 libName=mpp
 hppDir=./hpp
-compOpts=$(addprefix -O,3 s) -I$(hppDir) -save-temps -std=gnu++17
+compOpts=$(addprefix -O,3 s) $(addprefix -I,$(hppDir) /home/victor/include /usr/include/mysql) -save-temps -std=gnu++17
 dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-points) -Og -fvar-tracking-assignments
 
 # Directory where the libraries will be built
@@ -17,7 +17,7 @@ buildDir=./build
 # Directory where library should be installed
 instDir=~/lib/mpp
 
-all: $(addprefix $(buildDir)/,lib$(libName)-debug.so lib$(libName).so lib$(libName).a lib$(libName)-debug.a)
+all: $(addprefix $(buildDir)/,lib$(libName)-debug.so lib$(libName).so lib$(libName).a lib$(libName)-debug.a) ~/include/$(libName)
 	rm -rf ~/include/$(libName)
 	cp -r $(hppDir)/$(libName) ~/include/
 
@@ -58,19 +58,19 @@ clean_debug: $(addprefix clean_debug_,static dynamic)
 clean_production: $(addprefix clean_production_,static dynamic)
 
 clean_debug_static:
-	find $(objDir)/debug/static/* -type f -exec rm {} \;
+	find $(objDir)/debug/static/ -type f -exec rm {} \;
 	rm -f $(buildDir)/lib$(libName)-debug.a
 
 clean_debug_dynamic:
-	find $(objDir)/debug/dynamic/* -type f -exec rm {} \;
+	find $(objDir)/debug/dynamic/ -type f -exec rm {} \;
 	rm -f $(buildDir)/lib$(libName)-debug.so
 
 clean_production_dynamic:
-	find $(objDir)/production/dynamic/* -type f -exec rm {} \;
+	find $(objDir)/production/dynamic/ -type f -exec rm {} \;
 	rm -f $(buildDir)/lib$(libName).so
 
 clean_production_static:
-	find $(objDir)/production/static/* -type f -exec rm {} \;
+	find $(objDir)/production/static/ -type f -exec rm {} \;
 	rm -f $(buildDir)/lib$(libName).a
 
 rebuild: clean all

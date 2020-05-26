@@ -7,7 +7,7 @@
 #include <memory> // std::make_unique
 #include <any> // std::any
 #include <bitset> // std::bitset
-#include <iterator> // std::ostream_iterator
+#include <iterator> // std::ostream_iterator, std::advance
 #include <utility> // std::pair
 
 #ifdef DEBUG
@@ -72,8 +72,12 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	std::cout << "mpp::ReqParser::ReqParser: starting state = " << stateNames[curStat] << std::endl
 	<< "Version = " << version.at(0) << "." << version.at(1) << "." << version.at(2) << std::endl
 	<< "Recognised verbs = ";
-	std::for_each(verbs.begin(), verbs.end()-1, mpp::functors::Printer< std::pair<std::string, State>, std::ostream>(std::cout));
-	std::cout << verbs.at(verbs.size()-1) << std::endl;
+	//std::for_each(verbsInfo.begin(), verbInfo.end()-1, mpp::functors::Printer< std::pair<std::string, State>, std::ostream>(std::cout));
+	std::for_each(verbInfo.cbegin(), verbInfo.cend(), [=](std::pair<std::string, State> pair)
+		{
+			std::cout << "State #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
+		}
+	);
 	#endif
 	
 	/* Set up locale cache */
@@ -429,8 +433,10 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 				std::cout << "mpp::ReqParser::consume: verb_start: uppercase input is '" << upper << "'" << std::endl;
 				#endif
 
-				auto verbIt = std::find_if(verbs.cbegin(), verbs.cend(), [=](std::string verb) -> bool
+				auto verbIt = std::find_if(verbInfo.cbegin(), verbInfo.cend(), [=](std::pair<std::string, State> verbDat) -> bool
 					{
+						std::string verb = verbDat.first;
+
 						#ifdef DEBUG
 						std::cout << "mpp::ReqParser::consume: comparing first character of verb \"" << verb << "\" to uppercase char '" << upper << "'" << std::endl;
 						#endif
@@ -454,7 +460,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 					}
 				);
 
-				if (verbIt == verbs.cend()) // No matching verb found
+				if (verbIt == verbInfo.cend()) // No matching verb found
 				{
 					#ifdef DEBUG
 					std::cout << "mpp::ReqParser::consume: verb_start: no matching verb found." << std::endl;
@@ -470,7 +476,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 				else // Check which verb matched
 				{
-					std::string verb = *verbIt;
+					std::string verb = verbIt->first;
 		
 					#ifdef DEBUG
 					std::cout << "mpp::ReqParser::consume: verb_start: matched verb is: " << verb << std::endl

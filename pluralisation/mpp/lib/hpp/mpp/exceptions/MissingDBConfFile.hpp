@@ -1,5 +1,5 @@
-#ifndef MPP_EXCEPTIONS_MISSINGDBINFO_HPP
-#define MPP_EXCEPTIONS_MISSINGDBINFO_HPP
+#ifndef MPP_EXCEPTIONS_MISSINGDBCONFFILE_HPP
+#define MPP_EXCEPTIONS_MISSINGDBCONFFILE_HPP
 
 /* Standard C++ */
 #include <string> // std::string
@@ -14,7 +14,7 @@ namespace mpp
 		/**
 		* An exception thrown if we can't find the DB info file.
 		**/
-		class MissingDBConfFile : public Exception
+		class MissingDBConfFile : public virtual Exception
 		{
 			public:
 				/**
@@ -32,4 +32,4 @@ namespace mpp
 	};
 };
 
-#endif // MPP_EXCEPTIONS_MISSINGDBINFO_HPP
+#endif // MPP_EXCEPTIONS_MISSINGDBCONFFILE_HPP

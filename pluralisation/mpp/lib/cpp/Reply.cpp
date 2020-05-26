@@ -10,6 +10,7 @@
 /* Our headers */
 #include "mpp/ver.hpp" // MPP protocol version
 #include "mpp/exceptions/BadHeaderValue.hpp" // Exception thrown when the type of a header's value doesn't match the expected one
+#include "mpp/Header.hpp" // Header class
 #include "mpp/Reply.hpp" // Class def'n
 
 /**
@@ -41,8 +42,7 @@ mpp::Reply::Reply() :
 	statText[badMinor] = verSS.str() + "402 Unrecognised Protocol Minor Version Number";
 	statText[badPatch] = verSS.str() + "403 Unrecognised Protocol Patch Number";
 	statText[unknownVerb] = verSS.str() + "404 Unrecognised Verb";
-	statText[invMalChar] = verSS.str() + "405 Invalid Malayalam Codepoints in Input";
-	statText[invBool] = verSS.str() + "406 Invalid Boolean";
+	statText[invUTF8] = verSS.str() + "405 Malformed UTF-8 Input";
 
 	/* Set up invalid status text */
 	statText[invalid] = "Error: invalid Reply object!";
@@ -130,62 +130,6 @@ void mpp::Reply::addHeader(mpp::Header toAdd)
 }
 
 /**
-* @desc Copy constructor.
-* @param other Other Reply object to copy from.
-mpp::Reply::Reply(const Reply& other) : statText(other.statText),
-	stat(other.stat),
-	headers(other.headers),
-	content(other.content),
-	crlf(other.crlf)
-{
-}*/
-
-/**
-* @desc Copy assignment operator.
-* @param other Other Reply object to copy from.
-* @return this
-mpp::Reply& mpp::Reply::operator=(const mpp::Reply& other)
-{
-	if (&other == this)
-		return *this;
-
-	statText = other.statText;
-	stat = other.stat;
-	headers = other.headers;
-	content = other.content;
-
-	return *this;
-}*/
-
-/**
-* @desc Move constructor.
-* @param other Other Reply object to move from.
-mpp::Reply::Reply(Reply&& other) : statText(std::move(other.statText)),
-	stat(std::exchange(other.stat, invalid)),
-	headers(std::move(other.headers)),
-	content(std::move(other.content)),
-	crlf(std::move(other.crlf))
-{
-}*/
-
-/**
-* @desc Move assignment operator.
-* @param other Other Reply object to move from.
-* @return this
-mpp::Reply& mpp::Reply::operator=(mpp::Reply&& other)
-{
-	if (&other == this)
-		return *this;
-
-	statText = std::move(other.statText);
-	stat = std::exchange(other.stat, invalid);
-	headers = std::move(other.headers);
-	content = std::move(other.content);
-
-	return *this;
-}*/
-
-/**
 * @desc Fetches the string associated with the given status.
 * @param s THe status to fetch a string for.
 **/
@@ -201,4 +145,14 @@ std::string mpp::Reply::getStatText(mpp::Reply::Status s)
 void mpp::Reply::setContent(std::string c)
 {
 	content = c;
+}
+
+/**
+* @desc Uses in-place construction to add a Header to our list.
+* @param name The header's name.
+* @param val The header's value.
+**/
+void mpp::Reply::addHeader(std::string name, std::any val)
+{
+	headers.emplace_front(name, val); // Construct a new header in-place
 }

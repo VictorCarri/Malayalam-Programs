@@ -3,10 +3,15 @@ compiler=g++-8
 objDir=./obj
 objs=$(addprefix $(objDir)/,$(addsuffix .o,main))
 hdrDir=/home/victor/include
-compOpts=-I$(hdrDir) -save-temps -DDEBUG -ggdb3 -std=gnu++1z
+compOpts=-I$(hdrDir) -save-temps -DDEBUG -ggdb3 -std=gnu++1z $(shell mariadb_config --cflags)
 exeName=parserTest
-libDirs=$(addprefix -L,$(addprefix /usr/local/lib/,boost icu) /home/victor/lib/mpp)
-libs=$(addprefix -l,mpp-debug vuu-debug boost_program_options-mt-d-x64 boost_locale-mt-d-x64 boost_filesystem-mt-d-x64 $(addprefix icu,data i18n io test tu uc) pthread)
+myLibDirs=$(addprefix /home/victor/lib/,mpp vuu)
+usrLocalLibDirs=$(addprefix /usr/local/lib/,boost icu)
+libDirs=$(addprefix -L,$(usrLocalLibDirs) $(myLibDirs)) $(shell mariadb_config --libs)
+myLibs=$(addsuffix -debug,mpp vuu)
+boostLibs=$(addprefix boost_,$(addsuffix -mt-d-x64,regex program_options locale filesystem system))
+icuLibs=$(addprefix icu,data i18n io test tu uc)
+libs=$(addprefix -l,$(myLibs) $(boostLibs) $(icuLibs) pthread mariadbclientpp) $(shell mariadb_config --libs_sys)
 
 $(exeName): $(objs)
 	$(compiler) -o $@ $^ $(libDirs) $(libs) $(compOpts)

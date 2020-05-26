@@ -138,7 +138,6 @@ namespace mpp
 			mpp::Reply::Status status;
 			const std::array<short, 3> version; // Current parser/server version
 			std::array<std::unique_ptr<std::stringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
-			//const std::array<std::string, 2> verbs; // Recognised verbs
 			std::map<std::string, State> verbInfo; // Maps a verb to its state. The keys are iterated to check recognised verbs. The values are only used to determine which state to jump to next after parsing the first character of the verb.
 			boost::locale::generator gen; // Used to switch between US English and Malayalam locales
 			std::unique_ptr<std::stringstream> pSSHeaderName; // Use a pointer so that we can easily reset the stringstream

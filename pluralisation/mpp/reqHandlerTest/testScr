@@ -1,0 +1,10 @@
+#!/bin/bash
+time make
+
+for noun in അവർ അവൻ അത് അവൾ ഇത് പരുക്കൻ കര
+do
+	time gdb ./reqHandlerTest-debug-dynamic <<END
+set args -n $noun
+run
+END
+done

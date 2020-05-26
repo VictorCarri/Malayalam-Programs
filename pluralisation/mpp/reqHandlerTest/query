@@ -1,0 +1,5 @@
+How to select nouns' gender
+-------------------------
+SELECT nouns.id,nouns.noun,genders.gender FROM nouns JOIN genders ON nouns.id=genders.id
+
+This is an example of how to select all of the needed data in one query.

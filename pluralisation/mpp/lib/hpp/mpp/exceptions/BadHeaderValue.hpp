@@ -16,7 +16,7 @@ namespace mpp
 		* Eg. It's thrown if trying to any_cast the value associated with the "Content-Type" header
 		*     to "int" fails, because that header should have an "int" value associated with it.
 		**/
-		class BadHeaderValue : public Exception
+		class BadHeaderValue : public virtual Exception
 		{
 			public:
 				/**

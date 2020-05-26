@@ -14,7 +14,7 @@ namespace mpp
 		/**
 		* Thrown if the configuration file was missing data that mpp::data::DBInfo expected to be there.
 		**/
-		class MissingDBInfo : public Exception
+		class MissingDBInfo : public virtual Exception
 		{
 			public:
 				/**
@@ -28,7 +28,7 @@ namespace mpp
 				* @param what The message to store in this exception.
 				**/
 				MissingDBInfo(char* what);
-		}
+		};
 	};
 };
 

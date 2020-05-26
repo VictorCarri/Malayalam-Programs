@@ -2,6 +2,7 @@
 #include <stdexcept> // std::logic_error
 
 /* Our headers */
+#include "mpp/exceptions/Exception.hpp" // Parent
 #include "mpp/exceptions/Exception.hpp" // Class def'n
 
 /**

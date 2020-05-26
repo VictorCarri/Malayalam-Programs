@@ -1,6 +1,10 @@
 /* Standard C++ */
 #include <sstream> // std::ostringstream
 #include <string> // std::string
+#ifdef DEBUG
+#include <iostream> // std::cout
+#include <iomanip> // std::quoted
+#endif
 
 /* Boost */
 #include <boost/filesystem.hpp> // boost::filesystem::path, boost::filesystem::exists
@@ -28,6 +32,10 @@ mpp::data::DBInfo::DBInfo(boost::filesystem::path cfPath)
 		throw ex;
 	}
 
+	#ifdef DEBUG
+	std::cout << "mpp::data::DBInfo::DBInfo: data file " << cfPath << " exists." << std::endl;
+	#endif
+
 	/* Step 2: set up option parsing */
 	boost::program_options::options_description dbOpts("Database options");
 	boost::program_options::variables_map vm;
@@ -37,6 +45,13 @@ mpp::data::DBInfo::DBInfo(boost::filesystem::path cfPath)
 		("password", boost::program_options::value<std::string>(), "DB password")
 		("host", boost::program_options::value<std::string>(), "DB host")
 		("db", boost::program_options::value<std::string>(), "DB name");
+
+	#ifdef DEBUG
+	std::cout << "mpp::data::DBInfo::DBInfo: set up options " << std::endl
+	<< std::endl
+	<< dbOpts
+	<< std::endl;
+	#endif
 
 	/* Step 3: open config file */
 	boost::filesystem::ifstream confStrm(cfPath); // Now that we know that the path exists, we can open a stream to read it
@@ -49,11 +64,19 @@ mpp::data::DBInfo::DBInfo(boost::filesystem::path cfPath)
 		throw ex;
 	}
 
+	#ifdef DEBUG
+	std::cout << "mpp::data::DBInfo::DBInfo: opened data file " << cfPath << " for reading." << std::endl;
+	#endif
+
 	/* Step 4: parse options from config file */
 	boost::program_options::store(
 		boost::program_options::parse_config_file(confStrm, dbOpts)
 		, vm);
 	boost::program_options::notify(vm);
+
+	#ifdef DEBUG
+	std::cout << "mpp::data::DBInfo::DBInfo: parsed options from config file" << std::endl;
+	#endif
 
 	/* Step 5: ensure that all needed options are present */
 	if (!vm.count("user")) // No username
@@ -88,11 +111,23 @@ mpp::data::DBInfo::DBInfo(boost::filesystem::path cfPath)
 		throw ex;
 	}
 
+	#ifdef DEBUG
+	std::cout << "mpp::data::DBInfo::DBInfo: loaded all variables from config file" << std::endl;
+	#endif
+
 	/* Step 6: we have loaded all needed options, store them */
 	user = vm["user"].as<std::string>();
 	password = vm["password"].as<std::string>();
 	host = vm["host"].as<std::string>();
 	db = vm["db"].as<std::string>();
+
+	#ifdef DEBUG
+	std::cout << "mpp::data::DBInfo::DBInfo: loaded the following data: " << std::endl
+	<< "\tDB user name = " << std::quoted(user) << std::endl
+	<< "\tDB password = " << std::quoted(password) << std::endl
+	<< "\tDB host name = " << std::quoted(host) << std::endl
+	<< "\tDB name = " << std::quoted(db) << std::endl;
+	#endif
 }
 
 /**

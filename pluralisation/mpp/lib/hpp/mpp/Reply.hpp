@@ -6,6 +6,7 @@
 #include <vector> // std::vector
 #include <forward_list> // std::forward_list
 #include <array> // std::array
+#include <any> // std::any
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
@@ -66,32 +67,6 @@ namespace mpp
 			void addHeader(mpp::Header toAdd);
 
 			/**
-			* @desc Copy constructor.
-			* @param other Other Reply object to copy from.
-			**/
-			//Reply(const Reply& other);
-
-			/**
-			* @desc Copy assignment operator.
-			* @param other Other Reply object to copy from.
-			* @return this
-			**/
-			//Reply& operator=(const Reply& other);
-
-			/**
-			* @desc Move constructor.
-			* @param other Other Reply object to move from.
-			**/
-			//Reply(Reply&& other);
-
-			/**
-			* @desc Move assignment operator.
-			* @param other Other Reply object to move from.
-			* @return this
-			**/
-			//Reply& operator=(Reply&& other);
-
-			/**
 			* @desc Fetches the string associated with the given status.
 			* @param s THe status to fetch a string for.
 			**/
@@ -102,6 +77,13 @@ namespace mpp
 			* @param c The content to store in this reply.
 			**/
 			void setContent(std::string c);
+
+			/**
+			* @desc Uses in-place construction to add a Header to our list.
+			* @param name The header's name.
+			* @param val The header's value.
+			**/
+			void addHeader(std::string name, std::any val);
 	
 		private:
 			std::map<Status, std::string> statText; // Text for each status

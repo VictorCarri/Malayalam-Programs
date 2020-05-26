@@ -14,7 +14,7 @@ namespace mpp
 		/**
 		* Exception thrown when an unknown header name is given to a Request object.
 		**/
-		class UnknownHeader : public Exception
+		class UnknownHeader : public virtual Exception
 		{
 			public:
 				/**

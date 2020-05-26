@@ -2,7 +2,7 @@
 #define MPP_EXCEPTIONS_EXCEPTION_HPP
 
 /* Standard C++ */
-#include <exception> // std::logic_error
+#include <stdexcept> // std::logic_error
 #include <string> // std::string
 
 namespace mpp
@@ -12,7 +12,7 @@ namespace mpp
 		/**
 		* Base class of all MPP exceptions. Used to separate our exceptions from other sources.
 		**/
-		class Exception : public std::logic_error
+		class Exception : public virtual std::logic_error
 		{
 			public:
 				/**
@@ -26,6 +26,11 @@ namespace mpp
 				* @param what The text to store in this exception.
 				**/
 				Exception(char* what);
+
+				/**
+				* @desc Ensure that this base class has a virtual destructor, to enable polymorphism.
+				**/
+				virtual ~Exception() = default;
 		};
 	};
 };

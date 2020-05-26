@@ -1,5 +1,5 @@
 # 1 "cpp/exceptions/UnknownHeader.cpp"
-# 1 "/home/victor/Programming/CPP/malayalam/MalayalamPluralisationServer/mpp/lib//"
+# 1 "/home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/lib//"
 # 1 "<built-in>"
 #define __STDC__ 1
 #define __cplusplus 201703L
@@ -16,8 +16,6 @@
 #define __ATOMIC_RELEASE 3
 #define __ATOMIC_ACQ_REL 4
 #define __ATOMIC_CONSUME 1
-#define __pic__ 2
-#define __PIC__ 2
 #define __OPTIMIZE__ 1
 #define __FINITE_MATH_ONLY__ 0
 #define _LP64 1
@@ -27297,6 +27295,46 @@ namespace std __attribute__ ((__visibility__ ("default")))
 # 4 "cpp/exceptions/UnknownHeader.cpp" 2
 
 
+# 1 "./hpp/mpp/exceptions/Exception.hpp" 1
+
+#define MPP_EXCEPTIONS_EXCEPTION_HPP 
+
+
+
+
+
+
+# 8 "./hpp/mpp/exceptions/Exception.hpp"
+namespace mpp
+{
+ namespace exceptions
+ {
+
+
+
+  class Exception : public virtual std::logic_error
+  {
+   public:
+
+
+
+
+    Exception(std::string what);
+
+
+
+
+
+    Exception(char* what);
+
+
+
+
+    virtual ~Exception() = default;
+  };
+ };
+};
+# 7 "cpp/exceptions/UnknownHeader.cpp" 2
 # 1 "./hpp/mpp/exceptions/UnknownHeader.hpp" 1
 
 #define MPP_EXCEPTIONS_UNKNOWNHEADER_HPP 
@@ -27306,7 +27344,7 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 
 
-# 8 "./hpp/mpp/exceptions/UnknownHeader.hpp"
+
 namespace mpp
 {
  namespace exceptions
@@ -27314,7 +27352,7 @@ namespace mpp
 
 
 
-  class UnknownHeader : public std::invalid_argument
+  class UnknownHeader : public virtual Exception
   {
    public:
 
@@ -27322,15 +27360,29 @@ namespace mpp
 
 
     UnknownHeader(std::string msg);
+
+
+
+
+
+    UnknownHeader(char* msg);
   };
  };
 };
-# 7 "cpp/exceptions/UnknownHeader.cpp" 2
+# 8 "cpp/exceptions/UnknownHeader.cpp" 2
 
 
 
 
 
-mpp::exceptions::UnknownHeader::UnknownHeader(std::string msg) : std::invalid_argument(msg)
+mpp::exceptions::UnknownHeader::UnknownHeader(std::string msg) : std::logic_error(msg), mpp::exceptions::Exception(msg)
+{
+}
+
+
+
+
+
+mpp::exceptions::UnknownHeader::UnknownHeader(char* msg) : std::logic_error(msg), mpp::exceptions::Exception(msg)
 {
 }
