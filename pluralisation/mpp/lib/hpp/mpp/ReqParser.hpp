@@ -130,8 +130,17 @@ namespace mpp
 				backslash_n_after_headers, // Read "\r\n\r" so far - need to read another \n to indicate the end of the headers
 
 				/* Reading the Malayalam noun */
-				noun
+				noun,
+
+				invalid = -1 // Used to indicate an invalid state in prevStat upon default construction
 			};
+
+			/**
+			* @desc Determines whether or not the given string represents a valid decimal integer.
+			* @param toCheck The string to check.
+			* @return True if the string represents a valid decimal integer, false otherwise.
+			**/
+			bool isValidDecimalInt(std::string toCheck);
 	
 			State curStat; // Current state
 			State prevStat; // Previous state

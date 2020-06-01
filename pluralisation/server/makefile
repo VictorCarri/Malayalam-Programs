@@ -1,7 +1,7 @@
 exeName=malPlSrv
 cppDir=./cpp
 files=IoContextPool Connection Server main
-compiler=g++-8
+compiler=g++-9
 objDir=./obj
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
 dbgDynObjs=$(addprefix $(objDir)/debug/dynamic/,$(addsuffix .o,$(files)))
@@ -12,7 +12,7 @@ dbgLibs=$(addprefix -l,mpp-debug vuu-debug boost_filesystem-mt-d-x64 boost_progr
 prodLibs=$(addprefix -l,mpp vuu boost_program_options-mt-x64 boost_program_options-mt-x64 boost_thread-mt-x64 pthread)
 dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-points) -Og -fvar-tracking-assignments -save-temps
 hdrDir=./hpp
-compOpts=$(addprefix -I,$(hdrDir) /home/victor/include)
+compOpts=$(addprefix -I,$(hdrDir) /home/victor/include) $(addprefix -W,all error)
 
 all: $(addsuffix -dynamic, $(exeName)-debug $(exeName)-production) $(addsuffix -static,$(exeName)-debug $(exeName)-production)
 

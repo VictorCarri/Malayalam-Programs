@@ -1,10 +1,10 @@
 progName=malLenCounter
 objDir=./obj
-compiler=g++-8
+compiler=g++-9
 dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-points) -Og -fvar-tracking-assignments -save-temps
 icuOpts=-DU_DISABLE_RENAMING=1 -DUCONFIG_ENABLE_PLUGINS=1
 compLevel=0
-compOpts=$(addprefix -I,./hpp /usr/local/include) $(icuOpts) -O$(compLevel)
+compOpts=$(addprefix -I,./hpp /usr/local/include) $(icuOpts) -O$(compLevel) $(addprefix -W,all error)
 libDirs=$(addprefix -L,/home/victor/lib/vuu $(addprefix /usr/local/lib/,boost icu))
 icuLibs=$(addprefix icu,data i18n io test tu uc)
 

@@ -1,5 +1,5 @@
 cppDir=./cpp
-compiler=g++-8
+compiler=g++-9
 objDir=./obj
 files=functors/PtrResetter $(addprefix exceptions/,Exception BadHeaderValue DBError $(addprefix MissingDB,ConfFile Info) UnknownHeader) $(addprefix data/,DBInfo) Header Reply Request ReqParser ReqHandler
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
@@ -8,7 +8,7 @@ prodStatObjs=$(addprefix $(objDir)/production/static/,$(addsuffix .o,$(files)))
 prodDynObjs=$(addprefix $(objDir)/production/dynamic/,$(addsuffix .o,$(files)))
 libName=mpp
 hppDir=./hpp
-compOpts=$(addprefix -O,3 s) $(addprefix -I,$(hppDir) /home/victor/include /usr/include/mysql) -save-temps -std=gnu++17
+compOpts=$(addprefix -O,3 s) $(addprefix -I,$(hppDir) /home/victor/include /usr/include/mysql) -save-temps -std=gnu++17 $(addprefix -W,all error)
 dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-points) -Og -fvar-tracking-assignments
 
 # Directory where the libraries will be built

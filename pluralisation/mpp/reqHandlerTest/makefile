@@ -1,7 +1,7 @@
 objDir=./obj
 files=ReqHandler
 cppDir=./cpp
-compiler=g++-8
+compiler=g++-9
 exeName=reqHandlerTest
 files=main
 
@@ -10,7 +10,7 @@ dbgDynObjs=$(addprefix $(objDir)/dbg/dyn/,$(addsuffix .o,$(files)))
 prodDynObjs=$(addprefix $(objDir)/prod/dyn/,$(addsuffix .o,$(files)))
 prodStatObjs=$(addprefix $(objDir)/prod/stat/,$(addsuffix .o,$(files)))
 
-compOpts=-std=gnu++17 $(addprefix -O,3 s) -save-temps $(shell mariadb_config --cflags) -I./hpp
+compOpts=-std=gnu++17 $(addprefix -O,3 s) -save-temps $(shell mariadb_config --cflags) -I./hpp $(addprefix -W,all error)
 
 libDirs=$(addprefix -L,$(addprefix /usr/local/lib/,boost icu) $(addprefix /home/victor/lib/,mpp vuu)) $(shell mariadb_config --libs)
 

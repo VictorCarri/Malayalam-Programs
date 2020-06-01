@@ -10,7 +10,7 @@ _ZStL19piecewise_construct:
 	.weak	_ZNSt12_Base_bitsetILm1EEC2Ey
 	.type	_ZNSt12_Base_bitsetILm1EEC2Ey, @function
 _ZNSt12_Base_bitsetILm1EEC2Ey:
-.LFB1037:
+.LFB1041:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -27,7 +27,7 @@ _ZNSt12_Base_bitsetILm1EEC2Ey:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1037:
+.LFE1041:
 	.size	_ZNSt12_Base_bitsetILm1EEC2Ey, .-_ZNSt12_Base_bitsetILm1EEC2Ey
 	.weak	_ZNSt12_Base_bitsetILm1EEC1Ey
 	.set	_ZNSt12_Base_bitsetILm1EEC1Ey,_ZNSt12_Base_bitsetILm1EEC2Ey
@@ -35,7 +35,7 @@ _ZNSt12_Base_bitsetILm1EEC2Ey:
 	.weak	_ZNSt12_Base_bitsetILm1EE11_S_whichbitEm
 	.type	_ZNSt12_Base_bitsetILm1EE11_S_whichbitEm, @function
 _ZNSt12_Base_bitsetILm1EE11_S_whichbitEm:
-.LFB1041:
+.LFB1045:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -49,13 +49,13 @@ _ZNSt12_Base_bitsetILm1EE11_S_whichbitEm:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1041:
+.LFE1045:
 	.size	_ZNSt12_Base_bitsetILm1EE11_S_whichbitEm, .-_ZNSt12_Base_bitsetILm1EE11_S_whichbitEm
 	.section	.text._ZNSt12_Base_bitsetILm1EE10_S_maskbitEm,"axG",@progbits,_ZNSt12_Base_bitsetILm1EE10_S_maskbitEm,comdat
 	.weak	_ZNSt12_Base_bitsetILm1EE10_S_maskbitEm
 	.type	_ZNSt12_Base_bitsetILm1EE10_S_maskbitEm, @function
 _ZNSt12_Base_bitsetILm1EE10_S_maskbitEm:
-.LFB1042:
+.LFB1046:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -75,14 +75,14 @@ _ZNSt12_Base_bitsetILm1EE10_S_maskbitEm:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1042:
+.LFE1046:
 	.size	_ZNSt12_Base_bitsetILm1EE10_S_maskbitEm, .-_ZNSt12_Base_bitsetILm1EE10_S_maskbitEm
 	.section	.text._ZNKSt12_Base_bitsetILm1EE10_M_getwordEm,"axG",@progbits,_ZNKSt12_Base_bitsetILm1EE10_M_getwordEm,comdat
 	.align 2
 	.weak	_ZNKSt12_Base_bitsetILm1EE10_M_getwordEm
 	.type	_ZNKSt12_Base_bitsetILm1EE10_M_getwordEm, @function
 _ZNKSt12_Base_bitsetILm1EE10_M_getwordEm:
-.LFB1044:
+.LFB1048:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -97,14 +97,14 @@ _ZNKSt12_Base_bitsetILm1EE10_M_getwordEm:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1044:
+.LFE1048:
 	.size	_ZNKSt12_Base_bitsetILm1EE10_M_getwordEm, .-_ZNKSt12_Base_bitsetILm1EE10_M_getwordEm
 	.section	.text._ZNSt6bitsetILm8EEC1Ey,"axG",@progbits,_ZNSt6bitsetILm8EEC1Ey,comdat
 	.align 2
 	.weak	_ZNSt6bitsetILm8EEC1Ey
 	.type	_ZNSt6bitsetILm8EEC1Ey, @function
 _ZNSt6bitsetILm8EEC1Ey:
-.LFB1169:
+.LFB1173:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -130,14 +130,14 @@ _ZNSt6bitsetILm8EEC1Ey:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1169:
+.LFE1173:
 	.size	_ZNSt6bitsetILm8EEC1Ey, .-_ZNSt6bitsetILm8EEC1Ey
 	.text
 	.align 2
 	.globl	_ZN3vuu13UTF8ValidatorclEc
 	.type	_ZN3vuu13UTF8ValidatorclEc, @function
 _ZN3vuu13UTF8ValidatorclEc:
-.LFB1166:
+.LFB1170:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -155,6 +155,7 @@ _ZN3vuu13UTF8ValidatorclEc:
 	movq	%rdx, %rsi
 	movq	%rax, %rdi
 	call	_ZNSt6bitsetILm8EEC1Ey@PLT
+	movb	$0, -17(%rbp)
 	movq	-40(%rbp), %rax
 	movl	(%rax), %eax
 	cmpl	$6, %eax
@@ -481,13 +482,13 @@ _ZN3vuu13UTF8ValidatorclEc:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1166:
+.LFE1170:
 	.size	_ZN3vuu13UTF8ValidatorclEc, .-_ZN3vuu13UTF8ValidatorclEc
 	.align 2
 	.globl	_ZN3vuu13UTF8ValidatorC2Ev
 	.type	_ZN3vuu13UTF8ValidatorC2Ev, @function
 _ZN3vuu13UTF8ValidatorC2Ev:
-.LFB1171:
+.LFB1175:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -502,7 +503,7 @@ _ZN3vuu13UTF8ValidatorC2Ev:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1171:
+.LFE1175:
 	.size	_ZN3vuu13UTF8ValidatorC2Ev, .-_ZN3vuu13UTF8ValidatorC2Ev
 	.globl	_ZN3vuu13UTF8ValidatorC1Ev
 	.set	_ZN3vuu13UTF8ValidatorC1Ev,_ZN3vuu13UTF8ValidatorC2Ev
@@ -510,7 +511,7 @@ _ZN3vuu13UTF8ValidatorC2Ev:
 	.weak	_ZNSt13_Sanitize_valILm8ELb1EE18_S_do_sanitize_valEy
 	.type	_ZNSt13_Sanitize_valILm8ELb1EE18_S_do_sanitize_valEy, @function
 _ZNSt13_Sanitize_valILm8ELb1EE18_S_do_sanitize_valEy:
-.LFB1403:
+.LFB1407:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -524,7 +525,7 @@ _ZNSt13_Sanitize_valILm8ELb1EE18_S_do_sanitize_valEy:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1403:
+.LFE1407:
 	.size	_ZNSt13_Sanitize_valILm8ELb1EE18_S_do_sanitize_valEy, .-_ZNSt13_Sanitize_valILm8ELb1EE18_S_do_sanitize_valEy
 	.section	.rodata
 .LC0:
@@ -534,7 +535,7 @@ _ZNSt13_Sanitize_valILm8ELb1EE18_S_do_sanitize_valEy:
 	.weak	_ZNKSt6bitsetILm8EE4testEm
 	.type	_ZNKSt6bitsetILm8EE4testEm, @function
 _ZNKSt6bitsetILm8EE4testEm:
-.LFB1404:
+.LFB1408:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -559,7 +560,7 @@ _ZNKSt6bitsetILm8EE4testEm:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1404:
+.LFE1408:
 	.size	_ZNKSt6bitsetILm8EE4testEm, .-_ZNKSt6bitsetILm8EE4testEm
 	.section	.rodata
 	.align 8
@@ -570,7 +571,7 @@ _ZNKSt6bitsetILm8EE4testEm:
 	.weak	_ZNKSt6bitsetILm8EE8_M_checkEmPKc
 	.type	_ZNKSt6bitsetILm8EE8_M_checkEmPKc, @function
 _ZNKSt6bitsetILm8EE8_M_checkEmPKc:
-.LFB1503:
+.LFB1507:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -596,14 +597,14 @@ _ZNKSt6bitsetILm8EE8_M_checkEmPKc:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1503:
+.LFE1507:
 	.size	_ZNKSt6bitsetILm8EE8_M_checkEmPKc, .-_ZNKSt6bitsetILm8EE8_M_checkEmPKc
 	.section	.text._ZNKSt6bitsetILm8EE15_Unchecked_testEm,"axG",@progbits,_ZNKSt6bitsetILm8EE15_Unchecked_testEm,comdat
 	.align 2
 	.weak	_ZNKSt6bitsetILm8EE15_Unchecked_testEm
 	.type	_ZNKSt6bitsetILm8EE15_Unchecked_testEm, @function
 _ZNKSt6bitsetILm8EE15_Unchecked_testEm:
-.LFB1504:
+.LFB1508:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -633,7 +634,7 @@ _ZNKSt6bitsetILm8EE15_Unchecked_testEm:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1504:
+.LFE1508:
 	.size	_ZNKSt6bitsetILm8EE15_Unchecked_testEm, .-_ZNKSt6bitsetILm8EE15_Unchecked_testEm
-	.ident	"GCC: (SUSE Linux) 8.2.1 20180831 [gcc-8-branch revision 264010]"
+	.ident	"GCC: (SUSE Linux) 9.3.1 20200406 [revision 6db837a5288ee3ca5ec504fbd5a765817e556ac2]"
 	.section	.note.GNU-stack,"",@progbits

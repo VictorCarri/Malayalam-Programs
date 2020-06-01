@@ -1,9 +1,9 @@
 cppDir=./cpp
-compiler=g++-8
+compiler=g++-9
 objDir=./obj
 objs=$(addprefix $(objDir)/,$(addsuffix .o,main))
 hdrDir=/home/victor/include
-compOpts=-I$(hdrDir) -save-temps -DDEBUG -ggdb3 -std=gnu++1z $(shell mariadb_config --cflags)
+compOpts=-I$(hdrDir) -save-temps -DDEBUG -ggdb3 -std=gnu++1z $(shell mariadb_config --cflags) $(addprefix -W,all error)
 exeName=parserTest
 myLibDirs=$(addprefix /home/victor/lib/,mpp vuu)
 usrLocalLibDirs=$(addprefix /usr/local/lib/,boost icu)

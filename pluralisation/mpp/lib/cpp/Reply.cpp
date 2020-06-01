@@ -43,6 +43,8 @@ mpp::Reply::Reply() :
 	statText[badPatch] = verSS.str() + "403 Unrecognised Protocol Patch Number";
 	statText[unknownVerb] = verSS.str() + "404 Unrecognised Verb";
 	statText[invUTF8] = verSS.str() + "405 Malformed UTF-8 Input";
+	statText[noPlural] = verSS.str() + "406 No Plural Form";
+	statText[noSingular] = verSS.str() + "407 No Singular Form";
 
 	/* Set up invalid status text */
 	statText[invalid] = "Error: invalid Reply object!";

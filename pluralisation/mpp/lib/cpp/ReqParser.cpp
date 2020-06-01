@@ -1,3 +1,8 @@
+/* C++ versions of C headers */
+#include <cstdlib> // std::strtoull
+#include <climits> // ULLONG_MAX
+#include <cerrno> // errno
+
 /* Standard C++ */
 #include <locale> // std::isdigit, std::isspace, std::isalpha, std::toupper, std::tolower, std::isalnum
 #include <algorithm> // std::find_if, std::for_each, std::copy, std::all_of
@@ -20,6 +25,7 @@
 
 /* My Unicode utilities library */
 #include "vuu/UTF8Validator.hpp" // vuu::UTF8Validator, to ensure that a string contains valid UTF-8
+#include "vuu/CodepointFinder.hpp" // vuu::CodepointFinder, to find the list of codepoints in the UTF-8 string
 
 /* Our headers */
 #include "mpp/Reply.hpp" // Reply::FailureCode, to indicate why the parser failed
@@ -34,14 +40,19 @@
 * Construct ready to parse the request method.
 **/
 mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start state
+	prevStat(invalid), // Unneeded on the first invocation of consume(), but initialised to satisfy g++
+	status(mpp::Reply::invalid),
 	version {mpp::VER_MAJOR, mpp::VER_MINOR, mpp::VER_PATCH},
+	verSS {std::make_unique<std::stringstream>(), std::make_unique<std::stringstream>(), std::make_unique<std::stringstream>()},
 	verbInfo {
 		{"ISSING", issing_first_s},
 		{"FOF", fof_o}
 	},
-	pNounSS(new std::stringstream),
+	gen(),
 	pSSHeaderName(new std::stringstream),
-	pSSHeaderVal(new std::stringstream)
+	pSSHeaderVal(new std::stringstream),
+	mNBytes(0), // Initialise # of noun bytes read
+	pNounSS(new std::stringstream)
 {
 	#ifdef DEBUG
 	/* Set up map of states to state names */
@@ -86,10 +97,10 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	gen("ml_IN.UTF-8"); // Add Malayalam
 
 	/* Create stringstream pointers */
-	for (short i = 0; i < verSS.size(); i++)
+	/*for (short i = 0; i < verSS.size(); i++)
 	{
 		verSS[i] = std::make_unique<std::stringstream>(); // Create a pointer to a stringstream
-	}
+	}*/
 	//std::fill(verSS.begin(), verSS.end(), std::make_unique<std::stringstream>()); // Initialise the array of stringstreams for each version #
 }
 
@@ -825,11 +836,20 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 				/* We need to know the length to read the noun, so check if this header is the content-length header */
 				if (pSSHeaderName->str() == "Content-Length") // Yes, we need this header
 				{
-					(*pSSHeaderVal) >> mNBytes; // Read the # of bytes in the noun
-					req.addHeader(pSSHeaderName->str(), std::any(mNBytes)); // Pass the Request object the name and value. It will create and add the Header object internally.
-					#ifdef DEBUG
-					std::cout << "ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
-					#endif
+					if (isValidDecimalInt(pSSHeaderVal->str())) // Ensure that the value we have read so far is a valid int
+					{
+						(*pSSHeaderVal) >> mNBytes; // Read the # of bytes in the noun
+						req.addHeader(pSSHeaderName->str(), std::any(mNBytes)); // Pass the Request object the name and value. It will create and add the Header object internally.
+						#ifdef DEBUG
+						std::cout << "ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
+						#endif
+					}
+
+					else // Error in Content-Length header -> malformed request
+					{
+						status = Reply::badReq;
+						toReturn = false;
+					}
 				}
 
 				else // Treat it as a regular header
@@ -947,12 +967,27 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 					if (std::all_of(noun.cbegin(), noun.cend(), vuu::UTF8Validator())) // The noun is valid UTF-8
 					{
-						req.setNoun(pNounSS->str()); // Store the noun (as UTF-8 bytes) in the request
-						toReturn = true; // We have successfully parsed an entire request
+						vuu::CodepointFinder vcf = std::for_each(noun.cbegin(), noun.cend(), vuu::CodepointFinder()); // Use the functor to get a list of codepoints in the string (i.e., find the 32-bit codepoints derived from the UTF-8 string)
+						
+						if (std::all_of(vcf.cbegin(), vcf.cend(), [](unsigned long long codePoint) -> bool
+							{
+								return codePoint >= 0xd00 && codePoint <= 0xd7f;
+							})
+						) // Ensure that all of the codepoints are in the Malayalam range
+						{
+							req.setNoun(pNounSS->str()); // Store the noun (as UTF-8 bytes) in the request
+							toReturn = true; // We have successfully parsed an entire request
+	
+							#ifdef DEBUG
+							std::cout << "ReqParser::consume: successfully parsed noun \"" << req.getNoun() << "\"" << std::endl;
+							#endif
+						}
 
-						#ifdef DEBUG
-						std::cout << "ReqParser::consume: successfully parsed noun \"" << req.getNoun() << "\"" << std::endl;
-						#endif
+						else // At least one of the codepoints isn't a Malayalam codepoint
+						{
+							toReturn = false;
+							status = Reply::badReq;
+						}
 					}
 
 					else // The noun contains invalid UTF-8
@@ -980,6 +1015,11 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 			break;
 		}
+
+		case invalid: // We should never be in this state
+		{
+			break;
+		}
 	} // switch
 
 	#ifdef DEBUG
@@ -997,4 +1037,42 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 mpp::Reply::Status mpp::ReqParser::getStatus() const
 {
 	return status;
+}
+
+/**
+* @desc Determines whether or not the given string represents a valid decimal integer.
+* @param toCheck The string to check.
+* @return True if the string represents a valid decimal integer, false otherwise.
+**/
+bool mpp::ReqParser::isValidDecimalInt(std::string toCheck)
+{
+	int base = 10; // MPP requires all numbers to use base 10
+	char* end; // Pointer to the place where strtoull stopped parsing the string
+	const char* numCStr = toCheck.c_str(); // Fetch a C string to pass to strotull
+	unsigned long long val = std::strtoull(numCStr, &end, base);
+
+	if (val == ULLONG_MAX) // Range error
+	{
+		return false;
+	}
+
+	else if (val == 0) // Either the value is actually 0 or no conversion could be performed
+	{
+		if (*end == 0) // The end pointer actually points to the NULL terminator, meaning that strotull parsed the entire string successfully.
+		{
+			// Thus, the value is actually 0, and the string represents a valid integer
+			return true;
+		}
+
+		else // The end pointer doesn't point to the NULL terminator, so strotull couldn't parse the entire string
+		{
+			// Thus, the string isn't a valid integer
+			return false;
+		}
+	}
+
+	else // The conversion was successful
+	{
+		return true; // The string represents a valid decimal integer
+	}
 }

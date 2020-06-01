@@ -82,20 +82,29 @@ will be returned.
 
 Misc Errors
 ------------
-MTP/1.0 402 Bad Request
+MTP/1.0 400 Bad Request
 	- Reply used when a request is malformed in general
 
-MTP/1.0 403 Bad Major #
+MTP/1.0 401 Bad Major #
 	- Reply used when the server doesn't recognize the major # of the procotol in the request
 
-MTP/1.0 404 Bad Minor #
+MTP/1.0 402 Bad Minor #
 	- Reply used when the server doesn't recognize the minor # of the procotol in the request
 
-MTP/1.0 405 Bad Patch #
+MTP/1.0 403 Bad Patch #
 	- Reply used when the server doesn't recognize the patch # of the procotol in the request
 
-MTP/1.0 406 Unknown Verb
+MTP/1.0 404 Unknown Verb
 	- Used when the server doesn't recognise the verb which a request included
+
+MTP/1.0 405 Malformed UTF-8 Input
+	- Used when the Malayalam noun isn't a valid UTF-8 string
+
+MTP/1.0 406 No Plural Form
+	- Used when the singular Malayalam noun given in a FOF request has no plural
+
+MTP/1.0 407 No Singular Form
+	- Used when the plural Malayalam noun given in a FOF request has no singular
 
 MTP/1.0 500 Internal Server Error
 	- Used when some sort of error occurs while handling a request

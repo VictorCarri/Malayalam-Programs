@@ -43,6 +43,41 @@ void mpp::ReqHandler::handleReq(const Request& req, Reply& rep)
 	{
 		case Request::FOF: // "F"ind "O"pposite "F"orm
 		{
+			if (isSingular(req.getNoun())) // Need to find the plural (if it exists)
+			{
+				if (hasPlural(req.getNoun())) // The noun is pluralisable
+				{
+					std::string pluralForm = findPlural(req.getNoun());
+					rep.setStatus(Reply::pluralForm); // Set the right code
+					rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
+					rep.addHeader("Content-Length", std::any(pluralForm.length()));
+					rep.setContent(pluralForm);
+				}
+
+				else // The noun isn't pluralisable
+				{
+					rep.setStatus(Reply::noPlural);
+					rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
+					rep.addHeader("Content-Length", std::any(0));
+					rep.setContent("");
+				}
+			}
+
+			else // Need to find the singular (if it exists)
+			{
+				if (hasSingular(req.getNoun())) // The noun is singularisable
+				{
+				}
+
+				else // The noun isn't singularisable
+				{
+					rep.setStatus(Reply::noSingular);
+					rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
+					rep.addHeader("Content-Length", std::any(0));
+					rep.setContent("");
+				}
+			}
+
 			break;
 		}
 
@@ -51,6 +86,9 @@ void mpp::ReqHandler::handleReq(const Request& req, Reply& rep)
 			#ifdef DEBUG
 			std::cout << "mpp::ReqHandler::handleReq: checking whether " << std::quoted(req.getNoun()) << " is singular" << std::endl;
 			#endif
+
+			rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
+			rep.addHeader("Content-Length", std::any(0));
 
 			if (isSingular(req.getNoun()))
 			{
@@ -335,4 +373,13 @@ bool mpp::ReqHandler::hasPlural(std::string noun)
 	}
 
 	return toReturn;
+}
+
+/**
+* @desc Given a SINGULAR noun, finds its plural form.
+* @param noun The SINGULAR noun to find the plural of. The noun ISN'T CHECKED for singularity.
+* @return The plural form of the noun.
+**/
+std::string mpp::ReqHandler::findPlural(std::string noun)
+{
 }

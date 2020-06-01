@@ -37,11 +37,6 @@ vuu::LenCounter::LenCounter() :
 	stateNames[fourbyte_fourth] = "fourbyte_fourth";
 	stateNames[invalid_state] = "invalid_state";
 
-	/*std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto curPair)
-		{
-			std::cerr << "vuu::LenCounter::LenCounter: State value " << static_cast<int>(curPair.first) << " maps to string " << curPair.second << std::endl;
-		}
-	);*/
 	std::for_each(stateNames.cbegin(), stateNames.cend(), vuu::internals::StateNamePrinter()); // Print the names to be sure that they've been set correctly
 	#endif
 }
@@ -295,11 +290,7 @@ void vuu::LenCounter::operator()(char c)
 		std::cerr << "vuu::LenCounter::operator(): caught out_of_range while trying to print state at end." << std::endl
 		<< "\tMessage = " << stdoor.what() << std::endl;
 		std::cerr << "\tmap = [" << std::endl;
-		std::for_each(stateNames.cbegin(), stateNames.cend(), [](auto curPair)
-			{
-				std::cerr << "\t(" << curPair.first << "," << curPair.second << ")" << std::endl;
-			}
-		);
+		std::for_each(stateNames.cbegin(), stateNames.cend(), vuu::internals::StateNamePrinter());
 		std::cerr << "]" << std::endl;
 	}
 
@@ -325,11 +316,6 @@ vuu::LenCounter::LenCounter(const vuu::LenCounter& other) :
 	std::cerr << "vuu::LenCounter::copy_constructor: before copying stateNames: stateNames = [";
 	std::for_each(stateNames.cbegin(), stateNames.cend(), vuu::internals::StateNamePrinter("vuu::LenCounter::LenCounter(const vuu::LenCounter& other)"));
 	std::cerr << "]" << std::endl << "\tother.stateNames = [";
-	/*std::for_each(other.stateNames.cbegin(), other.stateNames.cend(), [](auto pair)
-		{
-			std::cerr << "(" << pair.first << ", " << pair.second << ")" << std::endl;
-		}
-	);*/
 
 	if (!other.stateNames.empty())
 	{
@@ -372,14 +358,11 @@ vuu::LenCounter::LenCounter(vuu::LenCounter&& other) :
 	ncp(std::exchange(other.ncp, -1)),
 	charPos(std::exchange(other.charPos, -1))
 	#ifdef DEBUG
-	//, stateNames(std::exchange(other.stateNames, std::map<State, std::string>()))
 	, stateNames(other.stateNames)
 	#endif
 {
 	#ifdef DEBUG
 	std::cerr << "vuu::LenCounter: move constructor called." << std::endl;
-	/* Trying to use the move constructor with std::exchange failed, so I'll try copying and clearing the other object's map 
-	stateNames = other.stateNames;*/
 	#endif
 }
 
@@ -424,7 +407,6 @@ vuu::LenCounter& vuu::LenCounter::operator=(vuu::LenCounter&& other)
 		ncp = std::exchange(other.ncp, -1);
 		charPos = std::exchange(other.charPos, -1);
 		#ifdef DEBUG
-		//stateNames = std::exchange(other.stateNames, std::map<State, std::string>());
 		stateNames = other.stateNames;
 		#endif
 		other.curStat = invalid_state;

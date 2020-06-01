@@ -57,31 +57,38 @@ namespace mpp
 			* @desc Determines whether or not the given noun is singular.
 			*	It first attempts to find the noun in the DB. If it does, it knows that the noun is singular.
 			*	If it doesn't find the noun in the DB, it uses regexes to guess at whether or not the noun is singular.
-			* @param noun The noun to check, encoded in UTF-8.
+			* @param noun The Malayalam noun to find the plural of. It must be a UTF-8 encoded string, with codepoints in the range 0xd00 to 0xd7f.
 			* @return True if the noun is singular, false otherwise.
 			**/
 			bool isSingular(std::string noun);
 
 			/**
 			* @desc Determines whether or not the given noun exists in the DB. It queries the DB for the noun and checks how many results there are.
-			* @param noun The noun to check, encoded in UTF-8.
+			* @param noun The Malayalam noun to find the plural of. It must be a UTF-8 encoded string, with codepoints in the range 0xd00 to 0xd7f.
 			* @return True if the noun is the DB, false otherwise.
 			**/
 			bool inDB(std::string noun);
 
 			/**
 			* @desc Uses regexes to guess at whether or not the noun is singular. One regex is used for each class of singular noun.
-			* @param noun The noun to check, encoded in UTF-8.
+			* @param noun The Malayalam noun to find the plural of. It must be a UTF-8 encoded string, with codepoints in the range 0xd00 to 0xd7f.
 			* @return True if any of the regexes for singular Malayalam nouns matches the given noun. False if none match.
 			**/
 			bool regGuess(std::string noun);
 
 			/**
 			* @desc Searches the DB to see whether or not this noun is pluralisable.
-			* @param noun The noun to check, encoded in UTF-8.
+			* @param noun The Malayalam noun to find the plural of. It must be a UTF-8 encoded string, with codepoints in the range 0xd00 to 0xd7f.
 			* @return True if the noun is in the DB and has a TRUE 'pluralisable' attribute. False otherwise.
 			**/
 			bool hasPlural(std::string noun);
+
+			/**
+			* @desc Given a SINGULAR noun, finds its plural form.
+			* @param noun The SINGULAR noun to find the plural of. The noun ISN'T CHECKED for singularity.
+			* @return The plural form of the noun.
+			**/
+			std::string findPlural(std::string noun);
 
 			/* Properties */
 			data::DBInfo dbInfo; // Holds information req'd to connect to the DB

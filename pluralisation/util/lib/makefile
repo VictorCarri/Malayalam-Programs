@@ -1,16 +1,17 @@
 libName=vuu
-dbgLibs=$(addprefix lib,$(addprefix $(libName)-debug,.a .so))
-prodLibs=$(addprefix lib,$(addprefix $(libName),.a .so))
-files=internals/StateNamePrinter InvByteInCodePoint LenCounter UTF8Validator
+buildDir=./build
+dbgLibs=$(addprefix $(buildDir)/lib,$(addprefix $(libName)-debug,.a .so))
+prodLibs=$(addprefix $(buildDir)/lib,$(addprefix $(libName),.a .so))
+files=internals/StateNamePrinter InvByteInCodePoint LenCounter UTF8Validator CodepointFinder
 objDir=./obj
 statDbgObjs=$(addprefix $(objDir)/static/debug/,$(addsuffix .o,$(files)))
 dynDbgObjs=$(addprefix $(objDir)/dynamic/debug/,$(addsuffix .o,$(files)))
 dynProdObjs=$(addprefix $(objDir)/dynamic/prod/,$(addsuffix .o,$(files)))
 statProdObjs=$(addprefix $(objDir)/static/prod/,$(addsuffix .o,$(files)))
 cppDir=./cpp
-compiler=g++-8
+compiler=g++-9
 hppDir=./hpp
-compOpts=-I$(hppDir) -save-temps
+compOpts=-I$(hppDir) -save-temps $(addprefix -W,all error)
 dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-points) -Og -fvar-tracking-assignments
 statOpts=$(compOpts)
 dynOpts=-fPIC $(compOpts)
@@ -26,19 +27,19 @@ headers: $(hppDir)/*
 
 ## All library targets ##
 
-lib$(libName)-debug.a: $(statDbgObjs)
+$(buildDir)/lib$(libName)-debug.a: $(statDbgObjs)
 	ar rcs $@ $^
 	cp $@ $(instDir)
 
-lib$(libName).a: $(statProdObjs)
+$(buildDir)/lib$(libName).a: $(statProdObjs)
 	ar rcs $@ $^
 	cp $@ $(instDir)
 
-lib$(libName)-debug.so: $(dynDbgObjs)
+$(buildDir)/lib$(libName)-debug.so: $(dynDbgObjs)
 	$(compiler) -shared -o $@ $^
 	cp $@ $(instDir)
 
-lib$(libName).so: $(dynProdObjs)
+$(buildDir)/lib$(libName).so: $(dynProdObjs)
 	$(compiler) -shared -o $@ $^
 	cp $@ $(instDir)
 
@@ -85,7 +86,7 @@ clean_prod_static:
 
 clean_prod_dynamic:
 	find $(objDir)/dynamic/prod/ -type f -iname '*.o' -delete
-	rm -f {.,$(instDir)}lib$(libName).so
+	rm -f {.,$(instDir)}/lib$(libName).so
 
 rebuild: $(addprefix rebuild_,debug prod) headers
 

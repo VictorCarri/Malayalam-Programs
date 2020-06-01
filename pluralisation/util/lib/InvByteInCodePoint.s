@@ -10,7 +10,7 @@ _ZStL19piecewise_construct:
 	.globl	_ZN3vuu18InvByteInCodePointC2EPc
 	.type	_ZN3vuu18InvByteInCodePointC2EPc, @function
 _ZN3vuu18InvByteInCodePointC2EPc:
-.LFB1007:
+.LFB1011:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -34,7 +34,7 @@ _ZN3vuu18InvByteInCodePointC2EPc:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1007:
+.LFE1011:
 	.size	_ZN3vuu18InvByteInCodePointC2EPc, .-_ZN3vuu18InvByteInCodePointC2EPc
 	.globl	_ZN3vuu18InvByteInCodePointC1EPc
 	.set	_ZN3vuu18InvByteInCodePointC1EPc,_ZN3vuu18InvByteInCodePointC2EPc
@@ -42,7 +42,7 @@ _ZN3vuu18InvByteInCodePointC2EPc:
 	.globl	_ZN3vuu18InvByteInCodePointC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	.type	_ZN3vuu18InvByteInCodePointC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, @function
 _ZN3vuu18InvByteInCodePointC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE:
-.LFB1010:
+.LFB1014:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -66,7 +66,7 @@ _ZN3vuu18InvByteInCodePointC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcE
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1010:
+.LFE1014:
 	.size	_ZN3vuu18InvByteInCodePointC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, .-_ZN3vuu18InvByteInCodePointC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	.globl	_ZN3vuu18InvByteInCodePointC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 	.set	_ZN3vuu18InvByteInCodePointC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE,_ZN3vuu18InvByteInCodePointC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
@@ -86,7 +86,7 @@ _ZTVN3vuu18InvByteInCodePointE:
 	.weak	_ZN3vuu18InvByteInCodePointD2Ev
 	.type	_ZN3vuu18InvByteInCodePointD2Ev, @function
 _ZN3vuu18InvByteInCodePointD2Ev:
-.LFB1467:
+.LFB1471:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -107,7 +107,7 @@ _ZN3vuu18InvByteInCodePointD2Ev:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1467:
+.LFE1471:
 	.size	_ZN3vuu18InvByteInCodePointD2Ev, .-_ZN3vuu18InvByteInCodePointD2Ev
 	.weak	_ZN3vuu18InvByteInCodePointD1Ev
 	.set	_ZN3vuu18InvByteInCodePointD1Ev,_ZN3vuu18InvByteInCodePointD2Ev
@@ -116,7 +116,7 @@ _ZN3vuu18InvByteInCodePointD2Ev:
 	.weak	_ZN3vuu18InvByteInCodePointD0Ev
 	.type	_ZN3vuu18InvByteInCodePointD0Ev, @function
 _ZN3vuu18InvByteInCodePointD0Ev:
-.LFB1469:
+.LFB1473:
 	.cfi_startproc
 	pushq	%rbp
 	.cfi_def_cfa_offset 16
@@ -136,7 +136,7 @@ _ZN3vuu18InvByteInCodePointD0Ev:
 	.cfi_def_cfa 7, 8
 	ret
 	.cfi_endproc
-.LFE1469:
+.LFE1473:
 	.size	_ZN3vuu18InvByteInCodePointD0Ev, .-_ZN3vuu18InvByteInCodePointD0Ev
 	.weak	_ZTIN3vuu18InvByteInCodePointE
 	.section	.data.rel.ro._ZTIN3vuu18InvByteInCodePointE,"awG",@progbits,_ZTIN3vuu18InvByteInCodePointE,comdat
@@ -154,5 +154,5 @@ _ZTIN3vuu18InvByteInCodePointE:
 	.size	_ZTSN3vuu18InvByteInCodePointE, 27
 _ZTSN3vuu18InvByteInCodePointE:
 	.string	"N3vuu18InvByteInCodePointE"
-	.ident	"GCC: (SUSE Linux) 8.2.1 20180831 [gcc-8-branch revision 264010]"
+	.ident	"GCC: (SUSE Linux) 9.3.1 20200406 [revision 6db837a5288ee3ca5ec504fbd5a765817e556ac2]"
 	.section	.note.GNU-stack,"",@progbits

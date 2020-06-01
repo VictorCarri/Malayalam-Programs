@@ -13,7 +13,7 @@
 bool vuu::UTF8Validator::operator()(char c)
 {
 	std::bitset<8> charBits(static_cast<unsigned long long>(c)); // Convert character to bits
-	bool toReturn; // The value to return (to satisfy g++, which thinks that there's no return statement)
+	bool toReturn = false; // The value to return (to satisfy g++, which thinks that there's no return statement)
 
 	switch (curStat)
 	{

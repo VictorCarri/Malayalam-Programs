@@ -37,6 +37,8 @@ namespace mpp
 				badPatch, // Bad patch #
 				unknownVerb, // Unrecognised MPP verb
 				invUTF8, // Invalid UTF-8 characters in input
+				noPlural, // The given noun in a FOF query that seeks the plural form has no plural form, according to the DB
+				noSingular, // The given noun in a FOF query that seeks the singular form has no singular form, according to the DB
 
 				/* Other */
 				invalid = -1 // Used when a Reply is default-constructed.
@@ -86,12 +88,12 @@ namespace mpp
 			void addHeader(std::string name, std::any val);
 	
 		private:
-			std::map<Status, std::string> statText; // Text for each status
 			Status stat; // This reply's status
 			std::forward_list<mpp::Header> headers; // List of headers to send with the reply
+			std::map<Status, std::string> statText; // Text for each status
+			std::string content; // The reply's content
 			const std::array<char, 2> crlf; // CR/LF sequence to be used in the reply
 			const std::array<char, 2> nameValSep; // Separates a header name from its value
-			std::string content;
 	};
 };
 
