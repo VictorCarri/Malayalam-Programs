@@ -7,6 +7,7 @@
 #include <numeric> // std::accumulate
 #include <functional> // std::logical_or
 #include <stdexcept> // std::out_of_range
+#include <vector> // std::vector
 #ifdef DEBUG
 #include <iostream> // std::cout
 #include <iomanip> // std::quoted
@@ -19,7 +20,7 @@
 #include <boost/regex/icu.hpp> // boost::make_u32regex, boost::u32regex_match, boost::u32regex
 
 /* MariaDB++ */
-#include <mariadb++/account.hpp> // mariadb::account::create
+#include <mariadb++/account.hpp> // mariadb::account::create, mariadb::account_ref
 #include <mariadb++/connection.hpp> // mariadb::connection::create
 #include <mariadb++/result_set.hpp> // mariadb::result_set_ref
 #include <mariadb++/exceptions.hpp> // mariadb::exception::connection
@@ -30,26 +31,30 @@
 #include "mpp/Header.hpp" // Represents a (name, value) pair
 #include "mpp/data/DBInfo.hpp" // A class that encapsulates the storage of DB info
 #include "mpp/exceptions/DBError.hpp" // Thrown if some sort of error occurs while connecting to the DB
+#include "mpp/exceptions/UnknownNoun.hpp" // Thrown if a noun doesn't exist in the DB, and the method which throws it expected it to exist
 #include "mpp/ReqHandler.hpp" // Class def'n
 
 /**
 * @desc Handles a request and produces a reply.
-* @param req The request object to set parameters on by parsing.
+* @param req The request object to get request data from.
 * @param rep The respnse object to set parameters on to generate a response.
 **/
-void mpp::ReqHandler::handleReq(const Request& req, Reply& rep)
+void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 {
-	switch (req.GETCOM_FUNC())
+	std::any utf8Text(std::string("UTF-8")); // Initialise the string once instead of using several temporaries
+	std::any zeroLengthInd(0);
+
+	switch (req.GETCOM_FUNC()) // Check what type of request it is
 	{
 		case Request::FOF: // "F"ind "O"pposite "F"orm
 		{
 			if (isSingular(req.getNoun())) // Need to find the plural (if it exists)
 			{
-				if (hasPlural(req.getNoun())) // The noun is pluralisable
+				if (hasPlural(req.getNoun()) == true) // The noun is pluralisable
 				{
 					std::string pluralForm = findPlural(req.getNoun());
 					rep.setStatus(Reply::pluralForm); // Set the right code
-					rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
+					rep.addHeader("Content-Type", utf8Text);
 					rep.addHeader("Content-Length", std::any(pluralForm.length()));
 					rep.setContent(pluralForm);
 				}
@@ -57,8 +62,8 @@ void mpp::ReqHandler::handleReq(const Request& req, Reply& rep)
 				else // The noun isn't pluralisable
 				{
 					rep.setStatus(Reply::noPlural);
-					rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
-					rep.addHeader("Content-Length", std::any(0));
+					rep.addHeader("Content-Type", utf8Text);
+					rep.addHeader("Content-Length", zeroLengthInd);
 					rep.setContent("");
 				}
 			}
@@ -67,13 +72,18 @@ void mpp::ReqHandler::handleReq(const Request& req, Reply& rep)
 			{
 				if (hasSingular(req.getNoun())) // The noun is singularisable
 				{
+					std::string singularForm = findSingular(req.getNoun());
+					rep.setStatus(Reply::singularForm);
+					rep.addHeader("Content-Type", utf8Text);
+					rep.addHeader("Content-Length", std::any(singularForm.length()));
+					rep.setContent(singularForm);
 				}
 
 				else // The noun isn't singularisable
 				{
 					rep.setStatus(Reply::noSingular);
-					rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
-					rep.addHeader("Content-Length", std::any(0));
+					rep.addHeader("Content-Type", utf8Text);
+					rep.addHeader("Content-Length", zeroLengthInd);
 					rep.setContent("");
 				}
 			}
@@ -87,8 +97,8 @@ void mpp::ReqHandler::handleReq(const Request& req, Reply& rep)
 			std::cout << "mpp::ReqHandler::handleReq: checking whether " << std::quoted(req.getNoun()) << " is singular" << std::endl;
 			#endif
 
-			rep.addHeader("Content-Type", std::any(std::string("UTF-8")));
-			rep.addHeader("Content-Length", std::any(0));
+			rep.addHeader("Content-Type", utf8Text);
+			rep.addHeader("Content-Length", zeroLengthInd);
 
 			if (isSingular(req.getNoun()))
 			{
@@ -133,6 +143,7 @@ mpp::ReqHandler::ReqHandler(std::string cfPath) : dbInfo(boost::filesystem::path
 		boost::make_u32regex(".*\\x{d4d}$"), // schwa-stem
 	}
 {
+	endsInKaar = boost::make_u32regex(".*\\x{d15}\\x{d3e}\\x{d30}(\\x{d7b}|\\x{d3f})$"); // A regex that matches -കാരൻ or -കാരി
 	openDBConn();
 }
 
@@ -168,10 +179,28 @@ void mpp::ReqHandler::openDBConn()
 	#ifdef DEBUG
 	std::cout << "mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun exists in the DB" << std::endl;
 	#endif
+
 	hasPluralStmt = dbConn->create_statement("SELECT nouns.id,pluralisableNouns.pluralisable FROM nouns JOIN pluralisableNouns ON nouns.id=pluralisableNouns.id WHERE nouns.noun=?"); // Prepare the statement used when checking whether or not a noun is pluralisable
 	#ifdef DEBUG
 	std::cout << "mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun is pluralisable" << std::endl;
 	#endif
+
+	isAnimateStmt = dbConn->create_statement("SELECT nouns.*,animacies.animate FROM nouns LEFT JOIN animacies ON animacies.id=nouns.id WHERE nouns.noun=?"); // Prepare the statement used to check whether or not a noun is animate
+	#ifdef DEBUG
+	std::cout << "mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun is animate" << std::endl;
+	#endif
+
+	isHumanStmt = dbConn->create_statement("SELECT nouns.*,humanNouns.humanity FROM nouns LEFT JOIN humanNouns ON humanNouns.id=nouns.id WHERE nouns.noun=?"); // Prepare the statement used to check whether or not a noun refers to a human
+	#ifdef DEBUG
+	std::cout << "mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun is animate" << std::endl;
+	#endif
+
+	getGenderStmt = dbConn->create_statement("SELECT nouns.id,genders.gender FROM nouns JOIN genders ON nouns.id=genders.id WHERE nouns.noun=?"); // Prepare the statement used to fetch a noun's gender
+	#ifdef DEBUG
+	std::cout << "mpp::ReqHandler::openDBConn:: created the statement used to find a noun's gender." << std::endl;
+	#endif
+
+	exceptionStmt = dbConn->create_statement("SELECT nouns.id,nouns.noun,exceptions.plural FROM nouns JOIN exceptions ON exceptions.nid=nouns.id WHERE nouns.noun=?"); // Prepare the statement used to fetch the plural of exceptional nouns
 }
 
 /**
@@ -249,7 +278,7 @@ bool mpp::ReqHandler::inDB(std::string noun)
 	{
 		std::ostringstream ess;
 		ess << "mpp::ReqHandler::inDB: caught MariaDB connection exception while trying to execute query" << std::endl
-		<< "\tSELECT * FROM nouns WHERE noun='" << noun << "'" << std::endl
+		<< "\tSELECT * FROM nouns WHERE noun=" << std::quoted(noun, '\'') << std::endl
 		<< "Exception: " << mece.what() << std::endl;
 		mpp::exceptions::DBError ex(ess.str());
 		throw ex;
@@ -259,7 +288,7 @@ bool mpp::ReqHandler::inDB(std::string noun)
 	{
 		std::ostringstream ess;
 		ess << "mpp::ReqHandler::inDB: caught out of range exception while trying to execute query" << std::endl
-		<< "\tSELECT COUNT(*) FROM nouns WHERE noun='" << noun << "'" << std::endl
+		<< "\tSELECT COUNT(*) FROM nouns WHERE noun=" << std::quoted(noun, '\'') << std::endl
 		<< "Exception: " << stdoore.what() << std::endl;
 		mpp::exceptions::DBError ex(ess.str());
 		throw ex;
@@ -276,7 +305,7 @@ bool mpp::ReqHandler::inDB(std::string noun)
 bool mpp::ReqHandler::regGuess(std::string noun)
 {
 	std::array<bool, NDECLREGS+2> matchRes; // Holds whether or not each singular regex matched the noun
-	std::array<boost::smatch, NDECLREGS+4> what; // Holds what matched (unused, but a necessary parameter for boost::u32regex_match
+	std::array<boost::smatch, NDECLREGS+2> what; // Holds what matched (unused, but a necessary parameter for boost::u32regex_match
 	#ifdef DEBUG
 	unsigned short regNum = 1; // Regex #, for printing
 	#endif
@@ -293,7 +322,7 @@ bool mpp::ReqHandler::regGuess(std::string noun)
 		}
 	);
 	 
-	matchRes.at(matchRes.size()-2) = boost::u32regex_match(noun, what.at(what.size()-4), boost::make_u32regex(".*\\x{d7e}$")) && !boost::u32regex_match(noun, what.at(what.size()-3), boost::make_u32regex(".*\\x{d15}\\x{d7e}$")); // Retroflex l-stems are a special case, since we need to distinguish a plural -കൾ suffix from a singular noun that ends in -ൾ . Thus, we look for a match with a regex that ends in ൾ, and a non-match with a regex that matches a final -കൾ
+	matchRes.at(matchRes.size()-1) = boost::u32regex_match(noun, what.at(what.size()-1), boost::make_u32regex(".*\\x{d7e}$")) && !boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*\\x{d15}\\x{d7e}$")); // Retroflex l-stems are a special case, since we need to distinguish a plural -കൾ suffix from a singular noun that ends in -ൾ . Thus, we look for a match with a regex that ends in ൾ, and a non-match with a regex that matches a final -കൾ
 	
 	#ifdef DEBUG
 	if (matchRes.at(matchRes.size()-2))
@@ -307,7 +336,7 @@ bool mpp::ReqHandler::regGuess(std::string noun)
 	}
 	#endif
 
-	matchRes.back() = boost::u32regex_match(noun, what.at(what.size()-2), boost::make_u32regex(".*[^\\x{d7a}-\\x{d7f}]$")) && !boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*\\x{d4d}$")); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa
+	matchRes.back() = isVowelStem(noun);
 
 	#ifdef DEBUG
 	if (matchRes.back())
@@ -326,12 +355,12 @@ bool mpp::ReqHandler::regGuess(std::string noun)
 
 /**
 * @desc Searches the DB to see whether or not this noun is pluralisable.
-* @param noun The noun to check, encoded in UTF-8.
-* @return True if the noun is in the DB and has a TRUE 'pluralisable' attribute. False otherwise.
+* @param noun The Malayalam noun to find the plural of. It must be a UTF-8 encoded string, with codepoints in the range 0xd00 to 0xd7f.
+* @return True if the noun is in the DB and has a TRUE 'pluralisable' attribute, false if the noun has no plural form, indeterminate otherwise.
 **/
-bool mpp::ReqHandler::hasPlural(std::string noun)
+boost::logic::tribool mpp::ReqHandler::hasPlural(std::string noun);
 {
-	bool toReturn = true;
+	boost::logic::tribool toReturn = true;
 
 	if (inDB(noun)) // We can check whether or not this noun is pluralisable, since it's in the DB
 	{
@@ -357,29 +386,380 @@ bool mpp::ReqHandler::hasPlural(std::string noun)
 		{
 			std::ostringstream ess;
 			ess << "mpp::ReqHandler::hasPlural: caught MariaDB connection exception while trying to execute query" << std::endl
-			<< "\tSELECT pluralisable FROM nouns WHERE noun='" << noun << "'" << std::endl
+			<< "\tSELECT pluralisable FROM nouns WHERE noun=" << std::quoted(noun, '\'') << std::endl
 			<< "Exception: " << mece.what() << std::endl;
 			mpp::exceptions::DBError ex(ess.str());
 			throw ex;
 		}
 	}
 
-	else // Unknown - assume false
+	else // Unknown
 	{
 		#ifdef DEBUG
 		std::cout << "mpp::ReqHandler::hasPlural: noun " << std::quoted(noun) << " isn't in the DB, so I'll assume that it isn't pluralisable" << std::endl;
 		#endif
-		toReturn = false;
+		toReturn = boost::indeterminate;
 	}
 
 	return toReturn;
 }
 
 /**
-* @desc Given a SINGULAR noun, finds its plural form.
+* @desc Given a SINGULAR noun, finds its plural form. A vector is returned because a noun may have multiple plural forms.
 * @param noun The SINGULAR noun to find the plural of. The noun ISN'T CHECKED for singularity.
-* @return The plural form of the noun.
+* @return The plural form of the noun or all plural forms of the noun.
 **/
-std::string mpp::ReqHandler::findPlural(std::string noun)
+std::vector<std::string> mpp::ReqHandler::findPlural(std::string noun)
 {
+	std::vector<std::string> toReturn;
+	std::array<boost::smatch, 2> what; // Holds what matched a regex. Unused - only used as a dummy parameter
+	boost::u32regex endsInLongA = boost::make_u32regex(".*\\x{d3e}$"); // A noun that ends in /a:/
+	boost::u32regex endsInSyllabicR = boost::make_u32regex(".*\\x{d43}$"); // A noun that ends in a short syllabic /r/
+	boost::logic::tribool isH = isHuman(noun);
+
+	if (isH == true) // This noun has a human referent
+	{
+		boost::logic::tribool isE = isException(noun);
+
+		if (isE == true) // This noun has an exceptional plural
+		{
+			exceptionStmt->set_string(0, noun); // Load the noun into the string
+
+			try
+			{
+				mariadb::result_set_ref qRes = exceptionStmt->query(); // Find its plural using the prepared statement
+
+				while (qRes->next())
+				{
+					toReturn.push_back(qRes->get_string("plural")); // Find the noun's plural and store it
+				}
+			}
+
+			catch (mariadb::exception::connection& mece)
+			{
+				std::ostringstream ess;
+				ess << "mpp::ReqHandler::findPlural: exceptional noun with human referent check: caught connection error\n"
+				<< "\t" << mece.what() << "\n";
+				mpp::exceptions::DBError ex(ess.str());
+				throw ex;
+			}
+		}
+
+		else // This noun has a regular plural
+		{
+			Gender g = getGender(noun); // The plural form depends on the noun's gender
+
+			if (g == Masculine)
+			{
+				if (boost::u32regex_match(noun, what[0], endsInLongA) || boost::u32regex_match(noun, what[1], endsInSyllabicR)) // Add the suffix -ക്കൾ
+				{
+					toReturn.push_back(noun + u8"\u0d15\u0d4d\u0d15\u0d7e");
+				}
+
+				else if (boost::u32regex_match(noun, endsInKaar)) // This must be a -kaaran noun, since getGender already identified it as masculine
+				{
+					toReturn.push_back(noun + u8"\u0d2e\u0d3e\u0d7c"); // One possible plural is a -maar form
+					toReturn.push_back(boost::u32regex_replace(noun, boost::make_u32regex("(.*)\\x{d30}\\x{d7b}"), u8"$1\u0d7c")); // Replace final -ran with chillu -r
+				}
+
+				else // All other masculine nouns
+				{
+					toReturn.push_back(noun + u8"\u0d2e\u0d3e\u0d7c"); // Add the suffix -മാർ
+				}
+			}
+	
+			else // The noun can't be neuter if it has a human referent, so if it isn't masculine, it must be feminine
+			{
+				boost::u32regex endsInA = boost::make_u32regex(".*[\\x{d15}-\\x{d3a}]$"); // Any noun that ends in a consonant that has no vowel sign after it ends in an /a/, since /a/ is the default vowel
+				boost::u32regex endsInShortI = boost::make_u32regex(".*\\x{d3f}$"); // A noun that ends in /i/
+
+				if (boost::u32regex_match(noun, what[0], endsInA))
+				{
+					toReturn.push_back(noun + u8"\u0d2e\u0d3e\u0d7c"); // Add the suffix -maar
+				}
+
+				else if (boost::u32regex_match(noun, what[0], endsInShortI)) // These nouns can take either -maar or -kaL
+				{
+					toReturn.push_back(noun + u8"\u0d2e\u0d3e\u0d7c"); // Add the suffix -മാർ
+					toReturn.push_back(noun + u8"\u0d15\u0d7e"); // Add the suffix -കൾ
+				}
+
+				else if (boost::u32regex_match(noun, endsInKaar)) // This must be a -kaari noun, since getGender already identified it as feminine
+				{
+					toReturn.push_back(noun + u8"\u0d2e\u0d3e\u0d7c"); // One possible plural is a -maar form
+					toReturn.push_back(boost::u32regex_replace(noun, boost::make_u32regex("\\x{d30}\\x{d3f}"), u8"\u0d7c")); // Replace final -ri with chillu -r
+				}
+
+				else if (boost::u32regex_match(noun, what[0], endsInLongA) || boost::u32regex_match(noun, what[1], endsInSyllabicR)) // Add the suffix -ക്കൾ
+				{
+					toReturn.push_back(noun + u8"\u0d15\u0d4d\u0d15\u0d7e");
+				}
+
+				else // All other feminine nouns take the suffix -kaL
+				{
+					toReturn.push_back(noun + u8"\u0d15\u0d7e");
+				}
+
+				break;
+			} // else
+		} // else if
+	}
+
+	else // Not a noun that refers to humans
+	{
+		boost::u32regex endsInAlveolarN = boost::make_u32regex(".*\\x{d7b}$");
+
+		if (isAnimate(noun) == true && boost::u32regex_match(noun, endsInAlveolarN)) // This noun has an animate referent
+		{
+			toReturn.push_back(noun + u8"\u0d2e\u0d3e\u0d7c"); // These nouns have -maar plurals
+		}
+	
+		else // This noun's referent is neither animate nor human. It takes the underlying suffix -kaL, but phonetic assimilation occurs.
+		{
+			boost::u32regex isAmStem = boost::make_u32regex(".*\\x{d02}$"); // Matches a noun that ends in an anusvara
+			boost::u32regex endsInSchwa = boost::make_u32regex(".*\\x{d4d}$"); // Matches a noun that ends in a schwa
+
+			if (boost::u32regex_match(noun, isAmStem)) // Replace -am with -anngal
+			{
+				boost::u32regex replaceAmStem = boost::make_u32regex("(.*)\\x{d02}$"); // Capture everything before the final -am
+
+				toReturn.push_back(boost::u32regex_replace(noun, replaceAmStem, u8"$1\u0d19\u0d4d\u0d19\u0d7e"));
+			}
+
+			else if (boost::u32regex_match(noun, endsInSchwa)) // Replace schwa with /u/ and add suffix -kal
+			{
+				boost::u32regex replaceSchwa = boost::make_u32regex("(.*)\\x{d4d}"); // Capture everything before the schwa
+				std::string nounWithU = boost::u32regex_replace(noun, replaceSchwa, u8"$1\u0d41"); // Replace schwa with /u/
+				toReturn.push_back(nounWithU + u8"\u0d15\u0d7e"); // Add the suffix -kaL and store it
+			}
+		}
+	}
+
+	return toReturn;
+}
+
+/**
+* @desc Given a PLURAL noun, determines whether or not it has a corresponding SINGULAR form.
+* @param noun The Malayalam noun to check (UTF-8 encoded, all codepoints in range 0xd00-0xd7f).
+* @return True if the noun has a corresponding singular form, false otherwise.
+**/
+bool mpp::ReqHandler::hasSingular(std::string noun)
+{
+}
+
+/**
+* @desc Uses the DB to determine whether or not the given noun is animate.
+* @param noun The noun to check. Malayalam text, encoded in UTF-8.
+* @return True if the noun is animate, false if it isn't, boost::indeterminate if it isn't in the DB.
+**/
+boost::logic::tribool mpp::ReqHandler::isAnimate(std::string noun)
+{
+	bool toReturn = true;
+
+	if (inDB(noun)) // The noun is in the DB
+	{
+		isAnimateStmt->set_string(0, noun); // Load the noun into the prepared statement
+
+		try
+		{
+			mariadb::result_set_ref qRes = isAnimateStmt->query(); // Fetch the noun's animacy
+
+			while (qRes->next()) // Should only run once, but still
+			{
+				toReturn = toReturn && qRes->get_boolean("animate"); // AND it to ensure that a single false stops the entire thing
+			}
+		}
+
+		catch (mariadb::exception::connection& mece)
+		{
+			std::ostringstream ess;
+			ess << "mpp::ReqHandler::isAnimate: caught MariaDB connection exception while trying to execute query" << std::endl
+			<< "\tSELECT nouns.*,animacies.animate FROM nouns LEFT JOIN animacies ON animacies.id=nouns.id WHERE nouns.noun=" << std::quoted(noun, '\'') << std::endl
+			<< "Exception: " << mece.what() << std::endl;
+			mpp::exceptions::DBError ex(ess.str());
+			throw ex;
+		}
+	}
+
+	else // We don't know
+	{
+		return boost::indeterminate;
+	}
+}
+
+/**
+* @desc Uses the DB to determine whether or not the given noun refers to a human.
+* @param noun The noun to check. Malayalam text, encoded in UTF-8.
+* @return True if the noun refers to a human, false if it doesn't, boost::indeterminate if it isn't in the DB.
+**/
+boost::logic::tribool mpp::ReqHandler::isHuman(std::string noun)
+{
+	if (inDB(noun)) // The noun is in the DB
+	{
+		isHumanStmt->set_string(0, noun);
+
+		try
+		{
+			mariadb::result_set_ref qRes = isHumanStmt->query(); // Fetch the noun's animacy
+
+			while (qRes->next()) // Should only run once, but still
+			{
+				toReturn = toReturn && qRes->get_boolean("humanity"); // AND it to ensure that a single false stops the entire thing
+			}
+		}
+
+		catch (mariadb::exception::connection& mece)
+		{
+			std::ostringstream ess;
+			ess << "mpp::ReqHandler::isHuman: caught MariaDB connection exception while trying to execute query" << std::endl
+			<< "\tSELECT nouns.*,humanNouns.humanity FROM nouns LEFT JOIN humanNouns ON humanNouns.id=nouns.id WHERE nouns.noun=" << std::quoted(noun, '\'') << std::endl
+			<< "Exception: " << mece.what() << std::endl;
+			mpp::exceptions::DBError ex(ess.str());
+			throw ex;
+		}
+	}
+
+	else // Unknown unless its a -kaaran/-kaari noun
+	{
+		//boost::u32regex endsInKaar = boost::make_u32regex(".*\\x{d15}\\x{d3e}\\x{d30}(\\x{d7b}|\\x{d3f})$"); // A regex that matches -കാരൻ or -കാരി
+
+		if (boost::u32regex_match(noun, endsInKaar)) // The noun ends in -കാരൻ or -കാരി
+		{
+			return true;
+		}
+
+		else
+		{
+			return boost::indeterminate;
+		}
+	}
+}
+
+/**
+* @desc Finds the gender of the given noun.
+* @param noun The noun to fetch the gender of. Malayalam text, encoded in UTF-8.
+* @return An enum value representing the noun's gender (masculine, feminine, or neuter).
+* @note Although most members return a tribool instead of throwing an exception if the noun isn't in the DB, this method throws an exception.
+*	I chose to do this because this method should only be called when it's already known that the noun exists in the DB,
+*	and more importantly, because I want to return a proper Gender type instead of a tribool.
+**/
+mpp::ReqHandler::Gender mpp::ReqHandler::getGender(std::string noun)
+{
+	Gender toReturn;
+	
+	if (inDB(noun)) // The noun is in the DB
+	{
+		getGenderStmt->set_string(0, noun); // Load the noun into the prepared statement
+		
+		try
+		{
+			mariadb::result_set_ref qRes = getGenderStmt->query(); // Run the query
+
+			while (qRes->next())
+			{
+				std::string genStr = qRes->get_string("gender"); // Fetch the gender as a string
+				
+				if (genStr == "Masculine")
+				{
+					toReturn = Masculine;
+				}
+
+				else if (genStr == "Feminine")
+				{
+					toReturn = Feminine;
+				}
+
+				else
+				{
+					toReturn = Neuter;
+				}
+			}
+
+			return toReturn;
+		}
+
+		catch (mariadb::exception::connection& mece)
+		{
+			std::ostringstream ess;
+			ess << "mpp::ReqHandler::getGender: caught MariaDB connection exception while trying to execute query" << std::endl
+			<< "\tSELECT nouns.id,genders.gender FROM nouns JOIN genders ON nouns.id=genders.id WHERE nouns.noun=" << std::quoted(noun, '\'') << std::endl
+			<< "Exception: " << mece.what() << std::endl;
+			mpp::exceptions::DBError ex(ess.str());
+			throw ex;
+		}
+	}
+
+	else // Error
+	{
+		if (boost::u32regex_match(noun, boost::make_u32regex(".*\\x{d15}\\x{d3e}\\x{d30}\\x{d7b}"))) // -kaaran is masculine
+		{
+			return Masculine;
+		}
+
+		else if (boost::u32regex_match(noun, boost::make_u32regex(".*\\x{d15}\\x{d3e}\\x{d30}\\x{d3f}"))) // -kaari is feminine
+		{
+			return Feminine;
+		}
+
+		else // Unknown
+		{
+			std::ostringstream ess;
+			ess << "mpp::ReqHandler::getGender: noun " << std::quoted(noun, '\'') << " doesn't exist in the DB!";
+			mpp::exceptions::UnknownNoun ex(ess.str());
+			throw ex;
+		}
+	}
+}
+
+/**
+* @desc Determines whether or not a noun ends in a vowel.
+* @param noun The noun to check. Must be UTF-8 encoded Malayalam text.
+* @return True if the noun is a vowel stem, false otherwise.
+**/
+bool mpp::ReqHandler::isVowelStem(std::string noun)
+{
+	std::array<boost::smatch, 2> what;
+	return boost::u32regex_match(noun, what.at(what.size()-1), boost::make_u32regex(".*[^\\x{d7a}-\\x{d7f}]$")) && !boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*\\x{d4d}$")); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa
+}
+
+/**
+* @desc Determines whether or not a noun has an exceptional plural.
+* @param noun The noun to check. Must be UTF-8 encoded Malayalam text.
+* @return True if the noun has an exceptional plural, false if it doesn't, and boost::indeterminate if it isn't in the DB.
+**/
+boost::logic::tribool mpp::ReqHandler::isException(std::string noun)
+{
+	boost::logic::tribool toReturn = true; // Default to true so that a single AND with a 'false' value will set it to false
+
+	if (inDB(noun)) // The noun is in the DB
+	{
+		exceptionStmt->set_string(0, noun); // Load the noun into the prepared statement
+		
+		try
+		{
+			mariadb::result_set_ref qRes = exceptionStmt->query(); // Run the query
+
+			while (qRes->next())
+			{
+				std::string pluralStr = qRes->get_string("plural"); // Fetch the noun's stored plural (or empty string)
+				toReturn = toReturn && !pluralStr.empty(); // A noun has an irregular plural if the stored string isn't empty
+			}
+		}
+
+		catch (mariadb::exception::connection& mece)
+		{
+			std::ostringstream ess;
+			ess << "mpp::ReqHandler::isException: caught MariaDB connection exception while trying to execute query" << std::endl
+			<< "SELECT nouns.id,nouns.noun,exceptions.plural FROM nouns JOIN exceptions ON exceptions.id=nouns.id WHERE nouns.noun=" << std::quoted(noun, '\'') << std::endl
+			<< "Exception: " << mece.what() << std::endl;
+			mpp::exceptions::DBError ex(ess.str());
+			throw ex;
+	}
+
+	else // The noun isn't in the DB
+	{
+		toReturn = boost::indeterminate;
+	}
+
+	return toReturn;
 }

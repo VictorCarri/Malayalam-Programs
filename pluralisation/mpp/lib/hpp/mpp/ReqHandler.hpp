@@ -4,11 +4,13 @@
 /* Standard C++ */
 #include <string> // std::string
 #include <array> // std::array
+#include <vector> // std::vector
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
 #include <boost/regex.hpp>
 #include <boost/regex/icu.hpp> // boost::u32regex
+#include <boost/logic/tribool.hpp> // boost::logic::tribool
 
 /* MariaDB++ */
 #include <mariadb++/account.hpp> // mariadb::account_ref
@@ -32,9 +34,8 @@ namespace mpp
 	{
 		public:
 			/**
-			* @desc Handles a request and produces a reply. It does this by passing the DB objects to a Noun object, which loads the data from the DB and determines how it
-			*	should pluralise/singularise itself.
-			* @param req The request object to set parameters on by parsing.
+			* @desc Handles a request and produces a reply. 
+			* @param req The request object to get request data from.
 			* @param rep The respnse object to set parameters on to generate a response.
 			**/
 			void handleReq(const Request& req, Reply& rep);
@@ -48,6 +49,14 @@ namespace mpp
 			explicit ReqHandler(std::string cfPath);
 
 		private:
+			/* Types */
+			enum Gender // A noun's gender
+			{
+				Masculine,
+				Feminine,
+				Neuter
+			};
+
 			/**
 			* @desc Acquires the resources needed to communicate with the DB.
 			**/
@@ -79,16 +88,58 @@ namespace mpp
 			/**
 			* @desc Searches the DB to see whether or not this noun is pluralisable.
 			* @param noun The Malayalam noun to find the plural of. It must be a UTF-8 encoded string, with codepoints in the range 0xd00 to 0xd7f.
-			* @return True if the noun is in the DB and has a TRUE 'pluralisable' attribute. False otherwise.
+			* @return True if the noun is in the DB and has a TRUE 'pluralisable' attribute, false if the noun has no plural form, indeterminate otherwise.
 			**/
-			bool hasPlural(std::string noun);
+			boost::logic::tribool hasPlural(std::string noun);
 
 			/**
-			* @desc Given a SINGULAR noun, finds its plural form.
+			* @desc Given a SINGULAR noun, finds its plural form. A vector is returned because a noun may have multiple plural forms.
 			* @param noun The SINGULAR noun to find the plural of. The noun ISN'T CHECKED for singularity.
-			* @return The plural form of the noun.
+			* @return The plural form of the noun or all plural forms of the noun.
 			**/
-			std::string findPlural(std::string noun);
+			std::vector<std::string> findPlural(std::string noun);
+
+			/**
+			* @desc Given a PLURAL noun, determines whether or not it has a corresponding SINGULAR form.
+			* @param noun The Malayalam noun to check (UTF-8 encoded, all codepoints in range 0xd00-0xd7f).
+			* @return True if the noun has a corresponding singular form, false otherwise.
+			**/
+			bool hasSingular(std::string noun);
+
+			/**
+			* @desc Uses the DB to determine whether or not the given noun is animate.
+			* @param noun The noun to check. Malayalam text, encoded in UTF-8.
+			* @return True if the noun is animate, false if it isn't, boost::indeterminate if it isn't in the DB.
+			**/
+			boost::logic::tribool isAnimate(std::string noun);
+
+			/**
+			* @desc Uses the DB to determine whether or not the given noun refers to a human.
+			* @param noun The noun to check. Malayalam text, encoded in UTF-8.
+			* @return True if the noun refers to a human, false if it doesn't, boost::indeterminate if it isn't in the DB.
+			**/
+			boost::logic::tribool isHuman(std::string noun);
+
+			/**
+			* @desc Finds the gender of the given noun.
+			* @param noun The noun to fetch the gender of. Malayalam text, encoded in UTF-8.
+			* @return An enum value representing the noun's gender (masculine, feminine, or neuter).
+			**/
+			Gender getGender(std::string noun);
+
+			/**
+			* @desc Determines whether or not a noun ends in a vowel.
+			* @param noun The noun to check. Must be UTF-8 encoded Malayalam text.
+			* @return True if the noun is a vowel stem, false otherwise.
+			**/
+			bool isVowelStem(std::string noun);
+
+			/**
+			* @desc Determines whether or not a noun has an exceptional plural.
+			* @param noun The noun to check. Must be UTF-8 encoded Malayalam text.
+			* @return True if the noun has an exceptional plural, false if it doesn't, and boost::indeterminate if it isn't in the DB.
+			**/
+			boost::logic::tribool isException(std::string noun);
 
 			/* Properties */
 			data::DBInfo dbInfo; // Holds information req'd to connect to the DB
@@ -96,7 +147,12 @@ namespace mpp
 			mariadb::connection_ref dbConn; // Pointer to DB connection object
 			mariadb::statement_ref existStmt; // Prepared statement used to check whether a noun is in the DB or not
 			mariadb::statement_ref hasPluralStmt; // Prepared statement used to check whether or not a noun is pluralisable
+			mariadb::statement_ref isAnimateStmt; // Prepared statement used to check whether or not a noun is animate
+			mariadb::statement_ref isHumanStmt; // Used to check whether or not a noun refers to a human
+			mariadb::statement_ref getGenderStmt; // Used to find a noun's gender
+			mariadb::statement_ref exceptionStmt; // Used to determine whether a noun is an exception that has a special plural and what the exceptional plural is
 			std::array<boost::u32regex, NDECLREGS> declRegs; // Array of regular expressions for use in determining the noun's declension class
+			boost::u32regex endsInKaar; // Regex used to check if a noun is a -kaaran/-kaari noun
 	};
 };
 

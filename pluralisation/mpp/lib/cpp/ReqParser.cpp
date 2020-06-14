@@ -48,7 +48,7 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 		{"ISSING", issing_first_s},
 		{"FOF", fof_o}
 	},
-	gen(),
+//	gen(),
 	pSSHeaderName(new std::stringstream),
 	pSSHeaderVal(new std::stringstream),
 	mNBytes(0), // Initialise # of noun bytes read
@@ -83,25 +83,17 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	std::cout << "mpp::ReqParser::ReqParser: starting state = " << stateNames[curStat] << std::endl
 	<< "Version = " << version.at(0) << "." << version.at(1) << "." << version.at(2) << std::endl
 	<< "Recognised verbs = ";
-	//std::for_each(verbsInfo.begin(), verbInfo.end()-1, mpp::functors::Printer< std::pair<std::string, State>, std::ostream>(std::cout));
-	std::for_each(verbInfo.cbegin(), verbInfo.cend(), [=](std::pair<std::string, State> pair)
-		{
-			std::cout << "State #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
-		}
-	);
+
+	for (std::pair<std::string, State> pair : verbInfo)
+	{
+		std::cout << "State #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
+	}
 	#endif
 	
 	/* Set up locale cache */
 	gen.locale_cache_enabled(true);
 	gen("en_US.UTF-8"); // Add US English
 	gen("ml_IN.UTF-8"); // Add Malayalam
-
-	/* Create stringstream pointers */
-	/*for (short i = 0; i < verSS.size(); i++)
-	{
-		verSS[i] = std::make_unique<std::stringstream>(); // Create a pointer to a stringstream
-	}*/
-	//std::fill(verSS.begin(), verSS.end(), std::make_unique<std::stringstream>()); // Initialise the array of stringstreams for each version #
 }
 
 /**
@@ -114,8 +106,6 @@ void mpp::ReqParser::reset()
 	#ifdef DEBUG
 	std::cout << "mpp::ReqParser::reset: reset to state " << stateNames[curStat] << std::endl;
 	#endif
-
-	//std::for_each(verSS.begin(), verSS.end(), mpp::functors::PtrResetter()); // Need to use std::for_each the pointers to stringstreams - a for loop doesn't work
 
 	for (auto& ptr : verSS)
 	{
@@ -491,10 +481,10 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 		
 					#ifdef DEBUG
 					std::cout << "mpp::ReqParser::consume: verb_start: matched verb is: " << verb << std::endl
-					<< "mpp::ReqParser::consume: verb_start: found '" << verb[0] << "' at beginning" << std::endl;
+					<< "mpp::ReqParser::consume: verb_start: found '" << verb[0] << "' at beginning of matched verb, going to state ";
 					#endif
 					
-					if (verb[0] == 'F') // Find the opposite form
+					/*if (verb[0] == 'F') // Find the opposite form
 					{
 						#ifdef DEBUG
 						std::cout << "' at start of matched verb, going to state " << stateNames[fof_o] << std::endl;
@@ -510,7 +500,13 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 						#endif
 
 						curStat = issing_first_s; // We expect to parse the first 's' of an "ISSING" command
-					}
+					}*/
+
+					curStat = verbInfo[verb]; // Go to whichever state is associated with parsing the verb's second character
+
+					#ifdef DEBUG
+					std::cout << stateNames[curStat] << std::endl;
+					#endif
 
 					toReturn = boost::indeterminate; // We need more info
 				}
@@ -1064,7 +1060,7 @@ bool mpp::ReqParser::isValidDecimalInt(std::string toCheck)
 			return true;
 		}
 
-		else // The end pointer doesn't point to the NULL terminator, so strotull couldn't parse the entire string
+		else // The end pointer doesn't point to the NULL terminator, so strtoull couldn't parse the entire string
 		{
 			// Thus, the string isn't a valid integer
 			return false;
