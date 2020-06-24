@@ -141,6 +141,20 @@ namespace mpp
 			**/
 			boost::logic::tribool isException(std::string noun);
 
+			/**
+			* @desc Finds the singular form of a noun, given the plural form.
+			* @param noun The noun to find the singular form of. Must be UTF-8 encoded Malayalam text.
+			* @return 1 or more UTF-8 encoded Malayalam strings containing the noun's singular form(s).
+			**/
+			std::vector<std::string> findSingular(std::string noun);
+
+			/**
+			* @desc Determines whether or not a string contains the plural form of an exceptional noun.
+			* @param noun A UTF-8 encoded Malayalam noun which may or may not be the plural form of an exceptional noun.
+			* @return True if the noun has an exceptional plural, false if it doesn't, and boost::indeterminate if it isn't in the DB.
+			**/
+			boost::logic::tribool isExceptionalPlural(std::string noun);
+
 			/* Properties */
 			data::DBInfo dbInfo; // Holds information req'd to connect to the DB
 			mariadb::account_ref dbAcc; // Pointer to DB account object
@@ -151,6 +165,7 @@ namespace mpp
 			mariadb::statement_ref isHumanStmt; // Used to check whether or not a noun refers to a human
 			mariadb::statement_ref getGenderStmt; // Used to find a noun's gender
 			mariadb::statement_ref exceptionStmt; // Used to determine whether a noun is an exception that has a special plural and what the exceptional plural is
+			mariadb::statement_ref exSingStmt; // Used to determine the singular form of an exceptional noun's plural
 			std::array<boost::u32regex, NDECLREGS> declRegs; // Array of regular expressions for use in determining the noun's declension class
 			boost::u32regex endsInKaar; // Regex used to check if a noun is a -kaaran/-kaari noun
 	};
