@@ -850,6 +850,13 @@ std::vector<std::string> mpp::ReqHandler::findSingular(std::string noun)
 	{
 		try
 		{
+			exSingStmt->set_string(0, noun); // Load the noun into the string
+			mariadb::result_set_ref qRes = exSingStmt->query(); // Find its plural using the prepared statement
+
+			while (qRes->next())
+			{
+				toReturn.push_back(qRes->get_string("noun")); // Find the noun's singular form and store it
+			}
 		}
 
 		catch (mariadb::exception::connection& mece)
@@ -876,8 +883,7 @@ boost::logic::tribool isExceptionalPlural(std::string noun)
 	try
 	{
 		exSingStmt->set_string(0, noun); // Load the noun into the prepared statement
-		mariadb::result_set_ref qRes = exSingStmt->query();
-		mariadb::u64 rowsAff = qRes->row_count();
+		mariadb::u64 rowsAff = exSingStmt->execute();
 		return (rowsAff != 0);
 	}
 
