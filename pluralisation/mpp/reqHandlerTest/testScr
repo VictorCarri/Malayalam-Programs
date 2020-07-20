@@ -1,10 +1,16 @@
 #!/bin/bash
+
+ourName=`basename "$0"`
+
+# Step 1: rebuild
+echo ${ourName}: rebuilding
 time make
 
-for noun in അവർ അവൻ അത് അവൾ ഇത് പരുക്കൻ കര
+# Step 2: test ISSING requests
+for noun in അവർ അവൻ അത് അവൾ ഇത് പരുക്കൻ കര ഇവ പണ ിക്കാർ
 do
 	time gdb ./reqHandlerTest-debug-dynamic <<END
-set args -n $noun
+set args $noun
 run
 END
 done

@@ -10,6 +10,7 @@ namespace mpp
 	{
 		/**
 		* A functor template that prints whatever is passed to it to the std::ostream that is given upon construction.
+		* The functor ASSUMES that operator<< is defined for T and std::ostream.
 		**/
 		template<typename T, class Stream>
 		class Printer

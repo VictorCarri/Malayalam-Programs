@@ -54,7 +54,8 @@ namespace mpp
 			{
 				Masculine,
 				Feminine,
-				Neuter
+				Neuter,
+				Unknown
 			};
 
 			/**

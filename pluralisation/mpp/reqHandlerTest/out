@@ -1,0 +1,285 @@
+testScr: rebuilding
+clear
+[3J[H[2Jfind ./obj/dbg/stat -type f -delete
+find ./obj/dbg/dyn -type f -delete
+rm -f reqHandlerTest-debug-{static,dynamic}
+find ./obj/prod/stat -type f -delete
+find ./obj/prod/dyn -type f -delete
+rm -f reqHandlerTest-prod-{static,dynamic}
+rm -f *.{ii,s}
+g++-9 -o obj/dbg/dyn/main.o -std=gnu++17 -O3 -Os -save-temps -I/usr/include/mysql -I/usr/include/mysql/mariadb -I./hpp -Wall -Werror -DDEBUG -ggdb3 -ggnu-pubnames -gvariable-location-views -ginline-points -Og -fvar-tracking-assignments -c cpp/main.cpp -fPIC
+g++-9 -o reqHandlerTest-debug-dynamic obj/dbg/dyn/main.o /home/victor/lib/mpp/libmpp-debug.so -L/usr/local/lib/boost -L/usr/local/lib/icu -L/home/victor/lib/mpp -L/home/victor/lib/vuu -L/usr/lib64 -lmariadb -lmpp-debug -lvuu-debug -lboost_locale-mt-d-x64 -lboost_regex-mt-d-x64 -lboost_program_options-mt-d-x64 -lboost_filesystem-mt-d-x64 -lboost_system-mt-d-x64 -licudata -licui18n -licuio -licutest -licutu -licuuc -ldl -lpthread -lmariadbclientpp -lz -ldl -lm -lpthread -lssl -lcrypto
+g++-9 -o obj/prod/dyn/main.o -std=gnu++17 -O3 -Os -save-temps -I/usr/include/mysql -I/usr/include/mysql/mariadb -I./hpp -Wall -Werror -DDEBUG -ggdb3 -ggnu-pubnames -gvariable-location-views -ginline-points -Og -fvar-tracking-assignments -c cpp/main.cpp -fPIC
+g++-9 -o reqHandlerTest-prod-dynamic obj/prod/dyn/main.o /home/victor/lib/mpp/libmpp.so -L/usr/local/lib/boost -L/usr/local/lib/icu -L/home/victor/lib/mpp -L/home/victor/lib/vuu -L/usr/lib64 -lmariadb -lmpp -lvuu -lboost_locale-mt-x64 -lboost_regex-mt-x64 -lboost_program_options-mt-x64 -lboost_filesystem-mt-x64 -lboost_system-mt-x64 -licudata -licui18n -licuio -licutest -licutu -licuuc -ldl -lpthread -lmariadbclientpp -lz -ldl -lm -lpthread -lssl -lcrypto
+g++-9 -o obj/dbg/stat/main.o -static -std=gnu++17 -O3 -Os -save-temps -I/usr/include/mysql -I/usr/include/mysql/mariadb -I./hpp -Wall -Werror -DDEBUG -ggdb3 -ggnu-pubnames -gvariable-location-views -ginline-points -Og -fvar-tracking-assignments -c cpp/main.cpp
+GNU gdb (GDB; openSUSE Leap 15.1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-suse-linux".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://bugs.opensuse.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./reqHandlerTest-debug-dynamic...
+(gdb) (gdb) Starting program: /home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/reqHandlerTest/reqHandlerTest-debug-dynamic -n അവർ
+Missing separate debuginfos, use: zypper install glibc-debuginfo-2.26-lp151.19.15.1.x86_64
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+reqHandlerTest-debug-dynamic: creating ReqHandler with DB info file located at path "/home/victor/info/pluraliser.dbinfo"
+mpp::data::DBInfo::DBInfo: data file "/home/victor/info/pluraliser.dbinfo" exists.
+mpp::data::DBInfo::DBInfo: set up options 
+
+Database options:
+  --user arg            DB username
+  --password arg        DB password
+  --host arg            DB host
+  --db arg              DB name
+
+mpp::data::DBInfo::DBInfo: opened data file "/home/victor/info/pluraliser.dbinfo" for reading.
+mpp::data::DBInfo::DBInfo: parsed options from config file
+mpp::data::DBInfo::DBInfo: loaded all variables from config file
+mpp::data::DBInfo::DBInfo: loaded the following data: 
+	DB user name = "pluraliser"
+	DB password = "I want more of you!"
+	DB host name = "localhost"
+	DB name = "malayalam"
+mpp::ReqHandler::openDBConn: created a reference to my account
+mpp::ReqHandler::openDBConn: created a reference to a connection to my account
+mpp::ReqHandler::openDBConn: set connection's character set to UTF-8
+mpp::ReqHandler::openDBConn: opened the connection
+mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun exists in the DB
+mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun is pluralisable
+mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun is animate
+mpp::ReqHandler::openDBConn: created the statement used to check whether or not a noun is animate
+mpp::ReqHandler::openDBConn:: created the statement used to find a noun's gender.
+mpp::ReqHandler::openDBConn: created statement used to fetch plural of exceptional nouns.
+mpp::ReqHandler::openDBConn: created statement used to fetch the singular form of an exceptional noun.
+------------------------------------------------------------------------------------------------------------------------------------
+reqHandlerTest-debug-dynamic: testing ISSING request
+reqHandlerTest-debug-dynamic: noun to test is "അവർ"
+mpp::ReqHandler::handleReq: checking whether "അവർ" is singular
+mpp::ReqHandler::inDB: noun to check is "അവർ"
+mpp::ReqHandler::inDB: field # = 0
+mpp::ReqHandler::inDB: # of rows affected by existence query was 0
+mpp::ReqHandler::inDB: nRowsAff != 1, returning false
+mpp::ReqHandler::regGuess: lambda 1: regex #1 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #2 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #3 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #4 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #5 didn't match noun "അവർ"
+mpp::ReqHandler::RegGuess: didn't find a retroflex l-stem
+mpp::ReqHandler::RegGuess: didn't find a vowel-stem (noun ends in a chillu or a schwa)
+mpp::ReqHandler::isSingular: noun "അവർ" isn't in the DB
+mpp::ReqHandler::isSingular: noun "അവർ" matched none of the singular regexes.
+mpp::ReqHandler::handleReq: "അവർ" is plural
+------------------------------------------------------------------------------------------------------------------------------------
+reqHandlerTest-debug-dynamic: testing FOF request
+reqHandlerTest-debug-dynamic: noun to test is "അവർ"
+mpp::ReqHandler::inDB: noun to check is "അവർ"
+mpp::ReqHandler::inDB: field # = 0
+mpp::ReqHandler::inDB: # of rows affected by existence query was 0
+mpp::ReqHandler::inDB: nRowsAff != 1, returning false
+mpp::ReqHandler::regGuess: lambda 1: regex #1 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #2 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #3 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #4 didn't match noun "അവർ"
+mpp::ReqHandler::regGuess: lambda 1: regex #5 didn't match noun "അവർ"
+mpp::ReqHandler::RegGuess: didn't find a retroflex l-stem
+mpp::ReqHandler::RegGuess: didn't find a vowel-stem (noun ends in a chillu or a schwa)
+mpp::ReqHandler::isSingular: noun "അവർ" isn't in the DB
+mpp::ReqHandler::isSingular: noun "അവർ" matched none of the singular regexes.
+mpp::ReqHandler::handleReq::FOF: noun "അവർ" is plural, so we shall find its singular.
+mpp::ReqHandler::handleReq::FOF: the noun "അവർ" is singularisable.
+mpp::ReqHandler::handleReq::FOF: # of singular forms found = 2
+mpp::ReqHAndler::handleReq::FOF: possible singular forms of "അവർ" are: 
+
+1)	അവൻ
+2)	അവൾ
+mpp::ReqHandler::handleReq::FOF:> 1 singular form: content = "അവൻ;അവൾ"
+[Inferior 1 (process 16170) exited normally]
+Missing separate debuginfos, use: zypper install libgcc_s1-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libmariadb3-debuginfo-3.1.8-lp151.3.12.1.x86_64 libopenssl1_1-debuginfo-1.1.0i-lp151.8.6.1.x86_64 libstdc++6-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libz1-debuginfo-1.2.11-lp151.5.6.1.x86_64
+(gdb) quit
+GNU gdb (GDB; openSUSE Leap 15.1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-suse-linux".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://bugs.opensuse.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./reqHandlerTest-debug-dynamic...
+(gdb) (gdb) Starting program: /home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/reqHandlerTest/reqHandlerTest-debug-dynamic -n അവൻ
+Missing separate debuginfos, use: zypper install glibc-debuginfo-2.26-lp151.19.15.1.x86_64
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7ddb0e1 in dl_main () from /lib64/ld-linux-x86-64.so.2
+Missing separate debuginfos, use: zypper install libgcc_s1-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libmariadb3-debuginfo-3.1.8-lp151.3.12.1.x86_64 libopenssl1_1-debuginfo-1.1.0i-lp151.8.6.1.x86_64 libstdc++6-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libz1-debuginfo-1.2.11-lp151.5.6.1.x86_64
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 16177] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+GNU gdb (GDB; openSUSE Leap 15.1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-suse-linux".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://bugs.opensuse.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./reqHandlerTest-debug-dynamic...
+(gdb) (gdb) Starting program: /home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/reqHandlerTest/reqHandlerTest-debug-dynamic -n അത്
+Missing separate debuginfos, use: zypper install glibc-debuginfo-2.26-lp151.19.15.1.x86_64
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7ddb0e1 in dl_main () from /lib64/ld-linux-x86-64.so.2
+Missing separate debuginfos, use: zypper install libgcc_s1-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libmariadb3-debuginfo-3.1.8-lp151.3.12.1.x86_64 libopenssl1_1-debuginfo-1.1.0i-lp151.8.6.1.x86_64 libstdc++6-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libz1-debuginfo-1.2.11-lp151.5.6.1.x86_64
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 16183] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+GNU gdb (GDB; openSUSE Leap 15.1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-suse-linux".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://bugs.opensuse.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./reqHandlerTest-debug-dynamic...
+(gdb) (gdb) Starting program: /home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/reqHandlerTest/reqHandlerTest-debug-dynamic -n അവൾ
+Missing separate debuginfos, use: zypper install glibc-debuginfo-2.26-lp151.19.15.1.x86_64
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7ddb0e1 in dl_main () from /lib64/ld-linux-x86-64.so.2
+Missing separate debuginfos, use: zypper install libgcc_s1-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libmariadb3-debuginfo-3.1.8-lp151.3.12.1.x86_64 libopenssl1_1-debuginfo-1.1.0i-lp151.8.6.1.x86_64 libstdc++6-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libz1-debuginfo-1.2.11-lp151.5.6.1.x86_64
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 16189] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+GNU gdb (GDB; openSUSE Leap 15.1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-suse-linux".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://bugs.opensuse.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./reqHandlerTest-debug-dynamic...
+(gdb) (gdb) Starting program: /home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/reqHandlerTest/reqHandlerTest-debug-dynamic -n ഇത്
+Missing separate debuginfos, use: zypper install glibc-debuginfo-2.26-lp151.19.15.1.x86_64
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7ddb0e1 in dl_main () from /lib64/ld-linux-x86-64.so.2
+Missing separate debuginfos, use: zypper install libgcc_s1-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libmariadb3-debuginfo-3.1.8-lp151.3.12.1.x86_64 libopenssl1_1-debuginfo-1.1.0i-lp151.8.6.1.x86_64 libstdc++6-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libz1-debuginfo-1.2.11-lp151.5.6.1.x86_64
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 16195] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+GNU gdb (GDB; openSUSE Leap 15.1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-suse-linux".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://bugs.opensuse.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./reqHandlerTest-debug-dynamic...
+(gdb) (gdb) Starting program: /home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/reqHandlerTest/reqHandlerTest-debug-dynamic -n പരുക്കൻ
+Missing separate debuginfos, use: zypper install glibc-debuginfo-2.26-lp151.19.15.1.x86_64
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7ddb0e1 in dl_main () from /lib64/ld-linux-x86-64.so.2
+Missing separate debuginfos, use: zypper install libgcc_s1-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libmariadb3-debuginfo-3.1.8-lp151.3.12.1.x86_64 libopenssl1_1-debuginfo-1.1.0i-lp151.8.6.1.x86_64 libstdc++6-debuginfo-9.3.1+git1296-lp151.2.2.x86_64 libz1-debuginfo-1.2.11-lp151.5.6.1.x86_64
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 16204] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]
+GNU gdb (GDB; openSUSE Leap 15.1) 8.3.1
+Copyright (C) 2019 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-suse-linux".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://bugs.opensuse.org/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./reqHandlerTest-debug-dynamic...
+(gdb) (gdb) Starting program: /home/victor/Programming/CPP/malayalam/Malayalam-Programs/pluralisation/mpp/reqHandlerTest/reqHandlerTest-debug-dynamic -n കര
+Missing separate debuginfos, use: zypper install glibc-debuginfo-2.26-lp151.19.15.1.x86_64
+
+Program received signal SIGINT, Interrupt.
+0x00007ffff7dd7ea0 in _start () from /lib64/ld-linux-x86-64.so.2
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 16212] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]

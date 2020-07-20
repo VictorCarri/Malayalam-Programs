@@ -30,12 +30,20 @@ int main(int argc, char* argv[])
 	boost::program_options::variables_map vm;
 	boost::program_options::positional_options_description posOpts;
 
-	posOpts.add("dbinfo", -1); // Convert all positional options to "dbinfo" options
+	/* Set up positional to named options conversion */
+	posOpts.add("noun", 1); // Convert the first positional option to a "noun" option
+	posOpts.add("dbinfo", -1); // Convert all other positional options to "dbinfo" options
+
+	/* Set up named options that are used to convert positional options to named ones */
 	posConvOpts.add_options()
-		("dbinfo,d", boost::program_options::value<std::string>()->default_value("/home/victor/info/pluraliser.dbinfo"), "Path to the DB info file");
-	cmdOpts.add_options()
-		("help,h", "Print a help message")
+		("dbinfo,d", boost::program_options::value<std::string>()->default_value("/home/victor/info/pluraliser.dbinfo"), "Path to the DB info file")
 		("noun,n", boost::program_options::value<std::string>()->default_value(u8"\u0d05\u0d35\u0d7b"), "The noun to test");
+
+	/* Set up other options */
+	cmdOpts.add_options()
+		("help,h", "Print a help message");
+
+	/* Set up a list of all options for parsing */
 	allOpts.add(posConvOpts).add(cmdOpts);
 	
 	try
@@ -72,13 +80,21 @@ int main(int argc, char* argv[])
 	mpp::ReqHandler rh(vm["dbinfo"].as<std::string>()); // Try to instantiate it with the path to the DB config file
 	mpp::Request req; // Request to use to test
 	mpp::Reply rep; // Reply to use as a test
-	std::cout << "------------------------------------------------------------------------------------------------------------------------------------";
+	std::cout << "------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
 
 	/* Test an ISSING request */
 	std::cout << ourName << ": testing ISSING request" << std::endl;
 	req.setNoun(vm["noun"].as<std::string>());
 	req.setCommand(mpp::Request::ISSING);
-	std::cout << ourName << ": noun to test is " << std::quoted(req.getNoun()) << std::endl;
+	std::cout << ourName << ": the noun to test is " << std::quoted(req.getNoun()) << std::endl;
 	rh.handleReq(req, rep);
+	std::cout << "------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+
+	/* Test a FOF request */
+	std::cout << ourName << ": testing FOF request" << std::endl;
+	req.setCommand(mpp::Request::FOF);
+	std::cout << ourName << ": the noun to test is " << std::quoted(req.getNoun()) << std::endl;
+	rh.handleReq(req, rep);
+
 	return 0;
 }
