@@ -368,7 +368,6 @@ bool mpp::ReqHandler::inDB(std::string noun)
 	try
 	{
  		existStmt->set_string(fno, noun); // Load the noun into the query to make
-		//nRowsAff = existStmt->execute(); // We don't care about the results, we just need the # of rows affected by the query
 		mariadb::result_set_ref results = existStmt->query();
 		nRowsAff = results->row_count();
 		#ifdef DEBUG
@@ -928,7 +927,11 @@ mpp::ReqHandler::Gender mpp::ReqHandler::getGender(std::string noun)
 bool mpp::ReqHandler::isVowelStem(std::string noun)
 {
 	std::array<boost::smatch, 2> what;
-	return boost::u32regex_match(noun, what.at(what.size()-1), boost::make_u32regex(".*[^\\x{d7a}-\\x{d7f}]$")) && !boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*\\x{d4d}$")); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa
+	bool doesntEndInChillu = boost::u32regex_match(noun, what.at(what.size()-1), boost::make_u32regex(".*[^\\x{d7a}-\\x{d7f}]$"));
+	bool doesntEndInSchwa = boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*[^\\x{d4d}]$"));
+	bool isIva = (noun == u8"\u0d07\u0d35"); // iva is a special case - it's a vowel stme, but it's plural
+	bool isAva = (noun == u8"\u0d05\u0d35"); // ava is also a special case, for the same reason as iva
+	return doesntEndInChillu && doesntEndInSchwa && !(isIva || isAva); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa AND must NOT be (iva OR ava)
 }
 
 /**
@@ -959,7 +962,7 @@ boost::logic::tribool mpp::ReqHandler::isException(std::string noun)
 			int pno = 1; // # of current plural form
 			#endif
 
-			if (qRes->next()) // The query returned results
+			if (qRes->row_count() > 0) // The query returned results
 			{
 				while (qRes->next())
 				{

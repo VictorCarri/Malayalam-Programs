@@ -56,7 +56,7 @@ mpp::data::DBInfo::DBInfo(boost::filesystem::path cfPath)
 	/* Step 3: open config file */
 	boost::filesystem::ifstream confStrm(cfPath); // Now that we know that the path exists, we can open a stream to read it
 
-	if (!(confStrm.is_open() && confStrm.good())) // Some kind of error
+	if (!confStrm.is_open() || !confStrm.good()) // Some kind of error
 	{
 		std::ostringstream ess;
 		ess << "Couldn't open file " << cfPath << " for reading.";

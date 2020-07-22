@@ -1,7 +1,6 @@
 /* STL */
 #include <string> // std::string
-#include <iostream> // std::cin, std::boolalpha
-//#include <array> // std::array
+#include <iostream> // std::cout, std::wcout, std::boolalpha
 #include <sstream> // std::stringstream
 
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::positional_options_description, boost::program_options::store, boost::program_options::command_line_parser, boost::filesystem::ifstream
@@ -123,74 +122,6 @@ int main(int argc, char* argv[])
 		}
 		
 	}
-
-	/*while (running)
-	{
-		std::cout << "Please use the commands: " << std::endl
-		<< "\tsetinput\tSet string to use as input" << std::endl
-		<< "\treset\tReset the parser" << std::endl
-		<< "\tparse\tParse the given data" << std::endl
-		<< "\tquit\tQuit" << std::endl;
-		command.fill('\0');
-		std::cin.getline(&command[0], COMLEN-1);
-		command[COMLEN-1] = 0; // Add null terminator
-		std::string comStr(command.data()); // For ease of use
-
-		if (comStr == "setinput")
-		{
-			std::cout << "\tPlease enter the string to parse: ";
-			std::cin.getline(&input[0], INPLEN-1);
-			input[INPLEN-1] = 0; // Add null terminator
-			std::string inpStr(input.data());
-			std::cout << "Input is: \"" << inpStr << "\"" << std::endl;
-		}
-
-		else if (comStr == "reset")
-		{
-			curInd = 0;
-			reqParser.reset();
-			input.fill('\0'); // Reset string to NULL
-			command.fill('\0'); // Reset string to NULL
-			std::cout << "Reset index to 0." << std::endl;
-		}
-
-		else if (comStr == "parse")
-		{
-			std::string inpStr(input.data());
-			std::cout << "Buffer contains: " << inpStr << std::endl;
-			boost::tribool result;
-			boost::tie(result, boost::tuples::ignore) = reqParser.parse(req, inpStr.cbegin(), inpStr.cend());
-
-			if (result)
-			{
-				std::cout << "Successfully parsed request." << std::endl;
-			}
-			
-			else if (!result)
-			{
-				std::cout << "main: Error occurred while parsing request." << std::endl;
-				Reply::FailureCode errReason = reqParser.getFailedReason();
-				std::string reasonStr = Reply::getFCString(errReason);
-				std::cout << reasonStr << std::endl;
-			}
-
-			else
-			{
-				std::cout << "Need more data." << std::endl;
-			}
-		}
-
-		else if (comStr == "quit")
-		{
-			running = false;
-		}
-
-		else
-		{
-			std::cerr << "Please enter a recognised command." << std::endl;
-		}
-
-	}*/
 
 	return NORMAL;
 }

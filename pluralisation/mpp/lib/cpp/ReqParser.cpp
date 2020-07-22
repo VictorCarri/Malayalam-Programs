@@ -48,7 +48,6 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 		{"ISSING", issing_first_s},
 		{"FOF", fof_o}
 	},
-//	gen(),
 	pSSHeaderName(new std::stringstream),
 	pSSHeaderVal(new std::stringstream),
 	mNBytes(0), // Initialise # of noun bytes read
