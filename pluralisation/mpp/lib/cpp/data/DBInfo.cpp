@@ -7,7 +7,7 @@
 #endif
 
 /* Boost */
-#include <boost/filesystem.hpp> // boost::filesystem::path, boost::filesystem::exists
+#include <boost/filesystem.hpp> // boost::filesystem::ifstream, boost::filesystem::exists, boost::filesystem::path
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost:program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::notify, boost::program_options::parse_config_file
 
 /* Our headers */

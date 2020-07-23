@@ -6,6 +6,7 @@
 
 /* Our headers */
 #include "BindFunc.hpp" // BIND_FUNCTION macro
+#include "ErrorCode.hpp" // ERROR_CODE macro
 #include "mpp/ReqHandler.hpp" // Request handler class
 #include "Connection.hpp" // Class def
 
@@ -38,7 +39,6 @@ void Connection::start()
 		boost::asio::buffer(
 			buffer
 		),
-		//boost::bind(
 		BIND_FUNCTION(
 			&Connection::handleRead,
 			shared_from_this(),
@@ -53,7 +53,7 @@ void Connection::start()
 * @param e An error code. Set if an error occurred during the read.
 * @param bytesTransferred # of bytes transferred during the read.
 **/
-void Connection::handleRead(const boost::system::error_code& e, std::size_t bytesTransferred)
+void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 {
 	if (!e)
 	{
@@ -67,12 +67,11 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 
 		if (result) // The parser successfully parsed an entire request
 		{
-			//rep.setStatus(reqParser.getStatus());
 			reqHandler.handleReq(req, rep); // Handle a request - generate a reply according to what the client requested
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				boost::bind(
+				BIND_FUNCTION(
 					&Connection::handleWrite,
 					shared_from_this(),
 					boost::asio::placeholders::error
@@ -82,12 +81,11 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 
 		else if (!result) // Malformed request
 		{
-			//reply = Reply::stockReply(Reply::badRequest); // Generate a stock reply
 			rep = mpp::Reply::stockReply(reqParser.getStatus()); // Generate a stock reply using the error code which the parser identified
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				boost::bind(
+				BIND_FUNCTION(
 					&Connection::handleWrite,
 					shared_from_this(),
 					boost::asio::placeholders::error
@@ -99,7 +97,7 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 		{
 			socket.async_read_some(
 				boost::asio::buffer(buffer),
-				boost::bind(
+				BIND_FUNCTION(
 					&Connection::handleRead,
 					shared_from_this(),
 					boost::asio::placeholders::error,
@@ -110,7 +108,7 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 	}
 
 	/*
-	* Now new async. ops. are started if an error occurs. Thus, all shared_ptr
+	* No new async. ops. are started if an error occurs. Thus, all shared_ptr
 	* references to the connection object will disappear and the object will be
 	* destroyed automatically after this handler returns. The Connection class'
 	* destructor closes the socket.
@@ -121,13 +119,13 @@ void Connection::handleRead(const boost::system::error_code& e, std::size_t byte
 * @desc Handles completion of a write operation.
 * @param e Describes what error occurred, if any.
 **/
-void Connection::handleWrite(const boost::system::error_code& e)
+void Connection::handleWrite(const ERROR_CODE& e)
 {
 	if (!e) // No error
 	{
 		/* Close the connection gracefully */
-		boost::system::error_code ignoredEc;
-		socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+		ERROR_CODE ignoredEc;
+		socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignoredEc);
 	}
 
 	/*

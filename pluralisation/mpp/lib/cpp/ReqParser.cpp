@@ -1,23 +1,19 @@
 /* C++ versions of C headers */
-#include <cstdlib> // std::strtoull
-#include <climits> // ULLONG_MAX
-#include <cerrno> // errno
+#include <cstddef> // std::size_t
 
 /* Standard C++ */
 #include <locale> // std::isdigit, std::isspace, std::isalpha, std::toupper, std::tolower, std::isalnum
-#include <algorithm> // std::find_if, std::for_each, std::copy, std::all_of
-#include <string> // std:wstring, std::string
-#include <exception> // std::runtime_error
+#include <algorithm> // std::find_if, std::for_each, std::all_of
+#include <string> // std:wstring, std::string, std::stoll
 #include <sstream> // std::ostringstream, std::stringstream
 #include <memory> // std::make_unique
-#include <any> // std::any
-#include <bitset> // std::bitset
-#include <iterator> // std::ostream_iterator, std::advance
 #include <utility> // std::pair
+#include <stdexcept> // std::invalid_argument, std::out_of_range
 
 #ifdef DEBUG
 #include <iostream> // std::cout, std::cout
 #include <ostream> // std::wostream
+#include <bitset> // std::bitset
 #endif
 
 /* Boost */
@@ -28,6 +24,7 @@
 #include "vuu/CodepointFinder.hpp" // vuu::CodepointFinder, to find the list of codepoints in the UTF-8 string
 
 /* Our headers */
+#include "mpp/bosmacros/any.hpp" // ANY_CLASS macro
 #include "mpp/Reply.hpp" // Reply::FailureCode, to indicate why the parser failed
 #include "mpp/Request.hpp" // Request class
 #include "mpp/ver.hpp" // Protocol version info
@@ -128,9 +125,9 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 	std::locale usLoc = gen("en_US.UTF-8"); // US English, UTF-8
 	std::locale mlLoc = gen("ml_IN.UTF-8"); // Malayalam
 	boost::tribool toReturn;
-	std::bitset<8> charBits(static_cast<unsigned long long>(input));
 
 	#ifdef DEBUG
+	std::bitset<8> charBits(static_cast<unsigned long long>(input));
 	std::cout << "mpp::ReqParser::consume: char bits are " << charBits << std::endl;
 	#endif
 	
@@ -834,7 +831,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 					if (isValidDecimalInt(pSSHeaderVal->str())) // Ensure that the value we have read so far is a valid int
 					{
 						(*pSSHeaderVal) >> mNBytes; // Read the # of bytes in the noun
-						req.addHeader(pSSHeaderName->str(), std::any(mNBytes)); // Pass the Request object the name and value. It will create and add the Header object internally.
+						req.addHeader(pSSHeaderName->str(), ANY_CLASS(mNBytes)); // Pass the Request object the name and value. It will create and add the Header object internally.
 						#ifdef DEBUG
 						std::cout << "ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
 						#endif
@@ -849,7 +846,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 				else // Treat it as a regular header
 				{
-					req.addHeader(pSSHeaderName->str(), std::any(pSSHeaderVal->str()));
+					req.addHeader(pSSHeaderName->str(), ANY_CLASS(pSSHeaderVal->str()));
 
 					#ifdef DEBUG
 					std::cout << "ReqParser::consume: header_value: read header \"" << pSSHeaderName->str() << "\", with value \"" << pSSHeaderVal->str() << "\"" << std::endl;
@@ -1041,7 +1038,7 @@ mpp::Reply::Status mpp::ReqParser::getStatus() const
 **/
 bool mpp::ReqParser::isValidDecimalInt(std::string toCheck)
 {
-	int base = 10; // MPP requires all numbers to use base 10
+	/*int base = 10; // MPP requires all numbers to use base 10
 	char* end; // Pointer to the place where strtoull stopped parsing the string
 	const char* numCStr = toCheck.c_str(); // Fetch a C string to pass to strotull
 	unsigned long long val = std::strtoull(numCStr, &end, base);
@@ -1069,5 +1066,28 @@ bool mpp::ReqParser::isValidDecimalInt(std::string toCheck)
 	else // The conversion was successful
 	{
 		return true; // The string represents a valid decimal integer
+	}*/
+	
+	std::size_t fuci; // The index of the first character after the point in the string where conversion stopped
+
+	try
+	{
+		std::stoll(toCheck, &fuci); // Use base 10 (default)
+
+		/*
+		* If we got here, the conversion was successful. But the conversion may not have consumed the entire string. We can check this by ensuring that fuci == toCheck.length().
+		*/
+
+		return (fuci == toCheck.length()); // The entire string should have been converted
+	}
+
+	catch (std::invalid_argument& stdia) // std::stoll couldn't convert the string to a number
+	{
+		return false; // Invalid decimal #
+	}
+
+	catch (std::out_of_range& stdoor) // The converted value is outside the range of a long long or std::strtoll set errno to ERANGE
+	{
+		return false;
 	}
 }

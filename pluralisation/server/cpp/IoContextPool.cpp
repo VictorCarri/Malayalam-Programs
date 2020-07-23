@@ -5,7 +5,7 @@
 #include <stdexcept> // std::runtime_error
 #include <vector> // std::vector
 #ifdef DEBUG
-#include <iostream> // std::clog
+#include <iostream> // std::cout
 #endif
 #include <sstream> // std::stringstream
 
@@ -14,9 +14,8 @@
 
 /* Our headers */
 #include "SharedPtr.hpp" // SHARED_PTR macro
-#include "ThreadClass.hpp" // THREAD_CLASS macro
+#include "Thread.hpp" // THREAD_CLASS macro
 #include "BindFunc.hpp" // BIND_FUNCTION macro
-#include "functors/ThreadJoiner.hpp" // functors::ThreadJoiner, to wait for threads to join
 #include "IoContextPool.hpp" // Class def
 
 /**
@@ -25,6 +24,10 @@
 **/
 IoContextPool::IoContextPool(std::size_t poolSize) : nextIoCon(0)
 {
+	#ifdef DEBUG
+	std::cout << "IoContextPool::IoContextPool: pool size = " << poolSize << std::endl;
+	#endif
+
 	if (poolSize <= 0) // We need a positive integer
 	{
 		std::stringstream ess;
@@ -39,12 +42,21 @@ IoContextPool::IoContextPool(std::size_t poolSize) : nextIoCon(0)
 	for (std::size_t i = 0; i < poolSize; i++)
 	{
 		iocPtr ioc(new boost::asio::io_context);
+		#ifdef DEBUG
+		std::cout << "IoContextPool::IoContextPool: created io_context ptr #" << (i+1) << std::endl;
+		#endif
 		ioContexts.push_back(ioc);
+		#ifdef DEBUG
+		std::cout << "IoContextPool::IoContextPool: added io_context ptr #" << (i+1) << " to the list" << std::endl;
+		#endif
 		work.push_back(boost::asio::make_work_guard(*ioc));
+		#ifdef DEBUG
+		std::cout << "IoContextPool::IoContextPool: added work_guard #" << (i+1) << " to the list" << std::endl;
+		#endif
 	}
 
 	#ifdef DEBUG
-	std::clog << "IoContextPool constructor: # of io_contexts = " << ioContexts.size() << std::endl
+	std::cout << "IoContextPool constructor: # of io_contexts = " << ioContexts.size() << std::endl
 		<< "\t# of work_guard objects = " << work.size() << std::endl;
 	#endif
 }
@@ -77,9 +89,16 @@ void IoContextPool::run()
 		threads.push_back(thread);
 	}
 
+	#ifdef DEBUG
+	tno = 1;
+	#endif
+
 	/* Wait for all threads to exit */
 	for (auto ptr : threads)
 	{
+		#ifdef DEBUG
+		std::cout << "IoContextPool::run: waiting for thread #" << tno << " to join" << std::endl;
+		#endif
 		ptr->join();
 	}
 }
@@ -89,8 +108,15 @@ void IoContextPool::run()
 **/
 void IoContextPool::stop()
 {
+	#ifdef DEBUG
+	int tno = 1;
+	#endif
+
 	for (auto ptr : ioContexts)
 	{
+		#ifdef DEBUG
+		std::cout << "IoContextPool::stop: stopping io_context #" << tno << std::endl;
+		#endif
 		ptr->stop();
 	}
 }
@@ -103,13 +129,12 @@ boost::asio::io_context& IoContextPool::getIoc()
 {
 	/* Use a round-robin scheme to choose the next io_context to use */
 	#ifdef DEBUG
-	std::clog << "IoContextPool::getIoc: current index is " << nextIoCon << std::endl;
+	std::cout << "IoContextPool::getIoc: current index is " << nextIoCon << std::endl;
 	#endif
-	//boost::asio::io_context& ioc = *ioContexts[nextIoCon];
 	boost::asio::io_context& ioc = *ioContexts.at(nextIoCon);
 	nextIoCon = (nextIoCon + 1) % ioContexts.size(); // Increment index, but reset to 0 if it passes the size of the vector
 	#ifdef DEBUG
-	std::clog << "IoContextPool::getIoc: index after increment & mod is " << nextIoCon << std::endl;
+	std::cout << "IoContextPool::getIoc: index after increment & mod is " << nextIoCon << std::endl;
 	#endif
 	return ioc;
 }

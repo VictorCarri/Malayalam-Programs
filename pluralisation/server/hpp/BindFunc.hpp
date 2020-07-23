@@ -1,5 +1,5 @@
 #ifndef BINDFUNC_HPP
-#ifndef BINDFUNC_HPP
+#define BINDFUNC_HPP
 
 /*
 * Define the macro BIND_FUNCTION as either std::bind or boost::bind, depending on whether the compile-time option USE_STD_BIND has been specified or not.
@@ -14,6 +14,7 @@
 
 #include <boost/bind.hpp> // boost::bind
 #define BIND_FUNCTION boost::bind
+using namespace boost::placeholders;
 
 #endif
 

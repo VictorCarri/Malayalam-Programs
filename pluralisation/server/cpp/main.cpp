@@ -9,7 +9,7 @@
 
 /* Boost */
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::parse_command_line
-#include <boost/filesystem.hpp> // boost::filesystem
+#include <boost/filesystem.hpp> // boost::filesystem::path
 
 /* Our headers */
 #include "Server.hpp" // Main server class
@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 {
 	/* Initial setup */
 	boost::filesystem::path ourPath(argv[0]); // Convert program name to a path
-	std::string ourName = ourPath.filename().u8string(); // Fetch our name
+	std::string ourName = ourPath.filename().string(); // Fetch our name
 
 	/* Option handling */
 	boost::program_options::options_description opts("Options");
@@ -37,12 +37,14 @@ int main(int argc, char* argv[])
 	int port; // Port #
 	std::size_t threads; // # of threads
 	std::string address; // Address to run on
+	std::string dbConfigFilePath;
 
 	opts.add_options()
 		("help,h", "Print this help message")
 		("port,p", boost::program_options::value<int>(&port)->default_value(50001), "Set the port to listen on.")
 		("threads,t", boost::program_options::value<std::size_t>(&threads)->default_value(5), "Set the number of threads to use.")
-		("address,a", boost::program_options::value<std::string>(&address)->default_value("127.0.0.1"), "Set the address which the server will run on");
+		("address,a", boost::program_options::value<std::string>(&address)->default_value("127.0.0.1"), "Set the address which the server will run on")
+		("dbconfigfilepath,d", boost::program_options::value<std::string>(&dbConfigFilePath)->default_value("/home/victor/info/pluraliser.dbinfo"), "The path to the file containing DB config info");
 
 	try
 	{
@@ -87,13 +89,14 @@ int main(int argc, char* argv[])
 
 	try
 	{	
-		Server s(address, port, threads); // Create the server
+		Server s(address, port, threads, ourName, dbConfigFilePath); // Create the server
 		s.run(); // Run the server until stopped
 	}
 
 	catch (std::exception& e)
 	{
-		std::cerr << ourName << ": an exception occurred while starting or running the server: " << e.what() << std::endl;
+		std::cerr << ourName << ": an exception occurred while starting or running the server: " << std::endl
+		<< "\t" << e.what() << std::endl;
 	}
 
 	return NORMAL;

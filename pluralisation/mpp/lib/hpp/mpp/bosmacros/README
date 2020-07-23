@@ -1,0 +1,3 @@
+This directory contains headers that define preprocessor tokens that resolve to either Boost or STD entities.
+The header files in this directory are used to define a single interface that the rest of the library can use to include either Boost or STD headers.
+This way, the test for defines that control whether Boost or STD is used only need to be done in one place, rather than in each header.

@@ -1,16 +1,16 @@
 /* C++ Standard Library */
 #include <utility> // std::move
 #include <string> // std::string
-#include <any> // std::any
 
 /* Our headers */
+#include "mpp/bosmacros/any.hpp" // ANY_CLASS
 #include "mpp/Header.hpp" // Class def'n
 
 /**
 * @name Constructor.
 * @desc Contructs a Header with the given name and value.
 **/
-mpp::Header::Header(std::string name, std::any value) : _name(name), _value(value)
+mpp::Header::Header(std::string name, ANY_CLASS value) : _name(name), _value(value)
 {
 }
 
@@ -27,7 +27,7 @@ std::string mpp::Header::getName() const
 * @desc Fetches this header's value.
 * @return This header's value.
 **/
-std::any mpp::Header::getValue() const
+ANY_CLASS mpp::Header::getValue() const
 {
 	return _value;
 }

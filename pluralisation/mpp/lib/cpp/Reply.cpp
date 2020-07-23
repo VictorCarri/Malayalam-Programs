@@ -1,13 +1,13 @@
 /* STL */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
-#include <utility> // std::exchange, std::move
-#include <any> // std::any_cast, std::bad_any_cast
+#include <utility> // std::exchange, std::move, std::swap
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
 
 /* Our headers */
+#include "mpp/bosmacros/any.hpp" // ANY_CLASS, BAD_ANY_CAST, ANY_CAST
 #include "mpp/ver.hpp" // MPP protocol version
 #include "mpp/exceptions/BadHeaderValue.hpp" // Exception thrown when the type of a header's value doesn't match the expected one
 #include "mpp/Header.hpp" // Header class
@@ -81,13 +81,13 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 	
 			try
 			{
-				length = std::any_cast<int>(h.getValue()); // Fetch the length
+				length = ANY_CAST<int>(h.getValue()); // Fetch the length
 				std::ostringstream convSS; // Used to convert int to str
 				convSS << length;
 				val = convSS.str();
 			}
 	
-			catch (std::bad_any_cast& stdbace) // Rethrow it as a library error
+			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
 				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
@@ -101,10 +101,10 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 		{
 			try
 			{
-				val = std::any_cast<std::string>(h.getValue()); // Fetch the string value
+				val = ANY_CAST<std::string>(h.getValue()); // Fetch the string value
 			}
 	
-			catch (std::bad_any_cast& stdbace) // Rethrow it as a library error
+			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
 				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
@@ -154,7 +154,55 @@ void mpp::Reply::setContent(std::string c)
 * @param name The header's name.
 * @param val The header's value.
 **/
-void mpp::Reply::addHeader(std::string name, std::any val)
+void mpp::Reply::addHeader(std::string name, ANY_CLASS val)
 {
 	headers.emplace_front(name, val); // Construct a new header in-place
+}
+
+/**
+* @desc Fetches a stock reply for a given status.
+* @param stat The status to fetch a stock reply for.
+* @return A Reply object containing a stock string for the given status.
+**/
+mpp::Reply mpp::Reply::stockReply(mpp::Reply::Status stat)
+{
+	mpp::Reply rep;
+	rep.addHeader("Content-Type", ANY_CLASS(std::string("text/plain")));
+	rep.addHeader("Content-Length", ANY_CLASS(0));
+	rep.setStatus(stat);
+	rep.setContent("");
+	return rep;
+}
+
+/**
+* @desc Copy constructor.
+* @param other The other Reply object to copy from.
+**/
+mpp::Reply::Reply(const mpp::Reply& other) : stat(other.stat),
+	headers(other.headers),
+	statText(other.statText),
+	content(other.content),
+	crlf(other.crlf),
+	nameValSep(other.nameValSep)
+{
+}
+
+/**
+* @desc Copy assignment operator.
+* @param other The other Reply object to copy from.
+* @return A reference to this.
+**/
+mpp::Reply& mpp::Reply::operator=(const mpp::Reply& other)
+{
+	/* Check for self-assignment */
+	if (&other == this) // Self-assignment
+	{
+		return *this;
+	}
+
+	stat = other.stat;
+	headers = other.headers;
+	statText = other.statText;
+	content = other.content;
+	return *this; // Allow chaining
 }

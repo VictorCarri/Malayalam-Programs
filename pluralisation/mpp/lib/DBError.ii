@@ -401,6 +401,9 @@
 #define __DECIMAL_BID_FORMAT__ 1
 # 1 "<command-line>"
 #define _GNU_SOURCE 1
+#define USE_STD_FILESYSTEM 1
+#define USE_STD_ANY 1
+#define USE_STD_ARRAY 1
 #define DEBUG 1
 # 1 "/usr/include/stdc-predef.h" 1 3 4
 # 19 "/usr/include/stdc-predef.h" 3 4
@@ -27907,7 +27910,7 @@ namespace mpp
 
 
 
-  class DBError : public virtual Exception
+  class DBError final : public Exception
   {
    public:
 

@@ -3,7 +3,6 @@
 
 /* Standard C++ */
 #include <string> // std::string
-#include <array> // std::array
 #include <vector> // std::vector
 
 /* Boost */
@@ -18,6 +17,7 @@
 #include <mariadb++/statement.hpp> // mariadb::statement_ref
 
 /* Our headers */
+#include "bosmacros/array.hpp" // ARRAY_CLASS macro
 #include "mpp/Request.hpp" // Represents a single request
 #include "mpp/Reply.hpp" // Represents a single reply
 #include "mpp/data/DBInfo.hpp" // Encapsulates DB connection information (username, host, etc.)
@@ -167,7 +167,7 @@ namespace mpp
 			mariadb::statement_ref getGenderStmt; // Used to find a noun's gender
 			mariadb::statement_ref exceptionStmt; // Used to determine whether a noun is an exception that has a special plural and what the exceptional plural is
 			mariadb::statement_ref exSingStmt; // Used to determine the singular form of an exceptional noun's plural
-			std::array<boost::u32regex, NDECLREGS> declRegs; // Array of regular expressions for use in determining the noun's declension class
+			ARRAY_CLASS<boost::u32regex, NDECLREGS> declRegs; // Array of regular expressions for use in determining the noun's declension class
 			boost::u32regex endsInKaar; // Regex used to check if a noun is a -kaaran/-kaari noun
 	};
 };

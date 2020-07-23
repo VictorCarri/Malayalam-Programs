@@ -4,9 +4,9 @@
 /* STL */
 #include <forward_list> // std::forward_list
 #include <string> // std::string
-#include <any> // std::any
 
 /* Our headers */
+#include "bosmacros/any.hpp" // ANY_CLASS macro
 #include "mpp/Header.hpp" // Header class
 
 /* Because I keep switching */
@@ -45,7 +45,7 @@ namespace mpp
 			* @param name The header's name.
 			* @param value The header's value.
 			**/
-			void addHeader(std::string name, std::any value);
+			void addHeader(std::string name, ANY_CLASS value);
 
 			/**
 			* @desc Attempts to find a Header by the given name.

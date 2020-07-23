@@ -2,7 +2,6 @@
 #define MPP_REQPARSER_HPP
 
 /* STL */
-#include <array> // std::array
 #include <sstream> // std::stringstream
 #include <string> // std::string
 #include <memory> // std::unique_ptr
@@ -19,6 +18,7 @@
 #include <boost/logic/tribool_io.hpp>
 
 /* Our headers */
+#include "bosmacros/array.hpp" // ARRAY_CLASS macro
 #include "mpp/Request.hpp" // Represents a request
 #include "mpp/Reply.hpp" // Reply::FailureCode (to indicate why the parser failed)
 
@@ -86,13 +86,6 @@ namespace mpp
 			**/
 			boost::tribool consume(Request& req, char input);
 
-			/**
-			* @desc Converts all ASCII chars. in the given UTF-8 string to lowercase.
-			* @param input The string to convert.
-			* @return The string with all ASCII chars. converted to lowercase.
-			**/
-			std::string toLowerStr(std::string input);
-
 			enum State
 			{
 				/* Reading "MPP" */
@@ -145,8 +138,8 @@ namespace mpp
 			State curStat; // Current state
 			State prevStat; // Previous state
 			mpp::Reply::Status status;
-			const std::array<short, 3> version; // Current parser/server version
-			std::array<std::unique_ptr<std::stringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
+			const ARRAY_CLASS<short, 3> version; // Current parser/server version
+			ARRAY_CLASS<std::unique_ptr<std::stringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
 			std::map<std::string, State> verbInfo; // Maps a verb to its state. The keys are iterated to check recognised verbs. The values are only used to determine which state to jump to next after parsing the first character of the verb.
 			boost::locale::generator gen; // Used to switch between US English and Malayalam locales
 			std::unique_ptr<std::stringstream> pSSHeaderName; // Use a pointer so that we can easily reset the stringstream

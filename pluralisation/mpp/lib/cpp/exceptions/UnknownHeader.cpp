@@ -1,6 +1,6 @@
 /* STL */
 #include <string> // std::string
-#include <stdexcept> // std::logic_error
+#include <stdexcept> // std::string
 
 /* Our headers */
 #include "mpp/exceptions/Exception.hpp" // Parent

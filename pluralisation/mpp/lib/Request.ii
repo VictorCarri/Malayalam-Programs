@@ -401,6 +401,9 @@
 #define __DECIMAL_BID_FORMAT__ 1
 # 1 "<command-line>"
 #define _GNU_SOURCE 1
+#define USE_STD_FILESYSTEM 1
+#define USE_STD_ANY 1
+#define USE_STD_ARRAY 1
 #define DEBUG 1
 # 1 "/usr/include/stdc-predef.h" 1 3 4
 # 19 "/usr/include/stdc-predef.h" 3 4
@@ -50775,577 +50778,6 @@ lexicographical_compare(_ExecutionPolicy&& __exec, _ForwardIterator1 __first1, _
 
 #define __cpp_lib_parallel_algorithm 201603L
 # 4 "cpp/Request.cpp" 2
-# 1 "/usr/include/c++/9/any" 1 3
-# 30 "/usr/include/c++/9/any" 3
-#define _GLIBCXX_ANY 1
-
-       
-# 33 "/usr/include/c++/9/any" 3
-# 41 "/usr/include/c++/9/any" 3
-namespace std __attribute__ ((__visibility__ ("default")))
-{
-
-# 54 "/usr/include/c++/9/any" 3
-  class bad_any_cast : public bad_cast
-  {
-  public:
-    virtual const char* what() const noexcept { return "bad any_cast"; }
-  };
-
-  [[gnu::noreturn]] inline void __throw_bad_any_cast()
-  {
-
-    throw bad_any_cast{};
-
-
-
-  }
-
-#define __cpp_lib_any 201606L
-
-
-
-
-
-
-
-  class any
-  {
-
-    union _Storage
-    {
-      constexpr _Storage() : _M_ptr{nullptr} {}
-
-
-      _Storage(const _Storage&) = delete;
-      _Storage& operator=(const _Storage&) = delete;
-
-      void* _M_ptr;
-      aligned_storage<sizeof(_M_ptr), alignof(void*)>::type _M_buffer;
-    };
-
-    template<typename _Tp, typename _Safe = is_nothrow_move_constructible<_Tp>,
-      bool _Fits = (sizeof(_Tp) <= sizeof(_Storage))
-     && (alignof(_Tp) <= alignof(_Storage))>
-      using _Internal = std::integral_constant<bool, _Safe::value && _Fits>;
-
-    template<typename _Tp>
-      struct _Manager_internal;
-
-    template<typename _Tp>
-      struct _Manager_external;
-
-    template<typename _Tp>
-      using _Manager = conditional_t<_Internal<_Tp>::value,
-         _Manager_internal<_Tp>,
-         _Manager_external<_Tp>>;
-
-    template<typename _Tp, typename _Decayed = decay_t<_Tp>>
-      using _Decay = enable_if_t<!is_same<_Decayed, any>::value, _Decayed>;
-
-
-    template <typename _Tp, typename... _Args,
-       typename _Mgr = _Manager<_Tp>>
-      void __do_emplace(_Args&&... __args)
-      {
- reset();
-        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
- _M_manager = &_Mgr::_S_manage;
-      }
-
-
-
-    template <typename _Tp, typename _Up, typename... _Args,
-       typename _Mgr = _Manager<_Tp>>
-      void __do_emplace(initializer_list<_Up> __il, _Args&&... __args)
-      {
- reset();
-        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
- _M_manager = &_Mgr::_S_manage;
-      }
-
-  public:
-
-
-
-    constexpr any() noexcept : _M_manager(nullptr) { }
-
-
-    any(const any& __other)
-    {
-      if (!__other.has_value())
- _M_manager = nullptr;
-      else
- {
-   _Arg __arg;
-   __arg._M_any = this;
-   __other._M_manager(_Op_clone, &__other, &__arg);
- }
-    }
-
-
-
-
-
-
-    any(any&& __other) noexcept
-    {
-      if (!__other.has_value())
- _M_manager = nullptr;
-      else
- {
-   _Arg __arg;
-   __arg._M_any = this;
-   __other._M_manager(_Op_xfer, &__other, &__arg);
- }
-    }
-
-    template <typename _Res, typename _Tp, typename... _Args>
-    using __any_constructible =
-      enable_if<__and_<is_copy_constructible<_Tp>,
-    is_constructible<_Tp, _Args...>>::value,
-    _Res>;
-
-    template <typename _Tp, typename... _Args>
-    using __any_constructible_t =
-      typename __any_constructible<bool, _Tp, _Args...>::type;
-
-
-    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              __any_constructible_t<_Tp, _ValueType&&> = true,
-       enable_if_t<!__is_in_place_type<_Tp>::value, bool> = true>
-      any(_ValueType&& __value)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, std::forward<_ValueType>(__value));
-      }
-
-
-    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              enable_if_t<__and_v<is_copy_constructible<_Tp>,
-      __not_<is_constructible<_Tp, _ValueType&&>>,
-      __not_<__is_in_place_type<_Tp>>>,
-     bool> = false>
-      any(_ValueType&& __value)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, __value);
-      }
-
-
-    template <typename _ValueType, typename... _Args,
-       typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              __any_constructible_t<_Tp, _Args&&...> = false>
-      explicit
-      any(in_place_type_t<_ValueType>, _Args&&... __args)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
-      }
-
-
-
-    template <typename _ValueType, typename _Up, typename... _Args,
-       typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              __any_constructible_t<_Tp, initializer_list<_Up>,
-        _Args&&...> = false>
-      explicit
-      any(in_place_type_t<_ValueType>,
-   initializer_list<_Up> __il, _Args&&... __args)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
-      }
-
-
-    ~any() { reset(); }
-
-
-
-
-    any& operator=(const any& __rhs)
-    {
-      *this = any(__rhs);
-      return *this;
-    }
-
-
-
-
-
-
-    any& operator=(any&& __rhs) noexcept
-    {
-      if (!__rhs.has_value())
- reset();
-      else if (this != &__rhs)
- {
-   reset();
-   _Arg __arg;
-   __arg._M_any = this;
-   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
- }
-      return *this;
-    }
-
-
-    template<typename _ValueType>
-      enable_if_t<is_copy_constructible<_Decay<_ValueType>>::value, any&>
-      operator=(_ValueType&& __rhs)
-      {
- *this = any(std::forward<_ValueType>(__rhs));
- return *this;
-      }
-
-
-    template <typename _ValueType, typename... _Args>
-      typename __any_constructible<_Decay<_ValueType>&,
-       _Decay<_ValueType>, _Args&&...>::type
-      emplace(_Args&&... __args)
-      {
- __do_emplace<_Decay<_ValueType>>(std::forward<_Args>(__args)...);
- any::_Arg __arg;
- this->_M_manager(any::_Op_access, this, &__arg);
- return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
-      }
-
-
-
-    template <typename _ValueType, typename _Up, typename... _Args>
-      typename __any_constructible<_Decay<_ValueType>&,
-       _Decay<_ValueType>,
-       initializer_list<_Up>,
-       _Args&&...>::type
-      emplace(initializer_list<_Up> __il, _Args&&... __args)
-      {
- __do_emplace<_Decay<_ValueType>, _Up>(__il,
-           std::forward<_Args>(__args)...);
- any::_Arg __arg;
- this->_M_manager(any::_Op_access, this, &__arg);
- return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
-      }
-
-
-
-
-    void reset() noexcept
-    {
-      if (has_value())
-      {
- _M_manager(_Op_destroy, this, nullptr);
- _M_manager = nullptr;
-      }
-    }
-
-
-    void swap(any& __rhs) noexcept
-    {
-      if (!has_value() && !__rhs.has_value())
- return;
-
-      if (has_value() && __rhs.has_value())
- {
-   if (this == &__rhs)
-     return;
-
-   any __tmp;
-   _Arg __arg;
-   __arg._M_any = &__tmp;
-   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
-   __arg._M_any = &__rhs;
-   _M_manager(_Op_xfer, this, &__arg);
-   __arg._M_any = this;
-   __tmp._M_manager(_Op_xfer, &__tmp, &__arg);
- }
-      else
- {
-   any* __empty = !has_value() ? this : &__rhs;
-   any* __full = !has_value() ? &__rhs : this;
-   _Arg __arg;
-   __arg._M_any = __empty;
-   __full->_M_manager(_Op_xfer, __full, &__arg);
- }
-    }
-
-
-
-
-    bool has_value() const noexcept { return _M_manager != nullptr; }
-
-
-
-    const type_info& type() const noexcept
-    {
-      if (!has_value())
- return typeid(void);
-      _Arg __arg;
-      _M_manager(_Op_get_type_info, this, &__arg);
-      return *__arg._M_typeinfo;
-    }
-
-
-    template<typename _Tp>
-      static constexpr bool __is_valid_cast()
-      { return __or_<is_reference<_Tp>, is_copy_constructible<_Tp>>::value; }
-
-  private:
-    enum _Op {
- _Op_access, _Op_get_type_info, _Op_clone, _Op_destroy, _Op_xfer
-    };
-
-    union _Arg
-    {
- void* _M_obj;
- const std::type_info* _M_typeinfo;
- any* _M_any;
-    };
-
-    void (*_M_manager)(_Op, const any*, _Arg*);
-    _Storage _M_storage;
-
-    template<typename _Tp>
-      friend void* __any_caster(const any* __any);
-
-
-    template<typename _Tp>
-      struct _Manager_internal
-      {
- static void
- _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
-
- template<typename _Up>
-   static void
-   _S_create(_Storage& __storage, _Up&& __value)
-   {
-     void* __addr = &__storage._M_buffer;
-     ::new (__addr) _Tp(std::forward<_Up>(__value));
-   }
-
- template<typename... _Args>
-   static void
-   _S_create(_Storage& __storage, _Args&&... __args)
-   {
-     void* __addr = &__storage._M_buffer;
-     ::new (__addr) _Tp(std::forward<_Args>(__args)...);
-   }
-      };
-
-
-    template<typename _Tp>
-      struct _Manager_external
-      {
- static void
- _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
-
- template<typename _Up>
-   static void
-   _S_create(_Storage& __storage, _Up&& __value)
-   {
-     __storage._M_ptr = new _Tp(std::forward<_Up>(__value));
-   }
- template<typename... _Args>
-   static void
-   _S_create(_Storage& __storage, _Args&&... __args)
-   {
-     __storage._M_ptr = new _Tp(std::forward<_Args>(__args)...);
-   }
-      };
-  };
-
-
-  inline void swap(any& __x, any& __y) noexcept { __x.swap(__y); }
-
-
-  template <typename _Tp, typename... _Args>
-    any make_any(_Args&&... __args)
-    {
-      return any(in_place_type<_Tp>, std::forward<_Args>(__args)...);
-    }
-
-
-  template <typename _Tp, typename _Up, typename... _Args>
-    any make_any(initializer_list<_Up> __il, _Args&&... __args)
-    {
-      return any(in_place_type<_Tp>, __il, std::forward<_Args>(__args)...);
-    }
-# 451 "/usr/include/c++/9/any" 3
-  template<typename _ValueType>
-    inline _ValueType any_cast(const any& __any)
-    {
-      using _Up = __remove_cvref_t<_ValueType>;
-      static_assert(any::__is_valid_cast<_ValueType>(),
-   "Template argument must be a reference or CopyConstructible type");
-      static_assert(is_constructible_v<_ValueType, const _Up&>,
-   "Template argument must be constructible from a const value.");
-      auto __p = any_cast<_Up>(&__any);
-      if (__p)
- return static_cast<_ValueType>(*__p);
-      __throw_bad_any_cast();
-    }
-# 477 "/usr/include/c++/9/any" 3
-  template<typename _ValueType>
-    inline _ValueType any_cast(any& __any)
-    {
-      using _Up = __remove_cvref_t<_ValueType>;
-      static_assert(any::__is_valid_cast<_ValueType>(),
-   "Template argument must be a reference or CopyConstructible type");
-      static_assert(is_constructible_v<_ValueType, _Up&>,
-   "Template argument must be constructible from an lvalue.");
-      auto __p = any_cast<_Up>(&__any);
-      if (__p)
- return static_cast<_ValueType>(*__p);
-      __throw_bad_any_cast();
-    }
-
-  template<typename _ValueType>
-    inline _ValueType any_cast(any&& __any)
-    {
-      using _Up = __remove_cvref_t<_ValueType>;
-      static_assert(any::__is_valid_cast<_ValueType>(),
-   "Template argument must be a reference or CopyConstructible type");
-      static_assert(is_constructible_v<_ValueType, _Up>,
-   "Template argument must be constructible from an rvalue.");
-      auto __p = any_cast<_Up>(&__any);
-      if (__p)
- return static_cast<_ValueType>(std::move(*__p));
-      __throw_bad_any_cast();
-    }
-
-
-
-  template<typename _Tp>
-    void* __any_caster(const any* __any)
-    {
-
-
-      using _Up = remove_cv_t<_Tp>;
-
-
-      if constexpr (!is_same_v<decay_t<_Up>, _Up>)
- return nullptr;
-
-      else if constexpr (!is_copy_constructible_v<_Up>)
- return nullptr;
-
-      else if (__any->_M_manager == &any::_Manager<_Up>::_S_manage
-
-   || __any->type() == typeid(_Tp)
-
-   )
- {
-   any::_Arg __arg;
-   __any->_M_manager(any::_Op_access, __any, &__arg);
-   return __arg._M_obj;
- }
-      return nullptr;
-    }
-# 546 "/usr/include/c++/9/any" 3
-  template<typename _ValueType>
-    inline const _ValueType* any_cast(const any* __any) noexcept
-    {
-      if constexpr (is_object_v<_ValueType>)
- if (__any)
-   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
-      return nullptr;
-    }
-
-  template<typename _ValueType>
-    inline _ValueType* any_cast(any* __any) noexcept
-    {
-      if constexpr (is_object_v<_ValueType>)
- if (__any)
-   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
-      return nullptr;
-    }
-
-
-  template<typename _Tp>
-    void
-    any::_Manager_internal<_Tp>::
-    _S_manage(_Op __which, const any* __any, _Arg* __arg)
-    {
-
-      auto __ptr = reinterpret_cast<const _Tp*>(&__any->_M_storage._M_buffer);
-      switch (__which)
-      {
-      case _Op_access:
- __arg->_M_obj = const_cast<_Tp*>(__ptr);
- break;
-      case _Op_get_type_info:
-
- __arg->_M_typeinfo = &typeid(_Tp);
-
- break;
-      case _Op_clone:
- ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp(*__ptr);
- __arg->_M_any->_M_manager = __any->_M_manager;
- break;
-      case _Op_destroy:
- __ptr->~_Tp();
- break;
-      case _Op_xfer:
- ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp
-   (std::move(*const_cast<_Tp*>(__ptr)));
- __ptr->~_Tp();
- __arg->_M_any->_M_manager = __any->_M_manager;
- const_cast<any*>(__any)->_M_manager = nullptr;
- break;
-      }
-    }
-
-  template<typename _Tp>
-    void
-    any::_Manager_external<_Tp>::
-    _S_manage(_Op __which, const any* __any, _Arg* __arg)
-    {
-
-      auto __ptr = static_cast<const _Tp*>(__any->_M_storage._M_ptr);
-      switch (__which)
-      {
-      case _Op_access:
- __arg->_M_obj = const_cast<_Tp*>(__ptr);
- break;
-      case _Op_get_type_info:
-
- __arg->_M_typeinfo = &typeid(_Tp);
-
- break;
-      case _Op_clone:
- __arg->_M_any->_M_storage._M_ptr = new _Tp(*__ptr);
- __arg->_M_any->_M_manager = __any->_M_manager;
- break;
-      case _Op_destroy:
- delete __ptr;
- break;
-      case _Op_xfer:
- __arg->_M_any->_M_storage._M_ptr = __any->_M_storage._M_ptr;
- __arg->_M_any->_M_manager = __any->_M_manager;
- const_cast<any*>(__any)->_M_manager = nullptr;
- break;
-      }
-    }
-
-
-
-  namespace __detail::__variant
-  {
-    template<typename> struct _Never_valueless_alt;
-
-
-
-    template<>
-      struct _Never_valueless_alt<std::any>
-      : std::true_type
-      { };
-  }
-
-
-}
-# 5 "cpp/Request.cpp" 2
 # 1 "/usr/include/c++/9/sstream" 1 3
 # 34 "/usr/include/c++/9/sstream" 3
 #define _GLIBCXX_SSTREAM 1
@@ -60935,9 +60367,593 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 }
 # 880 "/usr/include/c++/9/sstream" 2 3
-# 6 "cpp/Request.cpp" 2
+# 5 "cpp/Request.cpp" 2
 
 
+# 1 "./hpp/mpp/bosmacros/any.hpp" 1
+
+#define MPP_BOSMACROS_ANY_HPP 
+
+
+
+
+
+
+# 1 "/usr/include/c++/9/any" 1 3
+# 30 "/usr/include/c++/9/any" 3
+#define _GLIBCXX_ANY 1
+
+       
+# 33 "/usr/include/c++/9/any" 3
+# 41 "/usr/include/c++/9/any" 3
+namespace std __attribute__ ((__visibility__ ("default")))
+{
+
+# 54 "/usr/include/c++/9/any" 3
+  class bad_any_cast : public bad_cast
+  {
+  public:
+    virtual const char* what() const noexcept { return "bad any_cast"; }
+  };
+
+  [[gnu::noreturn]] inline void __throw_bad_any_cast()
+  {
+
+    throw bad_any_cast{};
+
+
+
+  }
+
+#define __cpp_lib_any 201606L
+
+
+
+
+
+
+
+  class any
+  {
+
+    union _Storage
+    {
+      constexpr _Storage() : _M_ptr{nullptr} {}
+
+
+      _Storage(const _Storage&) = delete;
+      _Storage& operator=(const _Storage&) = delete;
+
+      void* _M_ptr;
+      aligned_storage<sizeof(_M_ptr), alignof(void*)>::type _M_buffer;
+    };
+
+    template<typename _Tp, typename _Safe = is_nothrow_move_constructible<_Tp>,
+      bool _Fits = (sizeof(_Tp) <= sizeof(_Storage))
+     && (alignof(_Tp) <= alignof(_Storage))>
+      using _Internal = std::integral_constant<bool, _Safe::value && _Fits>;
+
+    template<typename _Tp>
+      struct _Manager_internal;
+
+    template<typename _Tp>
+      struct _Manager_external;
+
+    template<typename _Tp>
+      using _Manager = conditional_t<_Internal<_Tp>::value,
+         _Manager_internal<_Tp>,
+         _Manager_external<_Tp>>;
+
+    template<typename _Tp, typename _Decayed = decay_t<_Tp>>
+      using _Decay = enable_if_t<!is_same<_Decayed, any>::value, _Decayed>;
+
+
+    template <typename _Tp, typename... _Args,
+       typename _Mgr = _Manager<_Tp>>
+      void __do_emplace(_Args&&... __args)
+      {
+ reset();
+        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
+ _M_manager = &_Mgr::_S_manage;
+      }
+
+
+
+    template <typename _Tp, typename _Up, typename... _Args,
+       typename _Mgr = _Manager<_Tp>>
+      void __do_emplace(initializer_list<_Up> __il, _Args&&... __args)
+      {
+ reset();
+        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
+ _M_manager = &_Mgr::_S_manage;
+      }
+
+  public:
+
+
+
+    constexpr any() noexcept : _M_manager(nullptr) { }
+
+
+    any(const any& __other)
+    {
+      if (!__other.has_value())
+ _M_manager = nullptr;
+      else
+ {
+   _Arg __arg;
+   __arg._M_any = this;
+   __other._M_manager(_Op_clone, &__other, &__arg);
+ }
+    }
+
+
+
+
+
+
+    any(any&& __other) noexcept
+    {
+      if (!__other.has_value())
+ _M_manager = nullptr;
+      else
+ {
+   _Arg __arg;
+   __arg._M_any = this;
+   __other._M_manager(_Op_xfer, &__other, &__arg);
+ }
+    }
+
+    template <typename _Res, typename _Tp, typename... _Args>
+    using __any_constructible =
+      enable_if<__and_<is_copy_constructible<_Tp>,
+    is_constructible<_Tp, _Args...>>::value,
+    _Res>;
+
+    template <typename _Tp, typename... _Args>
+    using __any_constructible_t =
+      typename __any_constructible<bool, _Tp, _Args...>::type;
+
+
+    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              __any_constructible_t<_Tp, _ValueType&&> = true,
+       enable_if_t<!__is_in_place_type<_Tp>::value, bool> = true>
+      any(_ValueType&& __value)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, std::forward<_ValueType>(__value));
+      }
+
+
+    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              enable_if_t<__and_v<is_copy_constructible<_Tp>,
+      __not_<is_constructible<_Tp, _ValueType&&>>,
+      __not_<__is_in_place_type<_Tp>>>,
+     bool> = false>
+      any(_ValueType&& __value)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, __value);
+      }
+
+
+    template <typename _ValueType, typename... _Args,
+       typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              __any_constructible_t<_Tp, _Args&&...> = false>
+      explicit
+      any(in_place_type_t<_ValueType>, _Args&&... __args)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
+      }
+
+
+
+    template <typename _ValueType, typename _Up, typename... _Args,
+       typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              __any_constructible_t<_Tp, initializer_list<_Up>,
+        _Args&&...> = false>
+      explicit
+      any(in_place_type_t<_ValueType>,
+   initializer_list<_Up> __il, _Args&&... __args)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
+      }
+
+
+    ~any() { reset(); }
+
+
+
+
+    any& operator=(const any& __rhs)
+    {
+      *this = any(__rhs);
+      return *this;
+    }
+
+
+
+
+
+
+    any& operator=(any&& __rhs) noexcept
+    {
+      if (!__rhs.has_value())
+ reset();
+      else if (this != &__rhs)
+ {
+   reset();
+   _Arg __arg;
+   __arg._M_any = this;
+   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
+ }
+      return *this;
+    }
+
+
+    template<typename _ValueType>
+      enable_if_t<is_copy_constructible<_Decay<_ValueType>>::value, any&>
+      operator=(_ValueType&& __rhs)
+      {
+ *this = any(std::forward<_ValueType>(__rhs));
+ return *this;
+      }
+
+
+    template <typename _ValueType, typename... _Args>
+      typename __any_constructible<_Decay<_ValueType>&,
+       _Decay<_ValueType>, _Args&&...>::type
+      emplace(_Args&&... __args)
+      {
+ __do_emplace<_Decay<_ValueType>>(std::forward<_Args>(__args)...);
+ any::_Arg __arg;
+ this->_M_manager(any::_Op_access, this, &__arg);
+ return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
+      }
+
+
+
+    template <typename _ValueType, typename _Up, typename... _Args>
+      typename __any_constructible<_Decay<_ValueType>&,
+       _Decay<_ValueType>,
+       initializer_list<_Up>,
+       _Args&&...>::type
+      emplace(initializer_list<_Up> __il, _Args&&... __args)
+      {
+ __do_emplace<_Decay<_ValueType>, _Up>(__il,
+           std::forward<_Args>(__args)...);
+ any::_Arg __arg;
+ this->_M_manager(any::_Op_access, this, &__arg);
+ return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
+      }
+
+
+
+
+    void reset() noexcept
+    {
+      if (has_value())
+      {
+ _M_manager(_Op_destroy, this, nullptr);
+ _M_manager = nullptr;
+      }
+    }
+
+
+    void swap(any& __rhs) noexcept
+    {
+      if (!has_value() && !__rhs.has_value())
+ return;
+
+      if (has_value() && __rhs.has_value())
+ {
+   if (this == &__rhs)
+     return;
+
+   any __tmp;
+   _Arg __arg;
+   __arg._M_any = &__tmp;
+   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
+   __arg._M_any = &__rhs;
+   _M_manager(_Op_xfer, this, &__arg);
+   __arg._M_any = this;
+   __tmp._M_manager(_Op_xfer, &__tmp, &__arg);
+ }
+      else
+ {
+   any* __empty = !has_value() ? this : &__rhs;
+   any* __full = !has_value() ? &__rhs : this;
+   _Arg __arg;
+   __arg._M_any = __empty;
+   __full->_M_manager(_Op_xfer, __full, &__arg);
+ }
+    }
+
+
+
+
+    bool has_value() const noexcept { return _M_manager != nullptr; }
+
+
+
+    const type_info& type() const noexcept
+    {
+      if (!has_value())
+ return typeid(void);
+      _Arg __arg;
+      _M_manager(_Op_get_type_info, this, &__arg);
+      return *__arg._M_typeinfo;
+    }
+
+
+    template<typename _Tp>
+      static constexpr bool __is_valid_cast()
+      { return __or_<is_reference<_Tp>, is_copy_constructible<_Tp>>::value; }
+
+  private:
+    enum _Op {
+ _Op_access, _Op_get_type_info, _Op_clone, _Op_destroy, _Op_xfer
+    };
+
+    union _Arg
+    {
+ void* _M_obj;
+ const std::type_info* _M_typeinfo;
+ any* _M_any;
+    };
+
+    void (*_M_manager)(_Op, const any*, _Arg*);
+    _Storage _M_storage;
+
+    template<typename _Tp>
+      friend void* __any_caster(const any* __any);
+
+
+    template<typename _Tp>
+      struct _Manager_internal
+      {
+ static void
+ _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
+
+ template<typename _Up>
+   static void
+   _S_create(_Storage& __storage, _Up&& __value)
+   {
+     void* __addr = &__storage._M_buffer;
+     ::new (__addr) _Tp(std::forward<_Up>(__value));
+   }
+
+ template<typename... _Args>
+   static void
+   _S_create(_Storage& __storage, _Args&&... __args)
+   {
+     void* __addr = &__storage._M_buffer;
+     ::new (__addr) _Tp(std::forward<_Args>(__args)...);
+   }
+      };
+
+
+    template<typename _Tp>
+      struct _Manager_external
+      {
+ static void
+ _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
+
+ template<typename _Up>
+   static void
+   _S_create(_Storage& __storage, _Up&& __value)
+   {
+     __storage._M_ptr = new _Tp(std::forward<_Up>(__value));
+   }
+ template<typename... _Args>
+   static void
+   _S_create(_Storage& __storage, _Args&&... __args)
+   {
+     __storage._M_ptr = new _Tp(std::forward<_Args>(__args)...);
+   }
+      };
+  };
+
+
+  inline void swap(any& __x, any& __y) noexcept { __x.swap(__y); }
+
+
+  template <typename _Tp, typename... _Args>
+    any make_any(_Args&&... __args)
+    {
+      return any(in_place_type<_Tp>, std::forward<_Args>(__args)...);
+    }
+
+
+  template <typename _Tp, typename _Up, typename... _Args>
+    any make_any(initializer_list<_Up> __il, _Args&&... __args)
+    {
+      return any(in_place_type<_Tp>, __il, std::forward<_Args>(__args)...);
+    }
+# 451 "/usr/include/c++/9/any" 3
+  template<typename _ValueType>
+    inline _ValueType any_cast(const any& __any)
+    {
+      using _Up = __remove_cvref_t<_ValueType>;
+      static_assert(any::__is_valid_cast<_ValueType>(),
+   "Template argument must be a reference or CopyConstructible type");
+      static_assert(is_constructible_v<_ValueType, const _Up&>,
+   "Template argument must be constructible from a const value.");
+      auto __p = any_cast<_Up>(&__any);
+      if (__p)
+ return static_cast<_ValueType>(*__p);
+      __throw_bad_any_cast();
+    }
+# 477 "/usr/include/c++/9/any" 3
+  template<typename _ValueType>
+    inline _ValueType any_cast(any& __any)
+    {
+      using _Up = __remove_cvref_t<_ValueType>;
+      static_assert(any::__is_valid_cast<_ValueType>(),
+   "Template argument must be a reference or CopyConstructible type");
+      static_assert(is_constructible_v<_ValueType, _Up&>,
+   "Template argument must be constructible from an lvalue.");
+      auto __p = any_cast<_Up>(&__any);
+      if (__p)
+ return static_cast<_ValueType>(*__p);
+      __throw_bad_any_cast();
+    }
+
+  template<typename _ValueType>
+    inline _ValueType any_cast(any&& __any)
+    {
+      using _Up = __remove_cvref_t<_ValueType>;
+      static_assert(any::__is_valid_cast<_ValueType>(),
+   "Template argument must be a reference or CopyConstructible type");
+      static_assert(is_constructible_v<_ValueType, _Up>,
+   "Template argument must be constructible from an rvalue.");
+      auto __p = any_cast<_Up>(&__any);
+      if (__p)
+ return static_cast<_ValueType>(std::move(*__p));
+      __throw_bad_any_cast();
+    }
+
+
+
+  template<typename _Tp>
+    void* __any_caster(const any* __any)
+    {
+
+
+      using _Up = remove_cv_t<_Tp>;
+
+
+      if constexpr (!is_same_v<decay_t<_Up>, _Up>)
+ return nullptr;
+
+      else if constexpr (!is_copy_constructible_v<_Up>)
+ return nullptr;
+
+      else if (__any->_M_manager == &any::_Manager<_Up>::_S_manage
+
+   || __any->type() == typeid(_Tp)
+
+   )
+ {
+   any::_Arg __arg;
+   __any->_M_manager(any::_Op_access, __any, &__arg);
+   return __arg._M_obj;
+ }
+      return nullptr;
+    }
+# 546 "/usr/include/c++/9/any" 3
+  template<typename _ValueType>
+    inline const _ValueType* any_cast(const any* __any) noexcept
+    {
+      if constexpr (is_object_v<_ValueType>)
+ if (__any)
+   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
+      return nullptr;
+    }
+
+  template<typename _ValueType>
+    inline _ValueType* any_cast(any* __any) noexcept
+    {
+      if constexpr (is_object_v<_ValueType>)
+ if (__any)
+   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
+      return nullptr;
+    }
+
+
+  template<typename _Tp>
+    void
+    any::_Manager_internal<_Tp>::
+    _S_manage(_Op __which, const any* __any, _Arg* __arg)
+    {
+
+      auto __ptr = reinterpret_cast<const _Tp*>(&__any->_M_storage._M_buffer);
+      switch (__which)
+      {
+      case _Op_access:
+ __arg->_M_obj = const_cast<_Tp*>(__ptr);
+ break;
+      case _Op_get_type_info:
+
+ __arg->_M_typeinfo = &typeid(_Tp);
+
+ break;
+      case _Op_clone:
+ ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp(*__ptr);
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ break;
+      case _Op_destroy:
+ __ptr->~_Tp();
+ break;
+      case _Op_xfer:
+ ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp
+   (std::move(*const_cast<_Tp*>(__ptr)));
+ __ptr->~_Tp();
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ const_cast<any*>(__any)->_M_manager = nullptr;
+ break;
+      }
+    }
+
+  template<typename _Tp>
+    void
+    any::_Manager_external<_Tp>::
+    _S_manage(_Op __which, const any* __any, _Arg* __arg)
+    {
+
+      auto __ptr = static_cast<const _Tp*>(__any->_M_storage._M_ptr);
+      switch (__which)
+      {
+      case _Op_access:
+ __arg->_M_obj = const_cast<_Tp*>(__ptr);
+ break;
+      case _Op_get_type_info:
+
+ __arg->_M_typeinfo = &typeid(_Tp);
+
+ break;
+      case _Op_clone:
+ __arg->_M_any->_M_storage._M_ptr = new _Tp(*__ptr);
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ break;
+      case _Op_destroy:
+ delete __ptr;
+ break;
+      case _Op_xfer:
+ __arg->_M_any->_M_storage._M_ptr = __any->_M_storage._M_ptr;
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ const_cast<any*>(__any)->_M_manager = nullptr;
+ break;
+      }
+    }
+
+
+
+  namespace __detail::__variant
+  {
+    template<typename> struct _Never_valueless_alt;
+
+
+
+    template<>
+      struct _Never_valueless_alt<std::any>
+      : std::true_type
+      { };
+  }
+
+
+}
+# 10 "./hpp/mpp/bosmacros/any.hpp" 2
+#define ANY_CLASS std::any
+#define BAD_ANY_CAST std::bad_any_cast
+#define ANY_CAST std::any_cast
+# 8 "cpp/Request.cpp" 2
 # 1 "./hpp/mpp/Header.hpp" 1
 
 #define MPP_HEADER_HPP 
@@ -60947,7 +60963,9 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 
 
-# 8 "./hpp/mpp/Header.hpp"
+
+
+# 10 "./hpp/mpp/Header.hpp"
 namespace mpp
 {
  class Header
@@ -61060,7 +61078,7 @@ namespace mpp
 
 
 
-  class UnknownHeader : public virtual Exception
+  class UnknownHeader final : public Exception
   {
    public:
 
@@ -62616,7 +62634,8 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 
 
-
+# 1 "./hpp/mpp/bosmacros/any.hpp" 1
+# 10 "./hpp/mpp/Request.hpp" 2
 
 
 

@@ -14,7 +14,7 @@ namespace mpp
 		/**
 		* An exception thrown if we can't find the DB info file.
 		**/
-		class MissingDBConfFile : public virtual Exception
+		class MissingDBConfFile final : public Exception
 		{
 			public:
 				/**

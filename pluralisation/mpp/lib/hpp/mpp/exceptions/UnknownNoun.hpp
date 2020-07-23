@@ -11,7 +11,7 @@ namespace mpp
 {
 	namespace exceptions
 	{
-		class UnknownNoun : public virtual Exception
+		class UnknownNoun final : public Exception
 		{
 			public:
 				/**

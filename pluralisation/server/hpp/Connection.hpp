@@ -4,15 +4,10 @@
 /* STL */
 #include <cstddef> // std::size_t
 #include <array> // std::array
-//#include <memory> // std::enable_shared_from_this
-//#include <system_error> // std::error_code
 
 /* Boost */
-#include <boost/enable_shared_from_this.hpp> // boost::enable_shared_from_this
 #include <boost/noncopyable.hpp> // boost::noncopyable
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::ip::tcp::socket
-#include <boost/system/error_code.hpp> // boost::system::error_code
-#include <boost/shared_ptr.hpp> // boost::shared_ptr
 
 /* Our headers - Malayalam Pluralisation Protocol library */
 #include "mpp/ReqHandler.hpp" // Request handler
@@ -20,11 +15,15 @@
 #include "mpp/Request.hpp" // Represents a request
 #include "mpp/Reply.hpp" // Represents a reply
 
+/* Our headers - macros to choose between Boost and std implementations */
+#include "EnabledSharedFromThis.hpp" // ENABLE_SHARED_FROM_THIS macro
+#include "ErrorCode.hpp" // ERROR_CODE macro
+#include "SharedPtr.hpp" // SHARED_PTR macro
+
 /**
 * This class is templated so that any protocol's classes can be used with this.
 **/
-class Connection : public boost::enable_shared_from_this<Connection>,
-//class Connection : public std::enable_shared_from_this<Connection>,
+class Connection : public ENABLE_SHARED_FROM_THIS<Connection>,
 			private boost::noncopyable
 {
 	public:
@@ -53,15 +52,13 @@ class Connection : public boost::enable_shared_from_this<Connection>,
 		* @param e An error code. Set if an error occurred during the read.
 		* @param bytesTransferred # of bytes transferred during the read.
 		**/
-		void handleRead(const boost::system::error_code& e, std::size_t bytesTransferred);
-		//void handleRead(const std::error_code& e, std::size_t bytesTransferred);
+		void handleRead(const ERROR_CODE& e, std::size_t bytesTransferred);
 
 		/**
 		* @desc Handles completion of a write operation.
 		* @param e Describes what error occurred, if any.
 		**/
-		void handleWrite(const boost::system::error_code& e);
-		//void handleWrite(const std::error_code& e);
+		void handleWrite(const ERROR_CODE& e);
 
 		boost::asio::ip::tcp::socket socket; // We listen on this
 		mpp::ReqHandler& reqHandler; // Parses requests
@@ -70,3 +67,7 @@ class Connection : public boost::enable_shared_from_this<Connection>,
 		mpp::Request req;
 		mpp::Reply rep;
 };
+
+typedef SHARED_PTR<Connection> ConnectionPtr;
+
+#endif // CONNECTION_HPP

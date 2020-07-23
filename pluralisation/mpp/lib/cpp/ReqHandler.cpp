@@ -1,8 +1,6 @@
 /* C++ Standard Library */
 #include <string> // std::string
-#include <any> // std::any
 #include <sstream> // std::ostringstream
-#include <array> // std::array
 #include <algorithm> // std::transform, std::for_each
 #include <numeric> // std::accumulate
 #include <functional> // std::logical_or
@@ -15,12 +13,12 @@
 #endif
 
 /* Boost */
-#include <boost/filesystem.hpp> // boost::filesystem::path
 #include <boost/regex.hpp> // boost::smatch
 #include <boost/regex/icu.hpp> // boost::make_u32regex, boost::u32regex_match, boost::u32regex
 #include <boost/logic/tribool_fwd.hpp> // boost::logic::tribool fwd declarations
 #include <boost/logic/tribool.hpp> // boost::logic::tribool
 #include <boost/logic/tribool_io.hpp> // operator<< def'ns for boost::logic::tribool
+#include <boost/filesystem/path.hpp> // boost::filesystem::path
 
 /* MariaDB++ */
 #include <mariadb++/account.hpp> // mariadb::account::create, mariadb::account_ref
@@ -29,6 +27,7 @@
 #include <mariadb++/exceptions.hpp> // mariadb::exception::connection
 
 /* Our headers */
+#include "mpp/bosmacros/array.hpp" // ARRAY_CLASS macro
 #include "mpp/Request.hpp" // Represents a request
 #include "mpp/Reply.hpp" // Represents a reply
 #include "mpp/Header.hpp" // Represents a (name, value) pair
@@ -421,8 +420,8 @@ bool mpp::ReqHandler::inDB(std::string noun)
 **/
 bool mpp::ReqHandler::regGuess(std::string noun)
 {
-	std::array<bool, NDECLREGS+2> matchRes; // Holds whether or not each singular regex matched the noun
-	std::array<boost::smatch, NDECLREGS+2> what; // Holds what matched (unused, but a necessary parameter for boost::u32regex_match
+	ARRAY_CLASS<bool, NDECLREGS+2> matchRes; // Holds whether or not each singular regex matched the noun
+	ARRAY_CLASS<boost::smatch, NDECLREGS+2> what; // Holds what matched (unused, but a necessary parameter for boost::u32regex_match
 	#ifdef DEBUG
 	unsigned short regNum = 1; // Regex #, for printing
 	#endif
@@ -530,7 +529,7 @@ boost::logic::tribool mpp::ReqHandler::hasPlural(std::string noun)
 std::vector<std::string> mpp::ReqHandler::findPlural(std::string noun)
 {
 	std::vector<std::string> toReturn;
-	std::array<boost::smatch, 2> what; // Holds what matched a regex. Unused - only used as a dummy parameter
+	ARRAY_CLASS<boost::smatch, 2> what; // Holds what matched a regex. Unused - only used as a dummy parameter
 	boost::u32regex endsInLongA = boost::make_u32regex(".*\\x{d3e}$"); // A noun that ends in /a:/
 	boost::u32regex endsInSyllabicR = boost::make_u32regex(".*\\x{d43}$"); // A noun that ends in a short syllabic /r/
 	boost::logic::tribool isH = isHuman(noun);
@@ -926,7 +925,7 @@ mpp::ReqHandler::Gender mpp::ReqHandler::getGender(std::string noun)
 **/
 bool mpp::ReqHandler::isVowelStem(std::string noun)
 {
-	std::array<boost::smatch, 2> what;
+	ARRAY_CLASS<boost::smatch, 2> what;
 	bool doesntEndInChillu = boost::u32regex_match(noun, what.at(what.size()-1), boost::make_u32regex(".*[^\\x{d7a}-\\x{d7f}]$"));
 	bool doesntEndInSchwa = boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*[^\\x{d4d}]$"));
 	bool isIva = (noun == u8"\u0d07\u0d35"); // iva is a special case - it's a vowel stme, but it's plural

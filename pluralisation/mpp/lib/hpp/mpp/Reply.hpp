@@ -6,12 +6,12 @@
 #include <vector> // std::vector
 #include <forward_list> // std::forward_list
 #include <array> // std::array
-#include <any> // std::any
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
 
-/* Our header */
+/* Our headers */
+#include "bosmacros/any.hpp" // ANY_CLASS
 #include "mpp/Header.hpp" // mpp::Header, to represent response headers
 
 namespace mpp
@@ -85,7 +85,27 @@ namespace mpp
 			* @param name The header's name.
 			* @param val The header's value.
 			**/
-			void addHeader(std::string name, std::any val);
+			void addHeader(std::string name, ANY_CLASS val);
+
+			/**
+			* @desc Fetches a stock reply for a given status.
+			* @param stat The status to fetch a stock reply for.
+			* @return A Reply object containing a stock string for the given status.
+			**/
+			static Reply stockReply(Reply::Status stat);
+
+			/**
+			* @desc Copy constructor.
+			* @param other The other Reply object to copy from.
+			**/
+			Reply(const Reply& other);
+
+			/**
+			* @desc Copy assignment operator.
+			* @param other The other Reply object to copy from.
+			* @return A reference to this.
+			**/
+			Reply& operator=(const Reply& other);
 	
 		private:
 			Status stat; // This reply's status

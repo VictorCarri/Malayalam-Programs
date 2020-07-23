@@ -1,10 +1,10 @@
 /* STL */
 #include <string> // std::string, std::string
 #include <algorithm> // std::find_if
-#include <any> // std::any
 #include <sstream> // std::stringstream
 
 /* Our headers */
+#include "mpp/bosmacros/any.hpp" // ANY_CLASS macro
 #include "mpp/Header.hpp" // Header class
 #include "mpp/exceptions/UnknownHeader.hpp" // Thrown when an unknown header is requested
 #include "mpp/Request.hpp" // Class definition
@@ -37,7 +37,7 @@ mpp::Request::Command mpp::Request::GETCOM_FUNC() const
 * @param name The header's name.
 * @param value The header's value.
 **/
-void mpp::Request::addHeader(std::string name, std::any value)
+void mpp::Request::addHeader(std::string name, ANY_CLASS value)
 {
 	headers.emplace_front(name, value);
 }

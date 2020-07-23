@@ -1,16 +1,13 @@
-/* C headers */
-#include <signal.h> // SIGINT, SIGTERM, SIGQUIT
+/* C++ versions of C headers */
+#include <csignal> // SIGINT, SIGTERM, SIGQUIT
 
 /* STL */
 #include <sstream> // std::stringstream
+#include <string> // std::string
 #ifdef DEBUG
 #include <iostream> // std::clog
-#include <string> // std::string
+#include <iomanip> // std::quoted
 #endif
-
-/* Boost */
-#include <boost/bind.hpp> // boost::bind
-//#include <boost/asio.hpp> // boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::acceptor::reuse_address, boost::asio::placeholders::error
 
 /* Our headers */
 #include "BindFunc.hpp" // Defines the macro BIND_FUNCTION, that resolves to either boost::bind or std::bind
@@ -21,12 +18,15 @@
 * @desc Creates a server that listens on the given port, and uses a pool of io_contexts of the given size.
 * @param port Port to listen on.
 * @param numThreads # of threads to use.
+* @param progName The program's name.
+* @param dbConfPath The path to the DB config file.
 **/
-Server::Server(const std::string& address, int port, std::size_t numThreads)
+Server::Server(const std::string& address, int port, std::size_t numThreads, std::string progName, std::string dbConfPath)
 	: 	iocp(numThreads),
 		signals(iocp.getIoc()),
 		acceptor(iocp.getIoc()),
-		reqHandler("~/info/pluraliser.dbinfo") // Pass the request-handler the path to the DB config file
+		reqHandler(dbConfPath), // Pass the request-handler the path to the DB config file
+		pName(progName)
 {
 	/*
 	* Register to handle signals that indicate that the server should exit.
@@ -40,9 +40,17 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	#endif
 	signals.async_wait(BIND_FUNCTION(&Server::handleStop, this));
 
+	#ifdef DEBUG
+	std::cout << pName << ":Server::Server: registered signals" << std::endl;
+	#endif
+
 	/* Convert the port # to an std::string */
 	std::stringstream portNumSS;
 	portNumSS << port; // Insert the port #
+
+	#ifdef DEBUG
+	std::cout << pName << ":Server::Server: port # stringstream's contents are " << std::quoted(pName) << std::endl;
+	#endif
 
 	/* Open the acceptor with the option to reuse the address */
 	boost::asio::ip::tcp::resolver resolver(acceptor.get_executor());
@@ -51,13 +59,13 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 	#ifdef DEBUG
 	if (acceptor.is_open())
 	{
-		std::cout << "Server::Server: listening on " << address << ":" << port << std::endl
+		std::cout << pName << ":Server::Server: listening on " << address << ":" << port << std::endl
 		<< "\tusing " << numThreads << " threads" << std::endl;
 	}
 
 	else
 	{
-		std::cout << "Server::Server: acceptor failed to open." << std::endl;
+		std::cout << pName << ":Server::Server: acceptor failed to open." << std::endl;
 	}
 	#endif
 	acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
@@ -72,6 +80,9 @@ Server::Server(const std::string& address, int port, std::size_t numThreads)
 **/
 void Server::handleStop()
 {
+	#ifdef DEBUG
+	std::cout << pName << ":Server::handleStop called" << std::endl;
+	#endif
 	iocp.stop();
 }
 
@@ -80,6 +91,9 @@ void Server::handleStop()
 **/
 void Server::run()
 {
+	#ifdef DEBUG
+	std::cout << pName << ":Server::run called" << std::endl;
+	#endif
 	iocp.run(); // Run the pool
 }
 
@@ -94,14 +108,20 @@ void Server::startAccept()
 			reqHandler
 		)
 	);
+	#ifdef DEBUG
+	std::cout << pName << ":Server::startAccept: reset newConn" << std::endl;
+	#endif
 	acceptor.async_accept(
-		newConn->socket(),
+		newConn->getSocket(),
 		BIND_FUNCTION(
 			&Server::handleAccept,
 			this,
 			boost::asio::placeholders::error
 		)
 	);
+	#ifdef DEBUG
+	std::cout << pName << ":Server::startAccept: called acceptor.async_accept" << std::endl;
+	#endif
 }
 
 /**
@@ -110,10 +130,20 @@ void Server::startAccept()
 **/
 void Server::handleAccept(const boost::system::error_code& e)
 {
+	#ifdef DEBUG
+	std::cout << pName << ":Server::handleAccept called" << std::endl;
+	#endif
+
 	if (!e)
 	{
+		#ifdef DEBUG
+		std::cout << pName << ":Server::handleAccept: no error" << std::endl;
+		#endif
 		newConn->start(); // Start the new connection
 	}
 
+	#ifdef DEBUG
+	std::cout << pName << ":Server::handleAccept: calling startAccept" << std::endl;
+	#endif
 	startAccept();
 }

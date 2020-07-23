@@ -3,7 +3,9 @@
 
 /* STL */
 #include <string> // std::string
-#include <any> // std::any to store the value
+
+/* Boost or STL? */
+#include "mpp/bosmacros/any.hpp" // ANY_CLASS
 
 namespace mpp
 {
@@ -14,7 +16,7 @@ namespace mpp
 			* @name Constructor.
 			* @desc Contructs a Header with the given name and value.
 			**/
-			Header(std::string name, std::any value);
+			Header(std::string name, ANY_CLASS value);
 
 			/**
 			* @desc Fetches this header's name.
@@ -26,7 +28,7 @@ namespace mpp
 			* @desc Fetches this header's value.
 			* @return This header's value.
 			**/
-			std::any getValue() const;
+			ANY_CLASS getValue() const;
 
 			/**
 			* @desc Copy constructor.
@@ -59,7 +61,7 @@ namespace mpp
 
 		private:
 			std::string _name;
-			std::any _value;
+			ANY_CLASS _value;
 	};
 };
 
