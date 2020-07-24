@@ -48,7 +48,29 @@ class Client
 		**/
 		void getInput();
 
+		/**
+		* @desc Determines whether or not the user has requested that we quit, based on the value of $input.
+		* @return True if the user has requested that we quit, false otherwise.
+		**/
+		bool shouldQuit() const;
+
+		/**
+		* @desc Tells the client to quit.
+		**/
+		void quit();
+
 	private:
+		/*** Methods ***/
+
+		/**
+		* @desc Creates and returns a copy of the given string with all alphabetic characters converted to lowercase.
+		* @param toChange The string to create a lowercase copy of.
+		* @return A copy of the given parameter with all alphabetic characters converted to lowercase.
+		**/
+		std::string toLower(std::string toChange) const;
+		
+		/*** Properties ***/
+
 		bool active; // Whether or not we're active
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.

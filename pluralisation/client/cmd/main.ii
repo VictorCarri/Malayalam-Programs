@@ -36647,7 +36647,29 @@ class Client
 
   void getInput();
 
+
+
+
+
+  bool shouldQuit() const;
+
+
+
+
+  void quit();
+
  private:
+
+
+
+
+
+
+
+  std::string toLower(std::string toChange) const;
+
+
+
   bool active;
 
   std::ios_base::fmtflags initFlags;
@@ -36657,7 +36679,7 @@ class Client
 
   int major = 1;
   int minor = 3;
-  int patch = 4;
+  int patch = 5;
 };
 # 6 "cpp/main.cpp" 2
 
@@ -36679,7 +36701,25 @@ int main()
 
  while (c.isActive())
  {
+
+  std::cout << "main: fetching input" << std::endl;
+
   c.getInput();
+
+  std::cout << "main: fetched input" << std::endl
+  << "main: checking whether or not I should quit" << std::endl;
+
+
+  if (c.shouldQuit())
+  {
+
+   std::cout << "main: user has requested that I quit" << std::endl;
+
+   c.quit();
+
+   std::cout << "main: told client to quit" << std::endl;
+
+  }
  }
 
  return 0;

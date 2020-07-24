@@ -5,10 +5,10 @@ incDir=./hpp
 std=gnu++17
 
 # Warning options
-warnOpts=$(addprefix -W,all error extra old-style-cast overloaded-virtual extra pedantic null-dereference init-self $(addprefix missing-,include-dirs noreturn declarations) $(addprefix switch-,default enum) $(addprefix un,initialized known-pragmas def) no-prio-ctor-dtor stringop-truncation $(addprefix suggest-,$(addprefix final-,types methods) override) alloca $(addprefix duplicated-,branches cond) float-equal shadow unsafe-loop-optimizations placement-new $(addprefix cast-,qual align) catch-value=3 conditionally-supported conversion zero-as-null-pointer-constant useless-cast date-time extra-semi logical-op aggregate-return $(addprefix no-,aggressive-loop-optimizations no-builtin-declaration-mismatch) normalized packed redundant-decls inline invalid-pch no-virtual-move-assign disabled-optimization)
+warnOpts=$(addprefix -W,all error extra old-style-cast overloaded-virtual extra pedantic null-dereference init-self $(addprefix missing-,include-dirs noreturn declarations) $(addprefix switch-,default enum) $(addprefix un,initialized known-pragmas def) no-prio-ctor-dtor stringop-truncation $(addprefix suggest-,$(addprefix final-,types methods) override) alloca $(addprefix duplicated-,branches cond) float-equal shadow unsafe-loop-optimizations placement-new $(addprefix cast-,qual align) catch-value=3 conditionally-supported conversion zero-as-null-pointer-constant useless-cast date-time extra-semi logical-op $(addprefix no-,aggressive-loop-optimizations builtin-declaration-mismatch) normalized packed redundant-decls inline invalid-pch no-virtual-move-assign disabled-optimization)
 
 # Optimization options
-optimOpts=$(addprefix -f,$(addprefix tree-loop-i,m vcanon) ivopts tree-pta variable-expansion-in-unroller unroll-loops)
+optimOpts=$(addprefix -f,$(addprefix tree-loop-i,m vcanon) ivopts tree-pta variable-expansion-in-unroller unroll-loops $(addprefix lt,o o-odr-type-merging) tracer unroll-loops move-loop-invariants split-loops unswitch-loops)
 
 # Compilation options that are common to all builds
 compOpts=-I$(incDir) $(addprefix -O,3 s) -std=$(std) -pedantic-errors $(warnOpts) $(optimOpts)
@@ -32,7 +32,7 @@ files=Client main
 dbgDynObjs=$(addprefix $(objDir)/debug/dynamic/,$(addsuffix .o,$(files)))
 
 # Debug build options
-dbgOpts=-DDEBUG -Og -save-temps $(addprefix -g,gdb3 gnu-pubnames $(addprefix as-lo,c-support cview-support) variable-location-views inline-points z) -v -fisolate-erroneous-paths-dereference
+dbgOpts=-DDEBUG -Og -save-temps $(addprefix -g,gdb3 gnu-pubnames $(addprefix as-lo,c-support cview-support) variable-location-views inline-points z)
 
 # List of objects for the dynamically-linked production build
 prodDynObjs=$(addprefix $(objDir)/production/dynamic/,$(addsuffix .o,$(files)))
@@ -48,22 +48,25 @@ all: $(addsuffix -dynamic,$(addprefix $(exeName)-,debug production)) $(addsuffix
 # Dynamic debug executable
 $(exeName)-debug-dynamic: $(dbgDynObjs)
 	$(compiler) -o $@ $^ $(compOpts) $(dbgOpts) -fwhole-program
+	echo
 
 # Dynamic debug object
 $(objDir)/debug/dynamic/%.o: $(cppDir)/%.cpp
-	$(compiler) -o $@ -c $^ $(compOpts) $(dbgOpts)
+	$(compiler) -o $@ -c $^ $(compOpts) $(dbgOpts) -fPIC
 
 # Dynamic production executable
 $(exeName)-production-dynamic: $(prodDynObjs)
 	$(compiler) -o $@ $^ $(compOpts) -fwhole-program
+	echo
 
 # Dynamic production object
 $(objDir)/production/dynamic/%.o: $(cppDir)/%.cpp
-	$(compiler) -o $@ -c $^ $(compOpts)
+	$(compiler) -o $@ -c $^ $(compOpts) -fPIC
 
 # Static production executable
 $(exeName)-production-static: $(prodStatObjs)
 	$(compiler) -o $@ $^ $(compOpts) $(addprefix -stati,c c-libgcc) -fwhole-program
+	echo
 
 # Static production object
 $(objDir)/production/static/%.o: $(cppDir)/%.cpp
@@ -72,6 +75,7 @@ $(objDir)/production/static/%.o: $(cppDir)/%.cpp
 # Static debug executable
 $(exeName)-debug-static: $(dbgStatObjs)
 	$(compiler) -o $@ $^ $(compOpts) $(addprefix -stati,c c-libgcc) $(dbgOpts) -fwhole-program
+	echo
 
 # Static debug object
 $(objDir)/debug/static/%.o: $(cppDir)/%.cpp

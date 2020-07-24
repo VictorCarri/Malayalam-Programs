@@ -22,7 +22,25 @@ int main()
 
 	while (c.isActive()) // The client is running
 	{
+		#ifdef DEBUG
+		std::cout << "main: fetching input" << std::endl;
+		#endif
 		c.getInput(); // Fetch input from the user
+		#ifdef DEBUG
+		std::cout << "main: fetched input" << std::endl
+		<< "main: checking whether or not I should quit" << std::endl;
+		#endif
+
+		if (c.shouldQuit()) // The user requested that we quit
+		{
+			#ifdef DEBUG
+			std::cout << "main: user has requested that I quit" << std::endl;
+			#endif
+			c.quit(); // Tell the client to quit
+			#ifdef DEBUG
+			std::cout << "main: told client to quit" << std::endl;
+			#endif
+		}
 	}
 
 	return 0;
