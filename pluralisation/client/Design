@@ -1,0 +1,61 @@
+The client will run a constant loop. The loop will reside in main(), while the client will be encapsulated in a Client object that maintains state, handles the requests, etc.
+
+while (running)
+{
+	Ask the user for a Malayalam noun.
+	Read a space-terminated string as input.
+
+	if (input.lower() == "quit" or "exit") // Allow the user to quit gracefully
+	{
+		running = false;
+	}
+
+	Validate that the string contains only Malayalam code points.
+	
+	if (string is valid Malayalam)
+	{
+		Tell the user that we're asking the server whether or not the given noun is singular.
+		Send the server an ISSING request with the current noun as a payload.
+		Wait for a response.
+		
+		if (the response is an OK code [2xx])
+		{
+			Print whether the noun is singular or plural
+			Send a FOF request with the noun as a payload
+			Wait for a response
+			
+			if (noun is singular)
+			{
+				Print the noun's plural form and mark it as a plural
+			}
+
+			else
+			{
+				Print the noun's singular form and mark it as a singular form
+				Print the noun's singular form and mark it as a singular form
+				Print the noun's singular form and mark it as a singular form
+				Print the noun's singular form and mark it as a singular form
+			}
+		}
+
+		else
+		{
+			switch (response code)
+			{
+				case 400:
+				{
+					...
+				}
+
+				case ...
+
+				// Consult the Response class in MPP for a list of valid codes
+			}
+		}
+	}
+
+	else
+	{
+		Print an error message
+	}
+}
