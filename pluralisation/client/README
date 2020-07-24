@@ -1,0 +1,1 @@
+This directory contains client programs for MPP (the Malayalam Pluralisation Protocol). Each type of client (command-line, graphical, etc.) is kept in its own directory.
