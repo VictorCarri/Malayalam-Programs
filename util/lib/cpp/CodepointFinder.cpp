@@ -17,7 +17,7 @@
 **/
 void vuu::CodepointFinder::operator()(char cur)
 {
-	std::bitset<8> charBits(static_cast<unsigned long long>(cur)); // Reinterpret the character as a sequence of bits
+	std::bitset<8> charBits(static_cast<unsigned>(cur)); // Reinterpret the character as a sequence of bits
 
 	switch (curStat) // Check what state we are in
 	{
@@ -25,7 +25,7 @@ void vuu::CodepointFinder::operator()(char cur)
 		{
 			if (!charBits.test(7)) // 0xxxxxxx - 1-byte codepoint
 			{
-				codePoints.push_front(static_cast<unsigned long long>(cur)); // We need only store this byte as the current codepoint
+				codePoints.push_front(static_cast<unsigned>(cur)); // We need only store this byte as the current codepoint
 			}
 
 			else if (charBits.test(7) && charBits.test(6) && !charBits.test(5)) // 110xxxxx - first byte of a 2-byte codepoint
@@ -55,7 +55,7 @@ void vuu::CodepointFinder::operator()(char cur)
 			{
 				(*pBitSS) << charBits.to_string().substr(3-1); // Fetch the bits as a string, discard the top 2 bits, and append it to the bits that we've already read
 				const boost::dynamic_bitset<> finalBits(pBitSS->str()); // Fetch the concatenated string of bits and initialise a dynamic bitset with it
-				codePoints.push_front(static_cast<unsigned long long>(finalBits.to_ulong())); // Convert the final string of bits to an unsigned long, promote it to an unsigned long long, and add it to the list of code points
+				codePoints.push_front(static_cast<unsigned>(finalBits.to_ulong())); // Convert the final string of bits to an unsigned long, promote it to an unsigned, and add it to the list of code points
 				pBitSS.reset(new std::stringstream); // Destroy the old stringstream and create a new one, so that we have a clean stringstream for the next codepoint
 				curStat = codepoint_start; // Expect the start of the next codepoint
 			}
@@ -98,7 +98,7 @@ void vuu::CodepointFinder::operator()(char cur)
 			{
 				(*pBitSS) << charBits.to_string().substr(3-1); // Fetch the bits as a string, drop the leading "10", and concatenate it to the bitstring we're building
 				const boost::dynamic_bitset<> finalBits(pBitSS->str()); // Initialise a bitset using the generated string
-				codePoints.push_front(static_cast<unsigned long long>(finalBits.to_ulong()));
+				codePoints.push_front(static_cast<unsigned>(finalBits.to_ulong()));
 				pBitSS.reset(new std::stringstream); // Use a fresh stringstream next time
 				curStat = codepoint_start; // Wait for the next codepoint
 			}
@@ -164,7 +164,7 @@ void vuu::CodepointFinder::operator()(char cur)
 			{
 				(*pBitSS) << charBits.to_string().substr(3-1);
 				const boost::dynamic_bitset<> finalBits(pBitSS->str()); // Initialise a bitset using the generated string
-				codePoints.push_front(static_cast<unsigned long long>(finalBits.to_ulong()));
+				codePoints.push_front(static_cast<unsigned>(finalBits.to_ulong()));
 				pBitSS.reset(new std::stringstream);
 				curStat = codepoint_start;
 			}

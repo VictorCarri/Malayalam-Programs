@@ -78698,7 +78698,7 @@ namespace vuu
  class CodepointFinder
  {
   public:
-   typedef std::forward_list<unsigned long long>::const_iterator const_iterator;
+   typedef std::forward_list<unsigned>::const_iterator const_iterator;
 
 
 
@@ -78737,10 +78737,10 @@ namespace vuu
    };
 
    State curStat;
-   std::forward_list<unsigned long long> codePoints;
+   std::forward_list<unsigned> codePoints;
    std::unique_ptr<std::stringstream> pBitSS;
  };
-};
+}
 # 13 "cpp/CodepointFinder.cpp" 2
 
 
@@ -78749,7 +78749,7 @@ namespace vuu
 
 void vuu::CodepointFinder::operator()(char cur)
 {
- std::bitset<8> charBits(static_cast<unsigned long long>(cur));
+ std::bitset<8> charBits(static_cast<unsigned>(cur));
 
  switch (curStat)
  {
@@ -78757,7 +78757,7 @@ void vuu::CodepointFinder::operator()(char cur)
   {
    if (!charBits.test(7))
    {
-    codePoints.push_front(static_cast<unsigned long long>(cur));
+    codePoints.push_front(static_cast<unsigned>(cur));
    }
 
    else if (charBits.test(7) && charBits.test(6) && !charBits.test(5))
@@ -78787,7 +78787,7 @@ void vuu::CodepointFinder::operator()(char cur)
    {
     (*pBitSS) << charBits.to_string().substr(3-1);
     const boost::dynamic_bitset<> finalBits(pBitSS->str());
-    codePoints.push_front(static_cast<unsigned long long>(finalBits.to_ulong()));
+    codePoints.push_front(static_cast<unsigned>(finalBits.to_ulong()));
     pBitSS.reset(new std::stringstream);
     curStat = codepoint_start;
    }
@@ -78830,7 +78830,7 @@ void vuu::CodepointFinder::operator()(char cur)
    {
     (*pBitSS) << charBits.to_string().substr(3-1);
     const boost::dynamic_bitset<> finalBits(pBitSS->str());
-    codePoints.push_front(static_cast<unsigned long long>(finalBits.to_ulong()));
+    codePoints.push_front(static_cast<unsigned>(finalBits.to_ulong()));
     pBitSS.reset(new std::stringstream);
     curStat = codepoint_start;
    }
@@ -78896,7 +78896,7 @@ void vuu::CodepointFinder::operator()(char cur)
    {
     (*pBitSS) << charBits.to_string().substr(3-1);
     const boost::dynamic_bitset<> finalBits(pBitSS->str());
-    codePoints.push_front(static_cast<unsigned long long>(finalBits.to_ulong()));
+    codePoints.push_front(static_cast<unsigned>(finalBits.to_ulong()));
     pBitSS.reset(new std::stringstream);
     curStat = codepoint_start;
    }

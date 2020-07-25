@@ -15,7 +15,7 @@ namespace vuu
 	class CodepointFinder
 	{
 		public:
-			typedef std::forward_list<unsigned long long>::const_iterator const_iterator; // To allow the implementation & clients to use a simple type
+			typedef std::forward_list<unsigned>::const_iterator const_iterator; // To allow the implementation & clients to use a simple type
 
 			/**
 			* @desc Handles the current byte. This byte may be part of a code point, or it may be the start of the next one.
@@ -54,9 +54,9 @@ namespace vuu
 			};
 
 			State curStat; // Current state
-			std::forward_list<unsigned long long> codePoints; // Vector of codepoints
+			std::forward_list<unsigned> codePoints; // Vector of codepoints
 			std::unique_ptr<std::stringstream> pBitSS; // Pointer to stringstream that holds the string that contains the combined bits from multiple calls to operator()
 	};
-};
+}
 
 #endif // VUU_CODEPOINTFINDER_HPP
