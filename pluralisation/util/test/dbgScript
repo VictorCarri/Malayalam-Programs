@@ -1,4 +1,0 @@
-set args --help
-run
-set args ./inputs/1
-run

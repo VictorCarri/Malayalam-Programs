@@ -1,3 +1,0 @@
-1) Finish restructuring build tree and makefile.
-2) Add other Unicode helper functors, like one to verify that a string contains only codepoints in a specific range.
-3) Make all functors derive from a common base for ease of storage later on (optional).

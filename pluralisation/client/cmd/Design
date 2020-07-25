@@ -1,5 +1,13 @@
 The client will run a constant loop. The loop will reside in main(), while the client will be encapsulated in a Client object that maintains state, handles the requests, etc.
 
+asynchronous
+{
+	if (SIGHUP, SIGINT, SIGQUIT, SIGTERM, or SIGTSTP is caught)
+	{
+		running = false
+	}
+}
+
 while (running)
 {
 	Ask the user for a Malayalam noun.
@@ -10,52 +18,58 @@ while (running)
 		running = false;
 	}
 
-	Validate that the string contains only Malayalam code points.
-	
-	if (string is valid Malayalam)
+	if (string contains valid UTF-8)
 	{
-		Tell the user that we're asking the server whether or not the given noun is singular.
-		Send the server an ISSING request with the current noun as a payload.
-		Wait for a response.
-		
-		if (the response is an OK code [2xx])
+		if (all code-points in string are in the Malayalam range)
 		{
-			Print whether the noun is singular or plural
-			Send a FOF request with the noun as a payload
-			Wait for a response
+			Tell the user that we're asking the server whether or not the given noun is singular.
+			Send the server an ISSING request with the current noun as a payload.
+			Wait for a response.
 			
-			if (noun is singular)
+			if (the response is an OK code [2xx])
 			{
-				Print the noun's plural form and mark it as a plural
+				Print whether the noun is singular or plural
+				Send a FOF request with the noun as a payload
+				Wait for a response
+				
+				if (noun is singular)
+				{
+					Print the noun's plural form and mark it as a plural
+				}
+	
+				else
+				{
+					Print the noun's singular form and mark it as a singular form
+					Print the noun's singular form and mark it as a singular form
+					Print the noun's singular form and mark it as a singular form
+					Print the noun's singular form and mark it as a singular form
+				}
 			}
-
+	
 			else
 			{
-				Print the noun's singular form and mark it as a singular form
-				Print the noun's singular form and mark it as a singular form
-				Print the noun's singular form and mark it as a singular form
-				Print the noun's singular form and mark it as a singular form
+				switch (response code)
+				{
+					case 400:
+					{
+						...
+					}
+	
+					case ...
+	
+					// Consult the Response class in MPP for a list of valid codes
+				}
 			}
-		}
+		} // all code points are in Malayalam range
 
 		else
 		{
-			switch (response code)
-			{
-				case 400:
-				{
-					...
-				}
-
-				case ...
-
-				// Consult the Response class in MPP for a list of valid codes
-			}
+			print "Error: your valid UTF-8 input contains code-points that lie outside the valid range for Malayalam"
 		}
 	}
 
 	else
 	{
-		Print an error message
+		print "Error: your input is invalid UTF-8"!
 	}
 }

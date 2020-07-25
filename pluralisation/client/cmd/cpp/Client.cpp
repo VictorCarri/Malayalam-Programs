@@ -1,19 +1,27 @@
+/** C headers **/
+#include <signal.h> // SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGTSTP
+
+/** C++ versions of C headers **/
+#include <cctype> // std::tolower
+
+/** Standard C++ **/
+
 /* Headers that are only needed in debug builds */
 #ifdef DEBUG
 #include <ios> // std::boolalpha, std::ios_base::fmtflags
 #endif
 
-/* C++ versions of C headers */
-#include <cctype> // std::tolower
-
-/* Standard C++ */
 #include <iostream> // std::clog, std::endl, std::cin
 #include <string> // std::string
 #include <algorithm> // std::transform
 #include <iomanip> // std::quoted
 #include <iterator> // std::back_inserter
 
+/* Boost */
+#include <boost/asio/placeholders.hpp> // boost::asio::placeholders::error
+
 /* Our headers */
+#include "BindFunc.hpp" // Defines the BIND_FUNCTION macro, that resolves to either std::bind or boost::bind. Also pulls placeholders (_1, _2, ...) into the global namespace.
 #include "Client.hpp" // Class def'n
 
 /**
@@ -33,7 +41,10 @@ void Client::start()
 /**
 * Default constructor. Initialises our state.
 **/
-Client::Client() : active(false) // We start in an "inactive" state
+Client::Client() : active(false), // We start in an "inactive" state
+input (), // Use std::string's default ctor
+ioc (), // Use io_context's default ctor
+signals (ioc, SIGHUP, SIGINT, SIGQUIT) // Construct signal set using io_context, and add 3 signals (the max)
 #ifdef DEBUG
 , initFlags(std::clog.flags()) // Save original clog flags
 #endif
@@ -42,6 +53,21 @@ Client::Client() : active(false) // We start in an "inactive" state
 	std::clog << std::boolalpha // Show booleans as strings
 	<< "Client::Client: active = " << active << std::endl
 	<< "\tinitFlags = " << initFlags << std::endl;
+	#endif
+
+	/* Set up signal handling */
+	signals.add(SIGTERM); // Couldn't fit in ctor
+	signals.add(SIGTSTP); // Couldn't fit in ctor
+	signals.async_wait( // Start waiting for the user to send us a signal
+		BIND_FUNCTION( // Create a function object that binds our handler, since async wait needs a function that takes 2 arguments, but our method requires 3 (this, + the 2 arguments async_wait passes)
+			&Client::signalHandler, // Member function
+			this, // We need a reference to THIS object, NOT a copy, because the handler needs to modify THIS object's properties.
+			_1, // The error object
+			_2 // The signal # to be passed
+		)
+	);
+	#ifdef DEBUG
+	std::clog << "Client::Client: set up asynchronous wait on SIGHUP, SIGINT, SIGQUIT, SIGTERM, and SIGTSTP" << std::endl;
 	#endif
 }
 
@@ -69,24 +95,10 @@ Client::~Client()
 #endif
 
 /**
-* @desc Tells the client that it should switch back to an "inactive" state.
-**/
-void Client::stop()
-{
-	#ifdef DEBUG
-	std::clog << "Client::stop: active = " << active << " before change" << std::endl;
-	#endif
-	active = false;
-	#ifdef DEBUG
-	std::clog << "Client::stop: active = " << active << " after change" << std::endl;
-	#endif
-}
-
-/**
 * @desc Prompts the user for a Malayalam noun.
 *	It then fetches a space-terminated string and stores it in a property.
 **/
-void Client::getInput()
+void Client::readInput()
 {
 	std::cout << "Please enter a Malayalam noun to send to the server in ISSING and FOF queries." << std::endl // Inform the user
 	<< "You may also type \"quit\" or \"exit\" (case-insensitive) to exit the client" << std::endl
@@ -117,15 +129,15 @@ bool Client::shouldQuit() const
 	#endif
 
 	/*
-	* Ensure that: 
+	* Either:
 	* ------------
-	* a) There is input
-	* b) It is a request to quit
+	* a) There is input and it's a request to quit
+	* b) Our signal handler called quit() after handling a signal.
 	*/
-	bool toReturn = !isEmpty && (inputIsQuit || inputIsExit);
+	bool toReturn = (!isEmpty && (inputIsQuit || inputIsExit) ) || !active;
 
 	#ifdef DEBUG
-	std::clog << "toReturn = " << !isEmpty << " && (" << inputIsQuit << " || " << inputIsExit << ") = " << toReturn << std::endl;
+	std::clog << "toReturn = (" << !isEmpty << " && (" << inputIsQuit << " || " << inputIsExit << ") ) || " << !active << ") = " << toReturn << std::endl;
 	#endif
 
 	return toReturn;
@@ -169,5 +181,55 @@ std::string Client::toLower(const std::string toChange) const
 **/
 void Client::quit()
 {
+	#ifdef DEBUG
+	std::clog << "Client::quit: active = " << active << " before change" << std::endl;
+	#endif
+	std::cout << "Exiting..." << std::endl;
 	active = false;
+	#ifdef DEBUG
+	std::clog << "Client::quit: active = " << active << " after change" << std::endl;
+	#endif
+}
+
+/**
+* @desc This method performs the appropriate action upon receiving a signal (which is usually quitting).
+* @param ec An error code that was set when the operation failed.
+* @param sig The signal that occurred.
+**/
+void Client::signalHandler(__attribute__((unused)) const boost::system::error_code& ec, int sig)
+{
+	#ifdef DEBUG
+	std::clog << "Client::signalHandler called with signal #" << sig << std::endl;
+	#endif
+
+	switch (sig) // Is it a signal that we can handle?
+	{
+		/* Yes */
+		case SIGHUP:
+		case SIGINT:
+		case SIGQUIT:
+		case SIGTERM:
+		case SIGTSTP:
+		{
+			quit(); // We should quit
+			break;
+		}
+
+		default: // How???
+		{
+			std::cerr << "Client::signalHandler: caught unknown signal #" << sig << std::endl;
+			break;
+		}
+	}
+
+	std::cin.clear(); // Reset input stream
+}
+
+/**
+* @desc Fetches the current input string.
+* @return The current input string.
+**/
+std::string Client::getInput() const
+{
+	return input;
 }

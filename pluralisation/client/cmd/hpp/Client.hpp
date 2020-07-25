@@ -8,6 +8,10 @@
 
 #include <string> // std::string
 
+/* Boost */
+#include <boost/asio.hpp> // boost::asio::signal_set, boost::asio::io_context
+#include <boost/system/error_code.hpp> // boost::system::error_code
+
 /*
 * This class encapsulates our client. It maintains state and handles all communication with the server, using input from the loop in main().
 */
@@ -38,15 +42,10 @@ class Client
 		#endif
 
 		/**
-		* @desc Tells the client that it should switch back to an "inactive" state.
-		**/
-		void stop();
-
-		/**
 		* @desc Prompts the user for a Malayalam noun.
 		*	It then fetches a space-terminated string and stores it in a property.
 		**/
-		void getInput();
+		void readInput();
 
 		/**
 		* @desc Determines whether or not the user has requested that we quit, based on the value of $input.
@@ -59,6 +58,12 @@ class Client
 		**/
 		void quit();
 
+		/**
+		* @desc Fetches the current input string.
+		* @return The current input string.
+		**/
+		std::string getInput() const;
+
 	private:
 		/*** Methods ***/
 
@@ -67,19 +72,28 @@ class Client
 		* @param toChange The string to create a lowercase copy of.
 		* @return A copy of the given parameter with all alphabetic characters converted to lowercase.
 		**/
-		std::string toLower(std::string toChange) const;
+		std::string toLower(const std::string toChange) const;
+
+		/**
+		* @desc This method performs the appropriate action upon receiving a signal (which is usually quitting).
+		* @param ec An error code that was set when the operation failed.
+		* @param sig The signal that occurred.
+		**/
+		void signalHandler(const boost::system::error_code& ec, int sig);
 		
 		/*** Properties ***/
 
 		bool active; // Whether or not we're active
+		std::string input; // User input (before validation)
+		boost::asio::io_context ioc; // Req'd by signal_set
+		boost::asio::signal_set signals; // Used to catch signals that indicate that we should quit.
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.
 		#endif
-		std::string input; // User input (before validation)
 
 		/* Version #s */
 		int major = 1;
-		int minor = 3;
+		int minor = 4; // Asking the user for a noun, reading input, checking for exit, signal handling
 		int patch = 5;
 };
 

@@ -1,0 +1,56 @@
+main: constructing Client
+Client::Client: active = false
+	initFlags = 4098
+Client::Client: set up asynchronous wait on SIGHUP, SIGINT, SIGQUIT, SIGTERM, and SIGTSTP
+main: constructed Client
+main: starting client
+Client::start: active = false before change
+Client::start: active = true after change
+main: started client
+main: entering while loop
+Client::isActive: returning true
+main: fetching input
+Please enter a Malayalam noun to send to the server in ISSING and FOF queries.
+You may also type "quit" or "exit" (case-insensitive) to exit the client
+mpp-client-1-4-5>main: fetched input
+main: checking whether or not I should quit
+Client::toLower: toReturn = "" at beginning
+Client::toLower::lambda 1: c = 'h'
+Client::toLower::lambda 1: lowered = 'h'
+Client::toLower::lambda 1: c = 'e'
+Client::toLower::lambda 1: lowered = 'e'
+Client::toLower::lambda 1: c = 'p'
+Client::toLower::lambda 1: lowered = 'p'
+Client::toLower: toReturn = "hep" at end
+Client::shouldQuit: lowered input = "hep"
+Client::shouldQuit: isEmpty = false
+	inputIsQuit = false
+	inputIsExit = false
+toReturn = true && (false || false) = false
+Client::isActive: returning true
+main: fetching input
+Please enter a Malayalam noun to send to the server in ISSING and FOF queries.
+You may also type "quit" or "exit" (case-insensitive) to exit the client
+mpp-client-1-4-5>main: fetched input
+main: checking whether or not I should quit
+Client::toLower: toReturn = "" at beginning
+Client::toLower::lambda 1: c = 'q'
+Client::toLower::lambda 1: lowered = 'q'
+Client::toLower::lambda 1: c = 'u'
+Client::toLower::lambda 1: lowered = 'u'
+Client::toLower::lambda 1: c = 'i'
+Client::toLower::lambda 1: lowered = 'i'
+Client::toLower::lambda 1: c = 't'
+Client::toLower::lambda 1: lowered = 't'
+Client::toLower: toReturn = "quit" at end
+Client::shouldQuit: lowered input = "quit"
+Client::shouldQuit: isEmpty = false
+	inputIsQuit = true
+	inputIsExit = false
+toReturn = true && (true || false) = true
+main: user has requested that I quit
+Client::quit: active = true before change
+Client::quit: active = false after change
+main: told client to quit
+Client::isActive: returning false
+Client::~Client: restoring old clog flags (4098)
