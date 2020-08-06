@@ -21,10 +21,12 @@
 #include <memory> // std::make_unique
 
 /* Boost */
+#include <boost/asio/placeholders.hpp> // boost::asio::placeholders::error, boost::asio::placeholders::signal_number, boost::asio::placeholders::endpoint
 #include <boost/asio/connect.hpp> // boost::asio::async_connect
 #include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket, boost::asio::ip::tcp::endpoint
-#include <boost/asio/write.hpp> // boost::asio::buffer
-#include <boost/asio/placeholders.hpp> // boost::asio::placeholders::error, boost::asio::placeholders::signal_number, boost::asio::placeholders::endpoint
+#include <boost/asio/write.hpp> // boost::asio::buffer, boost::asio::async_write
+#include <boost/asio/connect.hpp> // boost::asio::async_connect
+#include <boost/asio/read.hpp> // boost::asio::async_read
 
 /* My Unicode utilities library */
 #include "vuu/UTF8Validator.hpp" // vuu::UTF8Validator, to ensure that an std::string is valid UTF-8 text
@@ -84,7 +86,7 @@ sigMsgs { // Construct the map of signal values to strings
 	/* Set up signal handling */
 	signals.add(SIGTERM); // Couldn't fit in ctor
 	signals.add(SIGTSTP); // Couldn't fit in ctor
-	/*signals.async_wait( // Handle signals when caught
+	signals.async_wait( // Handle signals when caught
 		[this](const boost::system::error_code& bsec, int sigNo)
 		{
 			if (!bsec) // No error
@@ -103,8 +105,8 @@ sigMsgs { // Construct the map of signal values to strings
 				<< "The operation " << (bsec.failed() ? "failed" : "didn't fail") << std::endl;
 			}
 		}
-	);*/
-	signals.async_wait(BIND_FUNCTION(&Client::signalHandler, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number)); // We will listen for signals using THIS so that we can set properties.
+	);
+	//signals.async_wait(BIND_FUNCTION(&Client::signalHandler, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number)); // We will listen for signals using THIS so that we can set properties.
 	#ifdef DEBUG
 	std::clog << "Client::Client: set up asynchronous wait on SIGHUP, SIGINT, SIGQUIT, SIGTERM, and SIGTSTP" << std::endl;
 	#endif
@@ -117,13 +119,13 @@ sigMsgs { // Construct the map of signal values to strings
 	#endif
 
 	endpoints = resolver.resolve(host, portSS.str().c_str()); // Fetch a list of endpoints that correspond to the address we were started with
-	/*workerThread = std::make_unique<THREAD>( // Create the thread that keeps our I/O context running in the background
+	workerThread = std::make_unique<THREAD>( // Create the thread that keeps our I/O context running in the background
 		[this]()
 		{
 			ioc.run(); // Run the I/O context so that Asio will run
 		}
-	);*/
-	workerThread = std::make_unique<THREAD>(BIND_FUNCTION(&Client::threadFunc, this)); // Have our thread function run the I/O context so that asynchronous operations will execute
+	);
+	//workerThread = std::make_unique<THREAD>(BIND_FUNCTION(&Client::threadFunc, this)); // Have our thread function run the I/O context so that asynchronous operations will execute
 }
 
 /**
@@ -297,7 +299,49 @@ bool Client::isSingular() const
 	#endif
 	boost::asio::async_connect(sock, // Connect using our socket
 		endpoints, // Try to connect to the server's endpoints
-		BIND_FUNCTION(&Client::handleConnect, this, boost::asio::placeholders::error, boost::asio::placeholders::endpoint) // Create a functor that'll call our callback method once the connection operation finishes
+		//BIND_FUNCTION(&Client::handleConnect, this, boost::asio::placeholders::error, boost::asio::placeholders::endpoint) // Create a functor that'll call our callback method once the connection operation finishes
+		[this](const boost::system::error_code& ec, const boost::asio::ip::tcp::endpoint& endPoint)
+		{
+			if (!ec) // No error
+			{
+				#ifdef DEBUG
+				std::clog << "Client::isSingular::outermost lambda: connected to server at endpoint " << endpoint.address().to_string() << std::endl;
+				#endif
+				boost::asio::async_write( // Send our request
+					sock, // Write to our socket
+					reqPtr->toBuffers(), // Convert the request to an std::vector of buffers to send
+					[this](const boost::system::error_code& ec, std::size_t bytesTransferred)
+					{
+						if (!ec) // No error
+						{
+							#ifdef DEBUG
+							std::cout << "Client::isSingular::inner lambda 1: wrote " << bytesTransferred << " bytes" << std::endl;
+							#endif
+							boost::asio::async_read( // Read a response
+								sock, // Read from our socket
+								boost::asio::buffer()
+							);
+						}
+					
+						else // An error occurred
+						{
+							std::cerr << "Client::handleWrite: a system error occurred while trying to send a request to the server" << std::endl
+							<< "\tValue = " << ec.value() << std::endl
+							<< "\tMessage = " << ec.message() << std::endl
+							<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+						}
+					}
+				);
+			}
+		
+			else // An error occurred
+			{
+				std::cerr << "Client::isSingular::outer lambda a system error occurred while trying to connect to the server." << std::endl
+				<< "\tValue = " << ec.value() << std::endl
+				<< "\tMessage = " << ec.message() << std::endl
+				<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+			}
+		}
 	);
 }
 
