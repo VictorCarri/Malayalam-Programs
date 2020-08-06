@@ -14,8 +14,8 @@
 /* Boost */
 #include <boost/tuple/tuple.hpp> // boost::tuple
 #include <boost/logic/tribool.hpp> // boost::tribool, boost::indeterminate
-#include <boost/locale.hpp> // boost::locale::generator
-#include <boost/logic/tribool_io.hpp>
+#include <boost/locale/generator.hpp> // boost::locale::generator
+#include <boost/logic/tribool_io.hpp> // operator<< for boost::logic::tribool
 
 /* Our headers */
 #include "bosmacros/array.hpp" // ARRAY_CLASS macro
@@ -25,7 +25,7 @@
 namespace mpp
 {
 	/*
-	* Parses a request uses a buffer of data obtained by the server.
+	* Parses a request from network data into a Request object.
 	*/
 	class ReqParser
 	{
@@ -39,7 +39,14 @@ namespace mpp
 			* Reset to initial parser state.
 			**/
 			void reset();
-	
+
+			/**
+			* @desc What actually parses the request.
+			* @param req The Request object to set values on.
+			* @param begin An iterator to the beginning of the current input bytes.
+			* @param begin A past-the-end iterator for the current input bytes.
+			* @return A pair of a tribool (true = full request parsed, false = invalid request, indeterminate = incomplete request); and an iterator to the last piece of data parsed.
+			**/	
 			template<typename InputIterator>
 			boost::tuple<boost::tribool, InputIterator> parse(Request& req, InputIterator begin, InputIterator end)
 			{

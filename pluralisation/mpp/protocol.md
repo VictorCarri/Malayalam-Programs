@@ -8,6 +8,7 @@ A request will be of the form:
 	{arg}
 
 {verb} refers to the action which the server should perform and {arg} refers to any arguments which the server requires.
+{version} will be of the form [number].[number].[number], with the major version first, the minor version second, and the patch version third.
 Each line will be separated by \r\n. The protocol/verb & header lines will be separated from the body (Malayalam noun) by 2 \r\n sequences.
 The parser will read $ContentLength BYTES after the final \r\n\r\n sequence for the value.
 The protocol and header lines will be in ASCII. Only the argument will be encoded in UTF-8 (the default), although I may extend the server to process other encodings later.
@@ -24,7 +25,7 @@ Content-Type	|	Type of the input (text/plain;charset=utf-8)
 An attempt to specify it in BNR form:
 
 Request -> protLine headers argument
-protLine -> "MPP/1.0.0" space verb lineTerm
+protLine -> "MPP/" integer "." integer "." integer space verb lineTerm
 space -> ' ' | '\t';
 verb -> "ISSING" | "FOF";
 lineTerm -> "\r\n";
@@ -34,7 +35,7 @@ string -> [char]+
 char -> [a-zA-Z0-9-] # any character except \r or \n
 argument -> [byte]+
 byte -> 0 | 1 | ... | 255
-
+integer -> [0-9]+
 
 Responses
 ==========

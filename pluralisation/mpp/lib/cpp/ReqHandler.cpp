@@ -18,7 +18,6 @@
 #include <boost/logic/tribool_fwd.hpp> // boost::logic::tribool fwd declarations
 #include <boost/logic/tribool.hpp> // boost::logic::tribool
 #include <boost/logic/tribool_io.hpp> // operator<< def'ns for boost::logic::tribool
-#include <boost/filesystem/path.hpp> // boost::filesystem::path
 
 /* MariaDB++ */
 #include <mariadb++/account.hpp> // mariadb::account::create, mariadb::account_ref
@@ -240,7 +239,7 @@ void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 * 	2) Opens a connection to the DB.
 * @param cfPath The path to the DB config file.
 **/
-mpp::ReqHandler::ReqHandler(std::string cfPath) : dbInfo(boost::filesystem::path(cfPath)), // Load DB info from the path or throw an exception
+mpp::ReqHandler::ReqHandler(std::string cfPath) : dbInfo(cfPath), // Load DB info from the path or throw an exception
 	declRegs { // Set up array of regexes used to guess what declension a noun falls into
 		boost::make_u32regex(".*\\x{d7b}$"), // an-stem
 		boost::make_u32regex(".*\\x{d02}$"), // am-stem

@@ -11,6 +11,7 @@ namespace vuu
 	/**
 	* This functor iterates through a valid UTF-8 string and creates a vector of UTF-32 codepoints for comparison.
 	* It then allows the caller to fetch iterators that loop through the list of codepoints.
+	* @usage vuu::CodepointFinder vcf = std::for_each(string.cbegin(), string.cend(), vuu::CodepointFinder);
 	**/
 	class CodepointFinder
 	{

@@ -3,25 +3,40 @@
 
 /** C++ versions of C headers **/
 #include <cctype> // std::tolower
+#include <cstddef> // std::size_t
 
 /** Standard C++ **/
 
 /* Headers that are only needed in debug builds */
 #ifdef DEBUG
 #include <ios> // std::boolalpha, std::ios_base::fmtflags
+#include <iomanip> // std::quoted
 #endif
 
 #include <iostream> // std::clog, std::endl, std::cin
 #include <string> // std::string
-#include <algorithm> // std::transform
-#include <iomanip> // std::quoted
+#include <algorithm> // std::transform, std::all_of
 #include <iterator> // std::back_inserter
+#include <sstream> // std::istringstream
+#include <memory> // std::make_unique
 
 /* Boost */
-#include <boost/asio/placeholders.hpp> // boost::asio::placeholders::error
+#include <boost/asio/connect.hpp> // boost::asio::async_connect
+#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket, boost::asio::ip::tcp::endpoint
+#include <boost/asio/write.hpp> // boost::asio::buffer
+#include <boost/asio/placeholders.hpp> // boost::asio::placeholders::error, boost::asio::placeholders::signal_number, boost::asio::placeholders::endpoint
+
+/* My Unicode utilities library */
+#include "vuu/UTF8Validator.hpp" // vuu::UTF8Validator, to ensure that an std::string is valid UTF-8 text
+#include "vuu/CodepointFinder.hpp" // vuu::CodepointFinder, to find a list of code-points in the UTF-8 string
+#include "vuu/CodepointsInRange.hpp" // vuu::CodepointsInRange, to determine whether all code-points in the list are in the valid range for Malayalam
+
+/* MPP library */
+#include "mpp/Request.hpp" // mpp::Request
 
 /* Our headers */
-#include "BindFunc.hpp" // Defines the BIND_FUNCTION macro, that resolves to either std::bind or boost::bind. Also pulls placeholders (_1, _2, ...) into the global namespace.
+#include "bosmacros/any.hpp" // ANY_CLASS macro
+#include "BindFunc.hpp" // BIND_FUNCTION macro
 #include "Client.hpp" // Class def'n
 
 /**
@@ -39,12 +54,23 @@ void Client::start()
 }
 
 /**
-* Default constructor. Initialises our state.
+* @desc Main constructor. Initialises the client to connect to a server on the given host and port.
+* @param host The host to connect to.
+* @param port The port on the host to connect to.
 **/
-Client::Client() : active(false), // We start in an "inactive" state
+Client::Client(char* host, short port) : active(false), // We start in an "inactive" state
 input (), // Use std::string's default ctor
 ioc (), // Use io_context's default ctor
-signals (ioc, SIGHUP, SIGINT, SIGQUIT) // Construct signal set using io_context, and add 3 signals (the max)
+signals (ioc, SIGHUP, SIGINT, SIGQUIT), // Construct signal set using io_context, and add 3 signals (the max)
+sock (ioc), // Construct the socket we'll use
+resolver(ioc), // Construct the TCP/IP resolver we'll use
+sigMsgs { // Construct the map of signal values to strings
+	{SIGHUP, "SIGHUP"},
+	{SIGINT, "SIGINT"},
+	{SIGQUIT, "SIGQUIT"},
+	{SIGTERM, "SIGTERM"},
+	{SIGTSTP, "SIGTSTP"}
+}
 #ifdef DEBUG
 , initFlags(std::clog.flags()) // Save original clog flags
 #endif
@@ -58,17 +84,53 @@ signals (ioc, SIGHUP, SIGINT, SIGQUIT) // Construct signal set using io_context,
 	/* Set up signal handling */
 	signals.add(SIGTERM); // Couldn't fit in ctor
 	signals.add(SIGTSTP); // Couldn't fit in ctor
-	signals.async_wait( // Start waiting for the user to send us a signal
-		BIND_FUNCTION( // Create a function object that binds our handler, since async wait needs a function that takes 2 arguments, but our method requires 3 (this, + the 2 arguments async_wait passes)
-			&Client::signalHandler, // Member function
-			this, // We need a reference to THIS object, NOT a copy, because the handler needs to modify THIS object's properties.
-			_1, // The error object
-			_2 // The signal # to be passed
-		)
-	);
+	/*signals.async_wait( // Handle signals when caught
+		[this](const boost::system::error_code& bsec, int sigNo)
+		{
+			if (!bsec) // No error
+			{
+				active = false; // Stop the client immediately
+				std::cout << "Client: caught " << sigMsgs[sigNo] << ", exiting..." << std::endl;
+				#ifdef DEBUG
+				#endif
+			}
+
+			else // An error occurred
+			{
+				std::cerr << "Client::signal handler lambda: a sytem error occurred" << std::endl
+				<< "\tValue = " << bsec.value() << std::endl
+				<< "\tMessage = " << bsec.message() << std::endl
+				<< "The operation " << (bsec.failed() ? "failed" : "didn't fail") << std::endl;
+			}
+		}
+	);*/
+	signals.async_wait(BIND_FUNCTION(&Client::signalHandler, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number)); // We will listen for signals using THIS so that we can set properties.
 	#ifdef DEBUG
 	std::clog << "Client::Client: set up asynchronous wait on SIGHUP, SIGINT, SIGQUIT, SIGTERM, and SIGTSTP" << std::endl;
 	#endif
+
+	/* Set up the network connection */
+	std::istringstream portSS; // Used to convert port # to a string
+	portSS << port;
+	#ifdef DEBUG
+	std::clog << "Client::Client: contents of port std::istringstream are " << std::quoted(portSS.str()) << std::endl;
+	#endif
+
+	endpoints = resolver.resolve(host, portSS.str().c_str()); // Fetch a list of endpoints that correspond to the address we were started with
+	/*workerThread = std::make_unique<THREAD>( // Create the thread that keeps our I/O context running in the background
+		[this]()
+		{
+			ioc.run(); // Run the I/O context so that Asio will run
+		}
+	);*/
+	workerThread = std::make_unique<THREAD>(BIND_FUNCTION(&Client::threadFunc, this)); // Have our thread function run the I/O context so that asynchronous operations will execute
+}
+
+/**
+* @desc Default constructor. Initialises our state.
+**/
+Client::Client() : Client("127.0.0.1", 50001) // Connect to the default host and port
+{
 }
 
 /**
@@ -129,7 +191,7 @@ bool Client::shouldQuit() const
 	#endif
 
 	/*
-	* Either:
+	 Either:
 	* ------------
 	* a) There is input and it's a request to quit
 	* b) Our signal handler called quit() after handling a signal.
@@ -137,7 +199,7 @@ bool Client::shouldQuit() const
 	bool toReturn = (!isEmpty && (inputIsQuit || inputIsExit) ) || !active;
 
 	#ifdef DEBUG
-	std::clog << "toReturn = (" << !isEmpty << " && (" << inputIsQuit << " || " << inputIsExit << ") ) || " << !active << ") = " << toReturn << std::endl;
+	std::clog << "Client::shouldQuit: toReturn = (" << !isEmpty << " && (" << inputIsQuit << " || " << inputIsExit << ") ) || " << !active << ") = " << toReturn << std::endl;
 	#endif
 
 	return toReturn;
@@ -192,44 +254,135 @@ void Client::quit()
 }
 
 /**
-* @desc This method performs the appropriate action upon receiving a signal (which is usually quitting).
-* @param ec An error code that was set when the operation failed.
-* @param sig The signal that occurred.
-**/
-void Client::signalHandler(__attribute__((unused)) const boost::system::error_code& ec, int sig)
-{
-	#ifdef DEBUG
-	std::clog << "Client::signalHandler called with signal #" << sig << std::endl;
-	#endif
-
-	switch (sig) // Is it a signal that we can handle?
-	{
-		/* Yes */
-		case SIGHUP:
-		case SIGINT:
-		case SIGQUIT:
-		case SIGTERM:
-		case SIGTSTP:
-		{
-			quit(); // We should quit
-			break;
-		}
-
-		default: // How???
-		{
-			std::cerr << "Client::signalHandler: caught unknown signal #" << sig << std::endl;
-			break;
-		}
-	}
-
-	std::cin.clear(); // Reset input stream
-}
-
-/**
 * @desc Fetches the current input string.
 * @return The current input string.
 **/
 std::string Client::getInput() const
 {
 	return input;
+}
+
+/**
+* @desc Checks whether or not the input string is a valid UTF-8 string.
+* @return True if the input string is a valid UTF-8 string, false otherwise.
+**/
+bool Client::isInputValidUTF8() const
+{
+	return std::all_of(input.cbegin(), input.cend(), vuu::UTF8Validator());
+}
+
+/**
+* @desc Determines whether or not the input string contains only Malayalam codepoints.
+* @return True if the input string contains only Malayalam codepoints, false otherwise.
+**/
+bool Client::isInputValidMalayalam() const
+{
+	vuu::CodepointFinder vcf = std::for_each(input.cbegin(), input.cend(), vuu::CodepointFinder()); // Find a list of code-points in the string
+	return std::all_of(vcf.cbegin(), vcf.cend(), vuu::CodepointsInRange(0x0D00, 0x0D7F)); // Ensure that all code-points are in the valid range for Malayalam
+}
+
+/**
+* @desc Determines whether or not the current noun is singular by sending a request to the server.
+* @return True if the noun is singular, false otherwise.
+**/
+bool Client::isSingular() const
+{
+	reqPtr.reset(); // Reset the pointer so that it contains a fresh Request object
+	reqPtr->SETCOM_FUNC(ISSING);
+	reqPtr->addHeader("Content-Type", ANY_CLASS("text/utf-8")); // We are sending a plain Malayalam noun
+	reqPtr->addHeader("Content-Length", ANY_CLASS(input.length())); // The server needs to know the length of the input IN BYTES, NOT codepoints!
+	reqPtr->setNoun(input); // Set the input to send
+	#ifdef DEBUG
+	std::cout << "Client::isSingular: input to send is " << std::quoted(input) << std::endl;
+	#endif
+	boost::asio::async_connect(sock, // Connect using our socket
+		endpoints, // Try to connect to the server's endpoints
+		BIND_FUNCTION(&Client::handleConnect, this, boost::asio::placeholders::error, boost::asio::placeholders::endpoint) // Create a functor that'll call our callback method once the connection operation finishes
+	);
+}
+
+/**
+* @desc Handles the signals that we registered to listen for. Causes the client to quit.
+* @param bsec An error code, set if an error occurred during the async. op.
+* @param sigNo The # of the signal that was caught.
+**/
+void Client::signalHandler(__attribute__((unused)) const boost::system::error_code& ec, int sigNo)
+{
+	if (!ec) // No error
+	{
+		active = false; // Stop the client immediately
+		#ifdef DEBUG
+		std::cout << "Client::signalHandler caught " << sigMsgs[sigNo] << ", exiting..." << std::endl;
+		#endif
+	}
+	
+	else // An error occurred
+	{
+		std::cerr << "Client::signalHandler: a sytem error occurred" << std::endl
+		<< "\tValue = " << ec.value() << std::endl
+		<< "\tMessage = " << ec.message() << std::endl
+		<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+	}
+}
+
+/**
+* @desc Runs our I/O context from our thread.
+**/
+void Client::threadFunc()
+{
+	ioc.run();
+}
+
+/**
+* @desc Callback for an attempt to connect to the server. Tries to send a request using the current input.
+* @param ec An error code. Set if any error occurred during the connection operation.
+* @param endPoint The endpoint that we connected to, if the connection operation was successful.
+**/
+void Client::handleConnect(const boost::system::error_code& ec, const boost::asio::ip::tcp::endpoint& endPoint)
+{
+	if (!ec) // No error
+	{
+		#ifdef DEBUG
+		std::clog << "Client::handleConnect: connected to server at endpoint " << endpoint.address().to_string() << std::endl;
+		#endif
+		boost::asio::async_write( // Send our request
+			sock, // Write to our socket
+			reqPtr->toBuffers(), // Convert the request to an std::vector of buffers to send
+			BIND_FUNCTION(&Client::handleWrite, this) // Callback
+		);
+	}
+
+	else // An error occurred
+	{
+		std::cerr << "Client::handleConnect: a system error occurred while trying to connect to the server." << std::endl
+		<< "\tValue = " << ec.value() << std::endl
+		<< "\tMessage = " << ec.message() << std::endl
+		<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+	}
+}
+
+/**
+* @desc Callback for sending the request to the server. Tries to read a response from the server.
+* @param ec An error code. Set if an error occurred during the write operation.
+* @param bytesTransferred The # of bytes that were sent to the server.
+**/
+void Client::handleWrite(const boost::system::error_code& ec, std::size_t bytesTransferred)
+{
+	if (!ec) // No error
+	{
+		#ifdef DEBUG
+		std::cout << "Client::handleWrite: wrote " << bytesTransferred << " bytes" << std::endl;
+		#endif
+		boost::asio::async_read( // Read a response
+			sock, // Read from our socket
+		);
+	}
+
+	else // An error occurred
+	{
+		std::cerr << "Client::handleWrite: a system error occurred while trying to send a request to the server" << std::endl
+		<< "\tValue = " << ec.value() << std::endl
+		<< "\tMessage = " << ec.message() << std::endl
+		<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+	}
 }

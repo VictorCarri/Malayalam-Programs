@@ -1,22 +1,34 @@
 # Additional directories to search for headers
 # ./hpp - our headers
 # /home/victor/include - Headers for libraries that I built
-incDirs=$(addprefix -I,./hpp /home/victor/include)
+# $(shell mariadb_config --cflags) - List of include paths for MariaDB
+incDirs=$(addprefix -I,./hpp /home/victor/include ) $(shell mariadb_config --cflags)
 
 # Standard to use. Use GNU dialect of C++17
 std=gnu++17
 
 # Warning options
-warnOpts=$(addprefix -W,all error extra old-style-cast overloaded-virtual extra pedantic null-dereference init-self $(addprefix missing-,include-dirs noreturn declarations) $(addprefix switch-,default enum) $(addprefix un,initialized known-pragmas def) no-prio-ctor-dtor stringop-truncation $(addprefix suggest-,$(addprefix final-,types methods) override) alloca $(addprefix duplicated-,branches cond) float-equal shadow unsafe-loop-optimizations placement-new $(addprefix cast-,qual align) catch-value=3 conditionally-supported conversion zero-as-null-pointer-constant useless-cast date-time extra-semi logical-op $(addprefix no-,aggressive-loop-optimizations builtin-declaration-mismatch) normalized packed redundant-decls invalid-pch no-virtual-move-assign disabled-optimization)
+#warnOpts=$(addprefix -W,all error extra old-style-cast overloaded-virtual extra pedantic null-dereference init-self $(addprefix missing-,include-dirs noreturn declarations) $(addprefix switch-,default enum) $(addprefix un,initialized known-pragmas def) no-prio-ctor-dtor stringop-truncation $(addprefix suggest-,$(addprefix final-,types methods) override) alloca $(addprefix duplicated-,branches cond) float-equal shadow unsafe-loop-optimizations placement-new $(addprefix cast-,qual align) catch-value=3 conditionally-supported conversion zero-as-null-pointer-constant useless-cast date-time extra-semi logical-op $(addprefix no-,aggressive-loop-optimizations builtin-declaration-mismatch) normalized packed redundant-decls invalid-pch no-virtual-move-assign disabled-optimization)
+warnOpts=$(addprefix -W,all error)
 
 # Optimization options
 optimOpts=$(addprefix -f,$(addprefix tree-loop-i,m vcanon) ivopts tree-pta variable-expansion-in-unroller unroll-loops $(addprefix lt,o o-odr-type-merging) tracer unroll-loops move-loop-invariants split-loops unswitch-loops)
 
 # Defines that control whether STD or Boost is used
-boostOrStd=$(addprefix -DUSE_STD_,BIND)
+boostOrStd=$(addprefix -DUSE_STD_,BIND ARRAY ANY FILESYSTEM)
 
 # Compilation options that are common to all builds
-compOpts=$(incDirs) $(addprefix -O,3 s) -std=$(std) -pedantic-errors $(warnOpts) $(optimOpts) $(boostOrStd)
+# $(incDirs): self-explanatory
+# $(addprefix -O,3 s): -O3 and -Os options
+# -std=$(std): Use the standard chosen above
+# -pedantic-errors - Catch as many errors as possible
+# $(warnOpts) - self-explanatory
+# $(optimOpts) - self-explanatory
+# $(boostOrStd) - Defines that control whether Boost or STD implementations are used for various pieces of code that originated in Boost
+# -pthread: Recommended option if using pthread lib (which we are)
+# -D_GLIBCXX_USE_CXX11_ABI=0 - Gets g++-9 to use C++20 ABI for std::string, instead of failing at link time because it tries to use std::__cxx11::basic_string
+#compOpts=$(incDirs) $(addprefix -O,3 s) -std=$(std) -pedantic-errors $(warnOpts) $(optimOpts) $(boostOrStd) -pthread -D_GLIBCXX_USE_CXX11_ABI=0
+compOpts=$(incDirs) $(addprefix -O,3 s) -std=$(std) $(warnOpts) $(optimOpts) $(boostOrStd) -pthread -D_GLIBCXX_USE_CXX11_ABI=0
 
 # Directory where C++ files are stored
 cppDir=./cpp
@@ -49,25 +61,36 @@ prodStatObjs=$(addprefix $(objDir)/production/static/,$(addsuffix .o,$(files)))
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
 
 # List of libraries that are common to all builds
-commonLibs=pthread
+commonLibs=pthread mariadbclientpp
 
 # Libraries for the debug builds
 # vuu-debug - Debug build of my Unicode utilities
-dbgLibs=$(addprefix -l,$(commonLibs) vuu-debug)
+# mpp-debug - Debug build of my Malayalam Pluralisation Protocol library
+# boost_program_options-mt-d-x64 - Boost.Program_Options
+# boost_filesystem-mt-d-x64 - Boost.Filesystem
+dbgLibs=$(addprefix -l,$(commonLibs) $(addsuffix -debug,vuu mpp) $(addprefix boost_,$(addsuffix -mt-d-x64,program_options filesystem locale regex))) $(shell mariadb_config --libs_sys)
 
 # Libraries for the production builds
-# vuu- Production build of my Unicode utilities
-prodLibs=$(addprefix -l,$(commonLibs) vuu)
+# vuu - Production build of my Unicode utilities
+# mpp - Production build of my Malayalam Pluralisation Protocol library
+# boost_program_options-mt-x64 - Boost.Program_Options
+# boost_filesystem-mt-x64 - Boost.Filesystem
+prodLibs=$(addprefix -l,$(commonLibs) vuu mpp $(addprefix boost_,$(addsuffix -mt-x64,program_options filesystem locale regex))) $(shell mariadb_config --libs_sys)
 
 # Additional directories to search for libraries
 # /home/victor/lib/vuu - my Unicode utilities library
-libDirs=$(addprefix -L,/home/victor/lib/vuu)
+# /home/victor/lib/mpp - the Malayalam Pluralisation Protocol library
+# /usr/local/lib/boost - Boost libs
+# /usr/local/lib - MariaDBPP
+# /usr/local/lib/icu - ICU libraries
+libDirs=$(addprefix -L,$(addprefix /home/victor/lib/,vuu mpp icu) $(addprefix /usr/local/lib,/boost /))
 
-all: $(addsuffix -dynamic,$(addprefix $(exeName)-,debug production)) $(addsuffix -static,$(addprefix $(exeName)-,debug production))
+# The executables are ordered with the dynamic builds first since thes static builds always fail, since MySQL relies on libs that are only dynamic
+all: $(exeName)-debug-dynamic $(exeName)-production-dynamic $(exeName)-debug-static $(exeName)-production-static
 
 # Dynamic debug executable
 $(exeName)-debug-dynamic: $(dbgDynObjs)
-	$(compiler) -o $@ $^ $(compOpts) $(dbgOpts) -fwhole-program $(libDirs) $(dbgLibs)
+	$(compiler) -o $@ $^ $(compOpts) $(dbgOpts) -fwhole-program $(libDirs) $(dbgLibs) $(shell mariadb_config --libs)
 	echo
 
 # Dynamic debug object
@@ -76,7 +99,7 @@ $(objDir)/debug/dynamic/%.o: $(cppDir)/%.cpp
 
 # Dynamic production executable
 $(exeName)-production-dynamic: $(prodDynObjs)
-	$(compiler) -o $@ $^ $(compOpts) -fwhole-program $(libDirs) $(prodLibs)
+	$(compiler) -o $@ $^ $(compOpts) -fwhole-program $(libDirs) $(prodLibs) $(shell mariadb_config --libs)
 	echo
 
 # Dynamic production object
@@ -85,7 +108,7 @@ $(objDir)/production/dynamic/%.o: $(cppDir)/%.cpp
 
 # Static production executable
 $(exeName)-production-static: $(prodStatObjs)
-	$(compiler) -o $@ $^ $(compOpts) $(addprefix -stati,c c-libgcc) -fwhole-program $(libDirs) $(prodLibs)
+	$(compiler) -o $@ $^ $(compOpts) $(addprefix -stati,c c-libgcc) -fwhole-program $(libDirs) $(prodLibs) $(shell mariadb_config --libs)
 	echo
 
 # Static production object
@@ -94,7 +117,7 @@ $(objDir)/production/static/%.o: $(cppDir)/%.cpp
 
 # Static debug executable
 $(exeName)-debug-static: $(dbgStatObjs)
-	$(compiler) -o $@ $^ $(compOpts) $(addprefix -stati,c c-libgcc) $(dbgOpts) -fwhole-program $(libDirs) $(dbgLibs)
+	$(compiler) -o $@ $^ $(compOpts) $(addprefix -stati,c c-libgcc) $(dbgOpts) -fwhole-program $(libDirs) $(dbgLibs) $(shell mariadb_config --libs)
 	echo
 
 # Static debug object

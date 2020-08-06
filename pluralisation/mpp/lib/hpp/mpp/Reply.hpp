@@ -6,9 +6,10 @@
 #include <vector> // std::vector
 #include <forward_list> // std::forward_list
 #include <array> // std::array
+#include <map> // std::map
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::const_buffer
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS

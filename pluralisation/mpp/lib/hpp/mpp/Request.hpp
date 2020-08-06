@@ -4,10 +4,16 @@
 /* STL */
 #include <forward_list> // std::forward_list
 #include <string> // std::string
+#include <vector> // std::vector
+#include <map> // std::map
+#include <array> // std::array
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
 #include "mpp/Header.hpp" // Header class
+
+/* Boost */
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 
 /* Because I keep switching */
 #define GETCOM_FUNC getCommand
@@ -24,6 +30,8 @@ namespace mpp
 				ISSING, // Determine whether or not the current form is singular
 				INVALID // A Request object is initialised to use this 
 			};
+
+			typedef ANY_CLASS any_type ; // To make things easier for library clients
 	
 			/**
 			* @desc Default constructor. Initialises the command to an invalid one.
@@ -65,11 +73,20 @@ namespace mpp
 			* @return This request's noun.
 			**/
 			std::string getNoun() const;
+
+			/**
+			* @desc Converts the Request object to a sequence of constant buffers, suitable for network transport.
+			* @return A vector of constant buffers, containing text that represents this Request object.
+			**/
+			std::vector<boost::asio::const_buffer> toBuffers() const;
 	
 		private:
 			Command c; // The command which this request asks the server to perform
 			std::forward_list<mpp::Header> headers; // A list of request headers
 			std::string noun; // The noun given with this request
+			std::map<Command, std::string> verbNames; // Maps a verb enum to a string describing it for network transport
+			const std::array<char, 2> crlf; // Used to represent the sequence "\r\n"
+			const std::array<char, 2> nameValSep; // Contains the ':' and space that separate a header name from its value
 	};
 };
 

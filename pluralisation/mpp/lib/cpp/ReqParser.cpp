@@ -105,12 +105,12 @@ void mpp::ReqParser::reset()
 
 	for (auto& ptr : verSS)
 	{
-		ptr.reset(new std::stringstream);
+		ptr.reset();
 	}
 
-	pSSHeaderName.reset(new std::stringstream); // Reset the header stringstream
-	pSSHeaderVal.reset(new std::stringstream); // Reset the header stringstream
-	pNounSS.reset(new std::stringstream);
+	pSSHeaderName.reset(); // Reset the header stringstream
+	pSSHeaderVal.reset(); // Reset the header stringstream
+	pNounSS.reset(); // Reset the noun's stringstream
 }
 
 /**
@@ -854,8 +854,8 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 				}
 
 				/* Reset stringstream pointers for the next header */
-				pSSHeaderName.reset(new std::stringstream);
-				pSSHeaderVal.reset(new std::stringstream);
+				pSSHeaderName.reset();
+				pSSHeaderVal.reset();
 
 			}
 

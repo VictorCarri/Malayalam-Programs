@@ -9,7 +9,8 @@
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
-#include <boost/asio.hpp> // boost::asio::signal_set, boost:asio::ip::tcp::acceptor
+#include <boost/asio/signal_set.hpp> // boost::asio::signal_set
+#include <boost/asio/ip/tcp.hpp> // boost:asio::ip::tcp::acceptor
 #include <boost/system/error_code.hpp> // boost::system::error_code
 
 /* MPP headers */

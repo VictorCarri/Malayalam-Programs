@@ -8,8 +8,11 @@
 #include <string> // std::string
 
 /* Boost */
-#include <boost/program_options.hpp> // boost::program_options::options_description, boost::program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::parse_command_line
-#include <boost/filesystem.hpp> // boost::filesystem::path
+#include <boost/program_options/options_description.hpp> // boost::program_options::options_description
+#include <boost/program_options/value_semantic.hpp> // boost::program_options::value
+#include <boost/program_options/variables_map.hpp> // boost::program_options::variables_map, boost::program_options::store
+#include <boost/program_options/parsers.hpp> // boost::program_options::parse_command_line
+#include <boost/filesystem/path.hpp> // boost::filesystem::path
 
 /* Our headers */
 #include "Server.hpp" // Main server class
