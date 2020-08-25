@@ -10,7 +10,7 @@
 #endif
 
 /* Our headers */
-#include "BindFunc.hpp" // Defines the macro BIND_FUNCTION, that resolves to either boost::bind or std::bind
+#include "bosmacros/bind.hpp" // Defines the macro BIND_FUNCTION, that resolves to either boost::bind or std::bind
 #include "Connection.hpp" // Connection class
 #include "Server.hpp" // Class definition
 
@@ -39,6 +39,11 @@ Server::Server(const std::string& address, int port, std::size_t numThreads, std
 	signals.add(SIGQUIT);
 	#endif
 	signals.async_wait(BIND_FUNCTION(&Server::handleStop, this));
+	/*signals.async_wait([this]() // Need to use this object
+		{
+			handleStop(); // Call our handler
+		}
+	);*/
 
 	#ifdef DEBUG
 	std::cout << pName << ":Server::Server: registered signals" << std::endl;
@@ -49,7 +54,7 @@ Server::Server(const std::string& address, int port, std::size_t numThreads, std
 	portNumSS << port; // Insert the port #
 
 	#ifdef DEBUG
-	std::cout << pName << ":Server::Server: port # stringstream's contents are " << std::quoted(pName) << std::endl;
+	std::cout << pName << ":Server::Server: port # stringstream's contents are " << std::quoted(portNumSS.str()) << std::endl;
 	#endif
 
 	/* Open the acceptor with the option to reuse the address */
@@ -72,6 +77,9 @@ Server::Server(const std::string& address, int port, std::size_t numThreads, std
 	acceptor.bind(endPoint);
 	acceptor.listen();
 
+	#ifdef DEBUG
+	std::cout << pName << ":Server::Server: calling startAccept." << std::endl;
+	#endif
 	startAccept();
 }
 
@@ -118,6 +126,10 @@ void Server::startAccept()
 			this,
 			boost::asio::placeholders::error
 		)
+		/*[this](const boost::system::error_code& e)
+		{
+			handleAccept(e);
+		}*/
 	);
 	#ifdef DEBUG
 	std::cout << pName << ":Server::startAccept: called acceptor.async_accept" << std::endl;

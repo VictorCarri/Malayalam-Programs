@@ -24,7 +24,7 @@
 #include "vuu/CodepointFinder.hpp" // vuu::CodepointFinder, to find the list of codepoints in the UTF-8 string
 
 /* Our headers */
-#include "mpp/bosmacros/any.hpp" // ANY_CLASS macro
+#include "bosmacros/any.hpp" // ANY_CLASS macro
 #include "mpp/Reply.hpp" // Reply::FailureCode, to indicate why the parser failed
 #include "mpp/Request.hpp" // Request class
 #include "mpp/ver.hpp" // Protocol version info
@@ -480,24 +480,6 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 					<< "mpp::ReqParser::consume: verb_start: found '" << verb[0] << "' at beginning of matched verb, going to state ";
 					#endif
 					
-					/*if (verb[0] == 'F') // Find the opposite form
-					{
-						#ifdef DEBUG
-						std::cout << "' at start of matched verb, going to state " << stateNames[fof_o] << std::endl;
-						#endif
-
-						curStat = fof_o; // We expect to parse the 'O' of the "FOF" command
-					}
-
-					else if (verb[0] == 'I') // Determine whether or not a form is singular
-					{
-						#ifdef DEBUG
-						std::cout << "' at start of matched verb, going to state " << stateNames[issing_first_s] << std::endl;
-						#endif
-
-						curStat = issing_first_s; // We expect to parse the first 's' of an "ISSING" command
-					}*/
-
 					curStat = verbInfo[verb]; // Go to whichever state is associated with parsing the verb's second character
 
 					#ifdef DEBUG
@@ -1038,36 +1020,6 @@ mpp::Reply::Status mpp::ReqParser::getStatus() const
 **/
 bool mpp::ReqParser::isValidDecimalInt(std::string toCheck)
 {
-	/*int base = 10; // MPP requires all numbers to use base 10
-	char* end; // Pointer to the place where strtoull stopped parsing the string
-	const char* numCStr = toCheck.c_str(); // Fetch a C string to pass to strotull
-	unsigned long long val = std::strtoull(numCStr, &end, base);
-
-	if (val == ULLONG_MAX) // Range error
-	{
-		return false;
-	}
-
-	else if (val == 0) // Either the value is actually 0 or no conversion could be performed
-	{
-		if (*end == 0) // The end pointer actually points to the NULL terminator, meaning that strotull parsed the entire string successfully.
-		{
-			// Thus, the value is actually 0, and the string represents a valid integer
-			return true;
-		}
-
-		else // The end pointer doesn't point to the NULL terminator, so strtoull couldn't parse the entire string
-		{
-			// Thus, the string isn't a valid integer
-			return false;
-		}
-	}
-
-	else // The conversion was successful
-	{
-		return true; // The string represents a valid decimal integer
-	}*/
-	
 	std::size_t fuci; // The index of the first character after the point in the string where conversion stopped
 
 	try

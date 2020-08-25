@@ -65785,9 +65785,9 @@ namespace std
 #define BOOST_HAS_RVALUE_REFS 
 #define BOOST_HAS_STATIC_ASSERT 
 #define BOOST_HAS_VARIADIC_TMPL 
-# 315 "/usr/local/include/boost/config/compiler/gcc.hpp" 3
+# 323 "/usr/local/include/boost/config/compiler/gcc.hpp" 3
 #define BOOST_FALLTHROUGH __attribute__((fallthrough))
-# 328 "/usr/local/include/boost/config/compiler/gcc.hpp" 3
+# 336 "/usr/local/include/boost/config/compiler/gcc.hpp" 3
 #define BOOST_ATTRIBUTE_UNUSED __attribute__((__unused__))
 
 
@@ -67846,9 +67846,11 @@ namespace boost {
 #define BOOST_NOINLINE __attribute__ ((__noinline__))
 # 638 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_NORETURN __attribute__ ((__noreturn__))
-# 674 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+# 671 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+#define BOOST_OVERRIDE override
+# 680 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_ALIGNMENT(x) alignas(x)
-# 715 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+# 721 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_DEFAULTED_FUNCTION(fun,body) fun = default;
 
 
@@ -67856,14 +67858,14 @@ namespace boost {
 
 
 #define BOOST_DELETED_FUNCTION(fun) fun = delete;
-# 950 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+# 956 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_FINAL final
-# 965 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+# 971 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_NOEXCEPT noexcept
 #define BOOST_NOEXCEPT_OR_NOTHROW noexcept
 #define BOOST_NOEXCEPT_IF(Predicate) noexcept((Predicate))
 #define BOOST_NOEXCEPT_EXPR(Expression) noexcept((Expression))
-# 988 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+# 994 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_CONSTEXPR constexpr
 #define BOOST_CONSTEXPR_OR_CONST constexpr
 
@@ -67891,12 +67893,12 @@ namespace boost {
 
 
 #define BOOST_INLINE_CONSTEXPR BOOST_INLINE_VARIABLE BOOST_CONSTEXPR_OR_CONST
-# 1035 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+# 1041 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_ATTRIBUTE_NODISCARD [[nodiscard]]
 
 
 #define BOOST_ATTRIBUTE_NO_UNIQUE_ADDRESS [[no_unique_address]]
-# 1048 "/usr/local/include/boost/config/detail/suffix.hpp" 3
+# 1054 "/usr/local/include/boost/config/detail/suffix.hpp" 3
 #define BOOST_STATIC_CONSTEXPR static BOOST_CONSTEXPR_OR_CONST
 # 62 "/usr/local/include/boost/config.hpp" 2 3
 
@@ -67907,7 +67909,7 @@ namespace boost {
 # 10 "/usr/local/include/boost/version.hpp" 3
 #define BOOST_VERSION_HPP 
 # 22 "/usr/local/include/boost/version.hpp" 3
-#define BOOST_VERSION 107300
+#define BOOST_VERSION 107400
 
 
 
@@ -67915,7 +67917,7 @@ namespace boost {
 
 
 
-#define BOOST_LIB_VERSION "1_73"
+#define BOOST_LIB_VERSION "1_74"
 # 28 "/usr/local/include/boost/asio/detail/config.hpp" 2 3
 #define BOOST_ASIO_HAS_BOOST_CONFIG 1
 # 37 "/usr/local/include/boost/asio/detail/config.hpp" 3
@@ -67926,50 +67928,83 @@ namespace boost {
 
 
 #define BOOST_ASIO_DECL inline
-# 102 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 65 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_UNSPECIFIED(e) e
+# 105 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_MOVE 1
-# 128 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 131 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_MOVE_ARG(type) type&&
 #define BOOST_ASIO_MOVE_ARG2(type1,type2) type1, type2&&
 #define BOOST_ASIO_NONDEDUCED_MOVE_ARG(type) type&
 #define BOOST_ASIO_MOVE_CAST(type) static_cast<type&&>
 #define BOOST_ASIO_MOVE_CAST2(type1,type2) static_cast<type1, type2&&>
-# 172 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_MOVE_OR_LVALUE(type) static_cast<type&&>
+#define BOOST_ASIO_MOVE_OR_LVALUE_TYPE(type) type
+# 179 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_VARIADIC_TEMPLATES 1
-# 189 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 192 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_ELLIPSIS ...
+# 203 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_DELETED = delete
-# 219 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 233 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_CONSTEXPR 1
-# 232 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 246 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_CONSTEXPR constexpr
-# 242 "/usr/local/include/boost/asio/detail/config.hpp" 3
+
+
+
+
+
+
+#define BOOST_ASIO_STATIC_CONSTEXPR(type,assignment) static constexpr type assignment
+# 264 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type,name) static constexpr const type name{}
+# 288 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_NOEXCEPT 1
+
 #define BOOST_ASIO_NOEXCEPT BOOST_NOEXCEPT
 #define BOOST_ASIO_NOEXCEPT_OR_NOTHROW BOOST_NOEXCEPT_OR_NOTHROW
-# 282 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_NOEXCEPT_IF(c) BOOST_NOEXCEPT_IF(c)
+# 347 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_DECLTYPE 1
-# 305 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 370 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_ALIAS_TEMPLATES 1
-# 325 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 390 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_RETURN_TYPE_DEDUCTION 1
-# 338 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 403 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS 1
-# 371 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 435 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_VARIABLE_TEMPLATES 1
+# 460 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_SFINAE_VARIABLE_TEMPLATES 1
+# 483 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_CONSTANT_EXPRESSION_SFINAE 1
+# 500 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_WORKING_EXPRESSION_SFINAE 1
+# 517 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_REF_QUALIFIED_FUNCTIONS 1
+# 530 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_LVALUE_REF_QUAL &
+
+
+#define BOOST_ASIO_RVALUE_REF_QUAL &&
+# 558 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_SYSTEM_ERROR 1
-# 385 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 572 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT BOOST_NOEXCEPT
-# 421 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 608 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_ARRAY 1
-# 446 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 633 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_SHARED_PTR 1
-# 471 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 658 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_ALLOCATOR_ARG 1
-# 504 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 691 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_ATOMIC 1
-# 533 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 720 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_CHRONO 1
-# 552 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 739 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_BOOST_CHRONO 1
-# 561 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 748 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_CHRONO 1
 
 
@@ -67979,40 +68014,46 @@ namespace boost {
 
 
 #define BOOST_ASIO_HAS_BOOST_DATE_TIME 1
-# 586 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 773 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_ADDRESSOF 1
-# 611 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 798 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_FUNCTION 1
-# 638 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 825 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_TYPE_TRAITS 1
-# 660 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 847 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_NULLPTR 1
-# 684 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 871 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_CXX11_ALLOCATORS 1
-# 709 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 896 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_CSTDINT 1
-# 736 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 923 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_THREAD 1
-# 763 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 950 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_MUTEX_AND_CONDVAR 1
-# 790 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 977 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_CALL_ONCE 1
-# 817 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1004 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_FUTURE 1
-# 849 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1036 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_STRING_VIEW 1
-# 883 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1070 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
-# 894 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1081 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STRING_VIEW 1
-# 907 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1094 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_STD_IOSTREAM_MOVE 1
-# 1067 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1129 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_STD_EXCEPTION_PTR 1
+# 1153 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_STD_NESTED_EXCEPTION 1
+# 1177 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_HAS_STD_ANY 1
+# 1357 "/usr/local/include/boost/asio/detail/config.hpp" 3
 # 1 "/usr/include/linux/version.h" 1 3 4
 # 35 "/usr/include/linux/version.h" 3 4
 #define LINUX_VERSION_CODE 265984
 #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-# 1068 "/usr/local/include/boost/asio/detail/config.hpp" 2 3
+# 1358 "/usr/local/include/boost/asio/detail/config.hpp" 2 3
 
 
 
@@ -68031,30 +68072,30 @@ namespace boost {
 
 
 #define BOOST_ASIO_HAS_TIMERFD 1
-# 1123 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1413 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_SERIAL_PORT 1
-# 1176 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1466 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_POSIX_STREAM_DESCRIPTOR 1
-# 1189 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1479 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_LOCAL_SOCKETS 1
-# 1202 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1492 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_SIGACTION 1
-# 1213 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1503 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_SIGNAL 1
-# 1236 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1526 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_GETADDRINFO 1
-# 1266 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1556 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_THREADS 1
-# 1290 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1580 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_PTHREADS 1
-# 1300 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1590 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_PREVENT_MACRO_SUBSTITUTION 
 
 
 
 
 #define BOOST_ASIO_STATIC_CONSTANT(type,assignment) BOOST_STATIC_CONSTANT(type, assignment)
-# 1316 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1606 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_BOOST_ARRAY 1
 
 
@@ -68098,20 +68139,22 @@ namespace boost {
 
 
 #define BOOST_ASIO_HAS_BOOST_WORKAROUND 1
-# 1380 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1670 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_HANDLER_HOOKS 1
-# 1395 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1685 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_THREAD_KEYWORD_EXTENSION 1
 #define BOOST_ASIO_THREAD_KEYWORD __thread
-# 1419 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1709 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_HAS_SSIZE_T 1
-# 1429 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1719 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_SYNC_OP_VOID boost::system::error_code
 #define BOOST_ASIO_SYNC_OP_VOID_RETURN(e) return e
-# 1446 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1736 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_UNUSED_TYPEDEF __attribute__((__unused__))
-# 1456 "/usr/local/include/boost/asio/detail/config.hpp" 3
+# 1746 "/usr/local/include/boost/asio/detail/config.hpp" 3
 #define BOOST_ASIO_UNUSED_VARIABLE __attribute__((__unused__))
+# 1797 "/usr/local/include/boost/asio/detail/config.hpp" 3
+#define BOOST_ASIO_NODISCARD [[nodiscard]]
 # 19 "/usr/local/include/boost/asio/buffer.hpp" 2 3
 
 # 1 "/usr/include/c++/9/cstring" 1 3
@@ -72857,14 +72900,16 @@ uninitialized_value_construct_n(_ExecutionPolicy&& __exec, _ForwardIterator __fi
 
 #define __cpp_lib_parallel_algorithm 201603L
 # 20 "/usr/local/include/boost/asio/detail/memory.hpp" 2 3
-# 30 "/usr/local/include/boost/asio/detail/memory.hpp" 3
+# 31 "/usr/local/include/boost/asio/detail/memory.hpp" 3
 namespace boost {
 namespace asio {
 namespace detail {
 
 
+using std::make_shared;
 using std::shared_ptr;
 using std::weak_ptr;
+
 
 
 
@@ -72887,7 +72932,7 @@ using std::allocator_arg_t;
 
 
 #define BOOST_ASIO_REBIND_ALLOC(alloc,t) typename std::allocator_traits<alloc>::template rebind_alloc<t>
-# 69 "/usr/local/include/boost/asio/detail/memory.hpp" 3
+# 72 "/usr/local/include/boost/asio/detail/memory.hpp" 3
 }
 }
 # 27 "/usr/local/include/boost/asio/buffer.hpp" 2 3
@@ -73107,6 +73152,21 @@ template<class E, class T> std::basic_ostream<E, T> & operator<<( std::basic_ost
 
 
 
+#define BOOST_BORLANDC_WORKAROUND_GUARD 1
+
+
+
+
+#define BOOST_CODEGEARC_WORKAROUND_GUARD 1
+
+
+
+
+#define BOOST_EMBTC_WORKAROUND_GUARD 1
+
+
+
+
 #define _MSC_VER_WORKAROUND_GUARD 1
 
 
@@ -73299,7 +73359,7 @@ template<class E, class T> std::basic_ostream<E, T> & operator<<( std::basic_ost
 #define BOOST_MPL_CFG_GCC_WORKAROUND_GUARD 0
 
 #define BOOST_WORKAROUND(symbol,test) ((symbol ## _WORKAROUND_GUARD + 0 == 0) && (symbol != 0) && (1 % (( (symbol test) ) + 1)))
-# 270 "/usr/local/include/boost/config/workaround.hpp" 3
+# 285 "/usr/local/include/boost/config/workaround.hpp" 3
 #define BOOST_TESTED_AT(value) != ((value)-(value))
 # 26 "/usr/local/include/boost/throw_exception.hpp" 2 3
 
@@ -73850,7 +73910,7 @@ public:
         set_info( *this, throw_function( loc.function_name() ) );
     }
 
-    virtual boost::exception_detail::clone_base const * clone() const
+    virtual boost::exception_detail::clone_base const * clone() const override
     {
         wrapexcept * p = new wrapexcept( *this );
         deleter del = { p };
@@ -73861,7 +73921,7 @@ public:
         return p;
     }
 
-    virtual void rethrow() const
+    virtual void rethrow() const override
     {
         throw *this;
     }
@@ -73905,12 +73965,15 @@ using boost::throw_exception;
 # 1 "/usr/local/include/boost/asio/detail/type_traits.hpp" 1 3
 # 12 "/usr/local/include/boost/asio/detail/type_traits.hpp" 3
 #define BOOST_ASIO_DETAIL_TYPE_TRAITS_HPP 
-# 40 "/usr/local/include/boost/asio/detail/type_traits.hpp" 3
+# 50 "/usr/local/include/boost/asio/detail/type_traits.hpp" 3
 namespace boost {
 namespace asio {
 
 
 using std::add_const;
+using std::add_lvalue_reference;
+using std::aligned_storage;
+using std::alignment_of;
 using std::conditional;
 using std::decay;
 using std::declval;
@@ -73920,9 +73983,21 @@ using std::integral_constant;
 using std::is_base_of;
 using std::is_class;
 using std::is_const;
+using std::is_constructible;
 using std::is_convertible;
+using std::is_copy_constructible;
+using std::is_destructible;
 using std::is_function;
+using std::is_move_constructible;
+using std::is_nothrow_copy_constructible;
+using std::is_nothrow_destructible;
+using std::is_object;
+using std::is_reference;
 using std::is_same;
+using std::is_scalar;
+using std::remove_cv;
+template <typename T>
+struct remove_cvref : remove_cv<typename std::remove_reference<T>::type> {};
 using std::remove_pointer;
 using std::remove_reference;
 
@@ -73933,7 +74008,18 @@ using std::remove_reference;
 using std::result_of;
 
 using std::true_type;
-# 88 "/usr/local/include/boost/asio/detail/type_traits.hpp" 3
+# 136 "/usr/local/include/boost/asio/detail/type_traits.hpp" 3
+template <typename> struct void_type { typedef void type; };
+
+
+
+template <typename...> struct conjunction : true_type {};
+template <typename T> struct conjunction<T> : T {};
+template <typename Head, typename... Tail> struct conjunction<Head, Tail...> :
+  conditional<Head::value, conjunction<Tail...>, Head>::type {};
+
+
+
 }
 }
 # 30 "/usr/local/include/boost/asio/buffer.hpp" 2 3
@@ -73946,7 +74032,7 @@ using std::true_type;
 
 #define WORKAROUND_DWA2002126_HPP 
 # 53 "/usr/local/include/boost/asio/buffer.hpp" 2 3
-# 64 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 66 "/usr/local/include/boost/asio/buffer.hpp" 3
 # 1 "/usr/local/include/boost/asio/detail/push_options.hpp" 1 3
 # 79 "/usr/local/include/boost/asio/detail/push_options.hpp" 3
 #pragma GCC visibility push (default)
@@ -73957,14 +74043,14 @@ using std::true_type;
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-# 65 "/usr/local/include/boost/asio/buffer.hpp" 2 3
+# 67 "/usr/local/include/boost/asio/buffer.hpp" 2 3
 
 namespace boost {
 namespace asio {
 
 class mutable_buffer;
 class const_buffer;
-# 91 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 93 "/usr/local/include/boost/asio/buffer.hpp" 3
 class mutable_buffer
 {
 public:
@@ -73981,7 +74067,7 @@ public:
       size_(size)
   {
   }
-# 124 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 126 "/usr/local/include/boost/asio/buffer.hpp" 3
   void* data() const noexcept
   {
 
@@ -74034,7 +74120,7 @@ public:
     : mutable_buffer(data, size)
   {
   }
-# 186 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 188 "/usr/local/include/boost/asio/buffer.hpp" 3
   explicit mutable_buffers_1(const mutable_buffer& b) noexcept
     : mutable_buffer(b)
   {
@@ -74052,7 +74138,7 @@ public:
     return begin() + 1;
   }
 };
-# 225 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 227 "/usr/local/include/boost/asio/buffer.hpp" 3
 class const_buffer
 {
 public:
@@ -74079,7 +74165,7 @@ public:
 
   {
   }
-# 268 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 270 "/usr/local/include/boost/asio/buffer.hpp" 3
   const void* data() const noexcept
   {
 
@@ -74132,7 +74218,7 @@ public:
     : const_buffer(data, size)
   {
   }
-# 330 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 332 "/usr/local/include/boost/asio/buffer.hpp" 3
   explicit const_buffers_1(const const_buffer& b) noexcept
     : const_buffer(b)
   {
@@ -74180,7 +74266,7 @@ public:
 private:
   mutable_buffer buf_;
 };
-# 386 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 388 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename MutableBuffer>
 inline const mutable_buffer* buffer_sequence_begin(const MutableBuffer& b,
     typename enable_if<
@@ -74223,7 +74309,7 @@ inline auto buffer_sequence_begin(const C& c,
 {
   return c.begin();
 }
-# 463 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 465 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename MutableBuffer>
 inline const mutable_buffer* buffer_sequence_end(const MutableBuffer& b,
     typename enable_if<
@@ -74266,7 +74352,7 @@ inline auto buffer_sequence_end(const C& c,
 {
   return c.end();
 }
-# 532 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 534 "/usr/local/include/boost/asio/buffer.hpp" 3
 namespace detail {
 
 
@@ -74309,7 +74395,7 @@ inline std::size_t buffer_size(multiple_buffers,
 }
 
 }
-# 593 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 595 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename BufferSequence>
 inline std::size_t buffer_size(const BufferSequence& b) noexcept
 {
@@ -74318,7 +74404,7 @@ inline std::size_t buffer_size(const BufferSequence& b) noexcept
       boost::asio::buffer_sequence_begin(b),
       boost::asio::buffer_sequence_end(b));
 }
-# 628 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 630 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PointerToPodType>
 inline PointerToPodType buffer_cast(const mutable_buffer& b) noexcept
 {
@@ -74331,7 +74417,7 @@ inline PointerToPodType buffer_cast(const const_buffer& b) noexcept
 {
   return static_cast<PointerToPodType>(b.data());
 }
-# 649 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 651 "/usr/local/include/boost/asio/buffer.hpp" 3
 inline mutable_buffer operator+(const mutable_buffer& b,
     std::size_t n) noexcept
 {
@@ -74381,7 +74467,7 @@ inline const_buffer operator+(std::size_t n,
 {
   return b + n;
 }
-# 900 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 902 "/usr/local/include/boost/asio/buffer.hpp" 3
 #define BOOST_ASIO_MUTABLE_BUFFER mutable_buffers_1
 #define BOOST_ASIO_CONST_BUFFER const_buffers_1
 
@@ -74395,7 +74481,7 @@ inline mutable_buffers_1 buffer(
 {
   return mutable_buffers_1(b);
 }
-# 921 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 923 "/usr/local/include/boost/asio/buffer.hpp" 3
 inline mutable_buffers_1 buffer(const mutable_buffer& b,
     std::size_t max_size_in_bytes) noexcept
 {
@@ -74418,7 +74504,7 @@ inline const_buffers_1 buffer(
 {
   return const_buffers_1(b);
 }
-# 951 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 953 "/usr/local/include/boost/asio/buffer.hpp" 3
 inline const_buffers_1 buffer(const const_buffer& b,
     std::size_t max_size_in_bytes) noexcept
 {
@@ -74450,13 +74536,13 @@ inline const_buffers_1 buffer(const void* data,
 {
   return const_buffers_1(data, size_in_bytes);
 }
-# 990 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 992 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline mutable_buffers_1 buffer(PodType (&data)[N]) noexcept
 {
   return mutable_buffers_1(data, N * sizeof(PodType));
 }
-# 1003 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1005 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline mutable_buffers_1 buffer(PodType (&data)[N],
     std::size_t max_size_in_bytes) noexcept
@@ -74465,14 +74551,14 @@ inline mutable_buffers_1 buffer(PodType (&data)[N],
       N * sizeof(PodType) < max_size_in_bytes
       ? N * sizeof(PodType) : max_size_in_bytes);
 }
-# 1019 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1021 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(
     const PodType (&data)[N]) noexcept
 {
   return const_buffers_1(data, N * sizeof(PodType));
 }
-# 1033 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1035 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(const PodType (&data)[N],
     std::size_t max_size_in_bytes) noexcept
@@ -74481,7 +74567,7 @@ inline const_buffers_1 buffer(const PodType (&data)[N],
       N * sizeof(PodType) < max_size_in_bytes
       ? N * sizeof(PodType) : max_size_in_bytes);
 }
-# 1119 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1121 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline mutable_buffers_1 buffer(
     boost::array<PodType, N>& data) noexcept
@@ -74489,7 +74575,7 @@ inline mutable_buffers_1 buffer(
   return mutable_buffers_1(
       data.c_array(), data.size() * sizeof(PodType));
 }
-# 1134 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1136 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline mutable_buffers_1 buffer(boost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) noexcept
@@ -74498,14 +74584,14 @@ inline mutable_buffers_1 buffer(boost::array<PodType, N>& data,
       data.size() * sizeof(PodType) < max_size_in_bytes
       ? data.size() * sizeof(PodType) : max_size_in_bytes);
 }
-# 1150 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1152 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(
     boost::array<const PodType, N>& data) noexcept
 {
   return const_buffers_1(data.data(), data.size() * sizeof(PodType));
 }
-# 1164 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1166 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(boost::array<const PodType, N>& data,
     std::size_t max_size_in_bytes) noexcept
@@ -74514,14 +74600,14 @@ inline const_buffers_1 buffer(boost::array<const PodType, N>& data,
       data.size() * sizeof(PodType) < max_size_in_bytes
       ? data.size() * sizeof(PodType) : max_size_in_bytes);
 }
-# 1182 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1184 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(
     const boost::array<PodType, N>& data) noexcept
 {
   return const_buffers_1(data.data(), data.size() * sizeof(PodType));
 }
-# 1196 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1198 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(const boost::array<PodType, N>& data,
     std::size_t max_size_in_bytes) noexcept
@@ -74530,14 +74616,14 @@ inline const_buffers_1 buffer(const boost::array<PodType, N>& data,
       data.size() * sizeof(PodType) < max_size_in_bytes
       ? data.size() * sizeof(PodType) : max_size_in_bytes);
 }
-# 1214 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1216 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline mutable_buffers_1 buffer(
     std::array<PodType, N>& data) noexcept
 {
   return mutable_buffers_1(data.data(), data.size() * sizeof(PodType));
 }
-# 1228 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1230 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline mutable_buffers_1 buffer(std::array<PodType, N>& data,
     std::size_t max_size_in_bytes) noexcept
@@ -74546,14 +74632,14 @@ inline mutable_buffers_1 buffer(std::array<PodType, N>& data,
       data.size() * sizeof(PodType) < max_size_in_bytes
       ? data.size() * sizeof(PodType) : max_size_in_bytes);
 }
-# 1244 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1246 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(
     std::array<const PodType, N>& data) noexcept
 {
   return const_buffers_1(data.data(), data.size() * sizeof(PodType));
 }
-# 1258 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1260 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(std::array<const PodType, N>& data,
     std::size_t max_size_in_bytes) noexcept
@@ -74562,14 +74648,14 @@ inline const_buffers_1 buffer(std::array<const PodType, N>& data,
       data.size() * sizeof(PodType) < max_size_in_bytes
       ? data.size() * sizeof(PodType) : max_size_in_bytes);
 }
-# 1274 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1276 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(
     const std::array<PodType, N>& data) noexcept
 {
   return const_buffers_1(data.data(), data.size() * sizeof(PodType));
 }
-# 1288 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1290 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, std::size_t N>
 inline const_buffers_1 buffer(const std::array<PodType, N>& data,
     std::size_t max_size_in_bytes) noexcept
@@ -74578,7 +74664,7 @@ inline const_buffers_1 buffer(const std::array<PodType, N>& data,
       data.size() * sizeof(PodType) < max_size_in_bytes
       ? data.size() * sizeof(PodType) : max_size_in_bytes);
 }
-# 1309 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1311 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, typename Allocator>
 inline mutable_buffers_1 buffer(
     std::vector<PodType, Allocator>& data) noexcept
@@ -74592,7 +74678,7 @@ inline mutable_buffers_1 buffer(
 
       );
 }
-# 1333 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1335 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, typename Allocator>
 inline mutable_buffers_1 buffer(std::vector<PodType, Allocator>& data,
     std::size_t max_size_in_bytes) noexcept
@@ -74607,7 +74693,7 @@ inline mutable_buffers_1 buffer(std::vector<PodType, Allocator>& data,
 
       );
 }
-# 1358 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1360 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, typename Allocator>
 inline const_buffers_1 buffer(
     const std::vector<PodType, Allocator>& data) noexcept
@@ -74621,7 +74707,7 @@ inline const_buffers_1 buffer(
 
       );
 }
-# 1382 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1384 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename PodType, typename Allocator>
 inline const_buffers_1 buffer(
     const std::vector<PodType, Allocator>& data,
@@ -74637,7 +74723,7 @@ inline const_buffers_1 buffer(
 
       );
 }
-# 1406 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1408 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits, typename Allocator>
 inline mutable_buffers_1 buffer(
     std::basic_string<Elem, Traits, Allocator>& data) noexcept
@@ -74651,7 +74737,7 @@ inline mutable_buffers_1 buffer(
 
       );
 }
-# 1430 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1432 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits, typename Allocator>
 inline mutable_buffers_1 buffer(
     std::basic_string<Elem, Traits, Allocator>& data,
@@ -74667,7 +74753,7 @@ inline mutable_buffers_1 buffer(
 
       );
 }
-# 1453 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1455 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits, typename Allocator>
 inline const_buffers_1 buffer(
     const std::basic_string<Elem, Traits, Allocator>& data) noexcept
@@ -74680,7 +74766,7 @@ inline const_buffers_1 buffer(
 
       );
 }
-# 1476 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1478 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits, typename Allocator>
 inline const_buffers_1 buffer(
     const std::basic_string<Elem, Traits, Allocator>& data,
@@ -74696,7 +74782,7 @@ inline const_buffers_1 buffer(
 
       );
 }
-# 1500 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1502 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits>
 inline const_buffers_1 buffer(
     basic_string_view<Elem, Traits> data) noexcept
@@ -74710,7 +74796,7 @@ inline const_buffers_1 buffer(
 
       );
 }
-# 1521 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1523 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits>
 inline const_buffers_1 buffer(
     basic_string_view<Elem, Traits> data,
@@ -74726,7 +74812,7 @@ inline const_buffers_1 buffer(
 
       );
 }
-# 1546 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1548 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits, typename Allocator>
 class dynamic_string_buffer
 {
@@ -74738,7 +74824,7 @@ public:
 
 
   typedef mutable_buffers_1 mutable_buffers_type;
-# 1570 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1572 "/usr/local/include/boost/asio/buffer.hpp" 3
   explicit dynamic_string_buffer(std::basic_string<Elem, Traits, Allocator>& s,
       std::size_t maximum_size =
         (std::numeric_limits<std::size_t>::max)()) noexcept
@@ -74770,7 +74856,7 @@ public:
       max_size_(other.max_size_)
   {
   }
-# 1610 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1612 "/usr/local/include/boost/asio/buffer.hpp" 3
   std::size_t size() const noexcept
   {
 
@@ -74799,25 +74885,25 @@ public:
   {
     return (std::min)(string_.capacity(), max_size());
   }
-# 1650 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1652 "/usr/local/include/boost/asio/buffer.hpp" 3
   const_buffers_type data() const noexcept
   {
     return const_buffers_type(boost::asio::buffer(string_, size_));
   }
-# 1671 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1673 "/usr/local/include/boost/asio/buffer.hpp" 3
   mutable_buffers_type data(std::size_t pos, std::size_t n) noexcept
   {
     return mutable_buffers_type(boost::asio::buffer(
           boost::asio::buffer(string_, max_size_) + pos, n));
   }
-# 1689 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1691 "/usr/local/include/boost/asio/buffer.hpp" 3
   const_buffers_type data(std::size_t pos,
       std::size_t n) const noexcept
   {
     return const_buffers_type(boost::asio::buffer(
           boost::asio::buffer(string_, max_size_) + pos, n));
   }
-# 1713 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1715 "/usr/local/include/boost/asio/buffer.hpp" 3
   mutable_buffers_type prepare(std::size_t n)
   {
     if (size() > max_size() || max_size() - size() < n)
@@ -74833,13 +74919,13 @@ public:
 
     return boost::asio::buffer(boost::asio::buffer(string_) + size_, n);
   }
-# 1742 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1744 "/usr/local/include/boost/asio/buffer.hpp" 3
   void commit(std::size_t n)
   {
     size_ += (std::min)(n, string_.size() - size_);
     string_.resize(size_);
   }
-# 1756 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1758 "/usr/local/include/boost/asio/buffer.hpp" 3
   void grow(std::size_t n)
   {
     if (size() > max_size() || max_size() - size() < n)
@@ -74850,12 +74936,12 @@ public:
 
     string_.resize(size() + n);
   }
-# 1774 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1776 "/usr/local/include/boost/asio/buffer.hpp" 3
   void shrink(std::size_t n)
   {
     string_.resize(n > size() ? 0 : size() - n);
   }
-# 1791 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1793 "/usr/local/include/boost/asio/buffer.hpp" 3
   void consume(std::size_t n)
   {
 
@@ -74893,7 +74979,7 @@ public:
 
 
   typedef mutable_buffers_1 mutable_buffers_type;
-# 1838 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1840 "/usr/local/include/boost/asio/buffer.hpp" 3
   explicit dynamic_vector_buffer(std::vector<Elem, Allocator>& v,
       std::size_t maximum_size =
         (std::numeric_limits<std::size_t>::max)()) noexcept
@@ -74925,7 +75011,7 @@ public:
       max_size_(other.max_size_)
   {
   }
-# 1878 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1880 "/usr/local/include/boost/asio/buffer.hpp" 3
   std::size_t size() const noexcept
   {
 
@@ -74945,30 +75031,30 @@ public:
   {
     return max_size_;
   }
-# 1906 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1908 "/usr/local/include/boost/asio/buffer.hpp" 3
   std::size_t capacity() const noexcept
   {
     return (std::min)(vector_.capacity(), max_size());
   }
-# 1923 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1925 "/usr/local/include/boost/asio/buffer.hpp" 3
   const_buffers_type data() const noexcept
   {
     return const_buffers_type(boost::asio::buffer(vector_, size_));
   }
-# 1944 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1946 "/usr/local/include/boost/asio/buffer.hpp" 3
   mutable_buffers_type data(std::size_t pos, std::size_t n) noexcept
   {
     return mutable_buffers_type(boost::asio::buffer(
           boost::asio::buffer(vector_, max_size_) + pos, n));
   }
-# 1962 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1964 "/usr/local/include/boost/asio/buffer.hpp" 3
   const_buffers_type data(std::size_t pos,
       std::size_t n) const noexcept
   {
     return const_buffers_type(boost::asio::buffer(
           boost::asio::buffer(vector_, max_size_) + pos, n));
   }
-# 1986 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 1988 "/usr/local/include/boost/asio/buffer.hpp" 3
   mutable_buffers_type prepare(std::size_t n)
   {
     if (size () > max_size() || max_size() - size() < n)
@@ -74984,13 +75070,13 @@ public:
 
     return boost::asio::buffer(boost::asio::buffer(vector_) + size_, n);
   }
-# 2015 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2017 "/usr/local/include/boost/asio/buffer.hpp" 3
   void commit(std::size_t n)
   {
     size_ += (std::min)(n, vector_.size() - size_);
     vector_.resize(size_);
   }
-# 2029 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2031 "/usr/local/include/boost/asio/buffer.hpp" 3
   void grow(std::size_t n)
   {
     if (size() > max_size() || max_size() - size() < n)
@@ -75001,12 +75087,12 @@ public:
 
     vector_.resize(size() + n);
   }
-# 2047 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2049 "/usr/local/include/boost/asio/buffer.hpp" 3
   void shrink(std::size_t n)
   {
     vector_.resize(n > size() ? 0 : size() - n);
   }
-# 2064 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2066 "/usr/local/include/boost/asio/buffer.hpp" 3
   void consume(std::size_t n)
   {
 
@@ -75028,7 +75114,7 @@ private:
 
   const std::size_t max_size_;
 };
-# 2097 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2099 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename Elem, typename Traits, typename Allocator>
 inline dynamic_string_buffer<Elem, Traits, Allocator> dynamic_buffer(
     std::basic_string<Elem, Traits, Allocator>& data) noexcept
@@ -75071,7 +75157,7 @@ inline dynamic_vector_buffer<Elem, Allocator> dynamic_buffer(
 {
   return dynamic_vector_buffer<Elem, Allocator>(data, max_size);
 }
-# 2170 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2172 "/usr/local/include/boost/asio/buffer.hpp" 3
 namespace detail {
 
 inline std::size_t buffer_copy_1(const mutable_buffer& target,
@@ -75243,7 +75329,7 @@ std::size_t buffer_copy(multiple_buffers, multiple_buffers,
 }
 
 }
-# 2361 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2363 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename MutableBufferSequence, typename ConstBufferSequence>
 inline std::size_t buffer_copy(const MutableBufferSequence& target,
     const ConstBufferSequence& source) noexcept
@@ -75256,7 +75342,7 @@ inline std::size_t buffer_copy(const MutableBufferSequence& target,
       boost::asio::buffer_sequence_begin(source),
       boost::asio::buffer_sequence_end(source));
 }
-# 2398 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2400 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename MutableBufferSequence, typename ConstBufferSequence>
 inline std::size_t buffer_copy(const MutableBufferSequence& target,
     const ConstBufferSequence& source,
@@ -75283,7 +75369,7 @@ inline std::size_t buffer_copy(const MutableBufferSequence& target,
 
 
 #pragma GCC diagnostic pop
-# 2418 "/usr/local/include/boost/asio/buffer.hpp" 2 3
+# 2420 "/usr/local/include/boost/asio/buffer.hpp" 2 3
 # 1 "/usr/local/include/boost/asio/detail/is_buffer_sequence.hpp" 1 3
 # 12 "/usr/local/include/boost/asio/detail/is_buffer_sequence.hpp" 3
 #define BOOST_ASIO_DETAIL_IS_BUFFER_SEQUENCE_HPP 
@@ -75559,7 +75645,7 @@ struct is_dynamic_buffer_v2
 
 #pragma GCC diagnostic pop
 # 313 "/usr/local/include/boost/asio/detail/is_buffer_sequence.hpp" 2 3
-# 2419 "/usr/local/include/boost/asio/buffer.hpp" 2 3
+# 2421 "/usr/local/include/boost/asio/buffer.hpp" 2 3
 # 1 "/usr/local/include/boost/asio/detail/push_options.hpp" 1 3
 # 79 "/usr/local/include/boost/asio/detail/push_options.hpp" 3
 #pragma GCC visibility push (default)
@@ -75570,7 +75656,7 @@ struct is_dynamic_buffer_v2
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-# 2420 "/usr/local/include/boost/asio/buffer.hpp" 2 3
+# 2422 "/usr/local/include/boost/asio/buffer.hpp" 2 3
 
 namespace boost {
 namespace asio {
@@ -75624,7 +75710,7 @@ struct is_dynamic_buffer_v2
 
 {
 };
-# 2481 "/usr/local/include/boost/asio/buffer.hpp" 3
+# 2483 "/usr/local/include/boost/asio/buffer.hpp" 3
 template <typename T>
 struct is_dynamic_buffer
 
@@ -75647,13 +75733,13 @@ struct is_dynamic_buffer
 
 
 #pragma GCC diagnostic pop
-# 2497 "/usr/local/include/boost/asio/buffer.hpp" 2 3
+# 2499 "/usr/local/include/boost/asio/buffer.hpp" 2 3
 # 11 "cpp/Request.cpp" 2
 
 
-# 1 "./hpp/mpp/bosmacros/any.hpp" 1
+# 1 "/home/victor/include/bosmacros/any.hpp" 1
 
-#define MPP_BOSMACROS_ANY_HPP 
+#define BOSMACROS_ANY_HPP 
 
 
 
@@ -76230,7 +76316,7 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 
 }
-# 10 "./hpp/mpp/bosmacros/any.hpp" 2
+# 10 "/home/victor/include/bosmacros/any.hpp" 2
 #define ANY_CLASS std::any
 #define BAD_ANY_CAST std::bad_any_cast
 #define ANY_CAST std::any_cast
@@ -82002,22 +82088,12 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 }
 # 9 "./hpp/mpp/Request.hpp" 2
-
-
-
-# 1 "./hpp/mpp/bosmacros/any.hpp" 1
-# 13 "./hpp/mpp/Request.hpp" 2
-
-
-
-
-
-
+# 20 "./hpp/mpp/Request.hpp"
 #define GETCOM_FUNC getCommand
 #define SETCOM_FUNC setCommand
 
 
-# 22 "./hpp/mpp/Request.hpp"
+# 23 "./hpp/mpp/Request.hpp"
 namespace mpp
 {
  class Request
@@ -82079,6 +82155,12 @@ namespace mpp
 
    std::vector<boost::asio::const_buffer> toBuffers() const;
 
+
+
+
+
+   typename std::string::size_type size() const;
+
   private:
    Command c;
    std::forward_list<mpp::Header> headers;
@@ -82086,7 +82168,21 @@ namespace mpp
    std::map<Command, std::string> verbNames;
    const std::array<char, 2> crlf;
    const std::array<char, 2> nameValSep;
+
+
+
+
+   friend std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
  };
+
+
+
+
+
+
+
+ std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
+
 };
 # 19 "cpp/Request.cpp" 2
 
@@ -82197,7 +82293,7 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers() const
   {
    try
    {
-    int ival = std::any_cast<int>(h.getValue());
+    int ival = std::any_cast<typename std::string::size_type>(h.getValue());
     std::ostringstream convSS;
     convSS << ival;
     val = convSS.str();
@@ -82206,7 +82302,7 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers() const
    catch (std::bad_any_cast& bace)
    {
     std::ostringstream ess;
-    ess << "mpp::Request::toBuffers: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("int") << " value, but doesn't!" << std::endl
+    ess << "mpp::Request::toBuffers: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("std::string::size_type") << " value, but doesn't!" << std::endl
     << "Error: " << bace.what() << std::endl;
     mpp::exceptions::BadHeaderValue mebhv(ess.str());
     throw mebhv;
@@ -82237,4 +82333,78 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers() const
  toReturn.push_back(boost::asio::buffer(crlf));
  toReturn.push_back(boost::asio::buffer(noun));
  return toReturn;
+}
+
+
+
+
+
+
+
+std::ostream& mpp::operator<<(std::ostream& os, const mpp::Request& req)
+{
+ os << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " " << req.verbNames.at(req.c) << "\r\n";
+
+ for (mpp::Header h : req.headers)
+ {
+  os << h.getName()
+  << ": ";
+  std::string val;
+
+
+  if (h.getName() == "Content-Length")
+  {
+   try
+   {
+    std::string::size_type ival = std::any_cast<typename std::string::size_type>(h.getValue());
+    std::ostringstream convSS;
+    convSS << ival;
+    val = convSS.str();
+   }
+
+   catch (std::bad_any_cast& bace)
+   {
+    std::ostringstream ess;
+    ess << "mpp::Request::toBuffers: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("std::string::size_type") << " value, but doesn't!" << std::endl
+    << "Error: " << bace.what() << std::endl;
+    mpp::exceptions::BadHeaderValue mebhv(ess.str());
+    throw mebhv;
+   }
+  }
+
+  else
+  {
+   try
+   {
+    val = std::any_cast<std::string>(h.getValue());
+   }
+
+   catch (std::bad_any_cast& bace)
+   {
+    std::ostringstream ess;
+    ess << "mpp::Request::toBuffers: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("std::string") << " value, but doesn't!" << std::endl
+    << "Error: " << bace.what() << std::endl;
+    mpp::exceptions::BadHeaderValue mebhv(ess.str());
+    throw mebhv;
+   }
+  }
+
+  os << val
+  << "\r\n";
+ }
+
+ os << "\r\n"
+ << req.noun;
+ return os;
+}
+
+
+
+
+
+typename std::string::size_type mpp::Request::size() const
+{
+ std::ostringstream ss;
+ ss << this;
+ return ss.str().length();
 }

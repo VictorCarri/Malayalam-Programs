@@ -1,6 +1,7 @@
 /* Standard library */
 #include <iostream> // std::cout
 #include <iomanip> // std::quoted
+#include <string> // std::string
 
 /* Our headers */
 #include "Client.hpp" // Client class def'n
@@ -51,12 +52,16 @@ int main()
 				if (c.isInputValidMalayalam()) // All of the Unicode code-points are in the Malayalam range
 				{
 					std::cout << "Determining whether or not the current noun is singular..." << std::endl;
-					bool isSingular = c.isSingular(); // Have the client query the server
+					c.isSingular([](bool isSing, std::string noun)
+						{
+							std::cout << "The noun " << std::quoted(noun) << " is " << (isSing ? "singular" : "plural") << std::endl;
+						}
+					); // Have the client query the server, and call our lambda when it finishes
 				}
 
 				else // Invalid Malayalam text
 				{
-					std::cerr << "You input contains code-points that are outside the Malayalam range!" << std::endl;
+					std::cerr << "Your input contains code-points that are outside the Malayalam range!" << std::endl;
 				}
 			}
 
@@ -67,5 +72,8 @@ int main()
 		}
 	}
 
+	std::cout << "main: reached end of main." << std::endl;
+
+	// Client's destructor closes the socket and joins the thread
 	return 0;
 }

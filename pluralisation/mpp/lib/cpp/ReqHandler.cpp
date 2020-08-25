@@ -26,7 +26,7 @@
 #include <mariadb++/exceptions.hpp> // mariadb::exception::connection
 
 /* Our headers */
-#include "mpp/bosmacros/array.hpp" // ARRAY_CLASS macro
+#include "bosmacros/array.hpp" // ARRAY_CLASS macro
 #include "mpp/Request.hpp" // Represents a request
 #include "mpp/Reply.hpp" // Represents a reply
 #include "mpp/Header.hpp" // Represents a (name, value) pair

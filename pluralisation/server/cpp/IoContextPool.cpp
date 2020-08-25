@@ -13,9 +13,9 @@
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::make_work_guard
 
 /* Our headers */
-#include "SharedPtr.hpp" // SHARED_PTR macro
-#include "Thread.hpp" // THREAD_CLASS macro
-#include "BindFunc.hpp" // BIND_FUNCTION macro
+#include "bosmacros/shared_ptr.hpp" // SHARED_PTR macro
+#include "bosmacros/thread.hpp" // THREAD_CLASS macro
+#include "bosmacros/bind.hpp" // BIND_FUNCTION macro
 #include "IoContextPool.hpp" // Class def
 
 /**
@@ -76,10 +76,14 @@ void IoContextPool::run()
 	{
 		SHARED_PTR<THREAD_CLASS> thread(
 			new THREAD_CLASS(
-				BIND_FUNCTION(
+				/*BIND_FUNCTION(
 					&boost::asio::io_context::run,
 					ptr
-				)
+				)*/
+				[&ptr]() // Lambda that takes the pointer by reference
+				{
+					ptr->run(); // Run the I/O context
+				}
 			)
 		);
 		#ifdef DEBUG

@@ -7,6 +7,7 @@
 #include <vector> // std::vector
 #include <map> // std::map
 #include <array> // std::array
+#include <ostream> // std::ostream
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
@@ -79,7 +80,13 @@ namespace mpp
 			* @return A vector of constant buffers, containing text that represents this Request object.
 			**/
 			std::vector<boost::asio::const_buffer> toBuffers() const;
-	
+
+			/**
+			* @desc Calculates the size of the request as a string.
+			* @return The size of this request as a string.
+			**/
+			typename std::string::size_type size() const;
+
 		private:
 			Command c; // The command which this request asks the server to perform
 			std::forward_list<mpp::Header> headers; // A list of request headers
@@ -87,7 +94,20 @@ namespace mpp
 			std::map<Command, std::string> verbNames; // Maps a verb enum to a string describing it for network transport
 			const std::array<char, 2> crlf; // Used to represent the sequence "\r\n"
 			const std::array<char, 2> nameValSep; // Contains the ':' and space that separate a header name from its value
-	};
-};
 
+			/**
+			* Friend declaration to allow operator<< to access private members.
+			**/
+			friend std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
+	}; // class Request
+
+	/**
+	* @desc An overload for the insertion operator that prints an MPP request.
+	* @param os The output stream to write to.
+	* @param req The mpp::Request object to write.
+	* @return A reference to the output stream, to allow chaining of operator<<.
+	**/
+	std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
+
+}; // namespace mpp
 #endif // MPP_REQUEST_HPP

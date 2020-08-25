@@ -13,7 +13,7 @@
 #include <boost/asio.hpp> // boost::asio::io_context, boost::asio::executor_work_guard, boost::asio::io_context::executor_type
 
 /* Our headers */
-#include "SharedPtr.hpp" // Defines the macro SHARED_PTR that resolves to either std::shared_ptr or boost::shared_ptr
+#include "bosmacros/shared_ptr.hpp" // Defines the macro SHARED_PTR that resolves to either std::shared_ptr or boost::shared_ptr
 
 class IoContextPool : private boost::noncopyable
 {

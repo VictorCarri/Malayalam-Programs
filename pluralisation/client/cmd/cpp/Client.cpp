@@ -1,32 +1,28 @@
-/** C headers **/
-#include <signal.h> // SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGTSTP
-
 /** C++ versions of C headers **/
 #include <cctype> // std::tolower
 #include <cstddef> // std::size_t
+#include <csignal> // SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGTSTP
 
 /** Standard C++ **/
 
 /* Headers that are only needed in debug builds */
 #ifdef DEBUG
 #include <ios> // std::boolalpha, std::ios_base::fmtflags
-#include <iomanip> // std::quoted
 #endif
 
-#include <iostream> // std::clog, std::endl, std::cin
+#include <iostream> // std::clog, std::endl, std::cin, std::cout
 #include <string> // std::string
 #include <algorithm> // std::transform, std::all_of
 #include <iterator> // std::back_inserter
-#include <sstream> // std::istringstream
+#include <sstream> // std::ostringstream
 #include <memory> // std::make_unique
+#include <string_view> // std::string_view
+#include <iomanip> // std::quoted
 
 /* Boost */
-#include <boost/asio/placeholders.hpp> // boost::asio::placeholders::error, boost::asio::placeholders::signal_number, boost::asio::placeholders::endpoint
-#include <boost/asio/connect.hpp> // boost::asio::async_connect
-#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket, boost::asio::ip::tcp::endpoint
-#include <boost/asio/write.hpp> // boost::asio::buffer, boost::asio::async_write
-#include <boost/asio/connect.hpp> // boost::asio::async_connect
-#include <boost/asio/read.hpp> // boost::asio::async_read
+#include <boost/asio.hpp> // boost::asio::placeholders::error, boost::asio::placeholders::signal_number, boost::asio::placeholders::endpoint, boost::asio::ip::tcp::socket, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver, boost::asio::buffer, boost::asio::async_write, boost::asio::async_connect, boost::asio::async_read, boost::asio::ip::tcp::socket::shutdown_both, boost::asio::mutable_buffer
+#include <boost/system/error_code.hpp> // boost::system::error_code
+#include <boost/system/system_error.hpp> // boost::system::system_error
 
 /* My Unicode utilities library */
 #include "vuu/UTF8Validator.hpp" // vuu::UTF8Validator, to ensure that an std::string is valid UTF-8 text
@@ -35,10 +31,11 @@
 
 /* MPP library */
 #include "mpp/Request.hpp" // mpp::Request
+#include "mpp/Reply.hpp" // mpp::Reply
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
-#include "BindFunc.hpp" // BIND_FUNCTION macro
+#include "bosmacros/thread.hpp" // THREAD_CLASS macro
 #include "Client.hpp" // Class def'n
 
 /**
@@ -60,12 +57,12 @@ void Client::start()
 * @param host The host to connect to.
 * @param port The port on the host to connect to.
 **/
-Client::Client(char* host, short port) : active(false), // We start in an "inactive" state
+Client::Client(const char* host, unsigned port) : active(false), // We start in an "inactive" state
 input (), // Use std::string's default ctor
 ioc (), // Use io_context's default ctor
 signals (ioc, SIGHUP, SIGINT, SIGQUIT), // Construct signal set using io_context, and add 3 signals (the max)
-sock (ioc), // Construct the socket we'll use
 resolver(ioc), // Construct the TCP/IP resolver we'll use
+sock (ioc), // Construct the socket we'll use
 sigMsgs { // Construct the map of signal values to strings
 	{SIGHUP, "SIGHUP"},
 	{SIGINT, "SIGINT"},
@@ -80,7 +77,9 @@ sigMsgs { // Construct the map of signal values to strings
 	#ifdef DEBUG
 	std::clog << std::boolalpha // Show booleans as strings
 	<< "Client::Client: active = " << active << std::endl
-	<< "\tinitFlags = " << initFlags << std::endl;
+	<< "\tinitFlags = " << initFlags << std::endl
+	<< "\thost = " << std::quoted(host) << std::endl
+	<< "\tport = " << port << std::endl;
 	#endif
 
 	/* Set up signal handling */
@@ -92,46 +91,64 @@ sigMsgs { // Construct the map of signal values to strings
 			if (!bsec) // No error
 			{
 				active = false; // Stop the client immediately
-				std::cout << "Client: caught " << sigMsgs[sigNo] << ", exiting..." << std::endl;
+				std::cout << "Client: signal handler lambda: caught " << sigMsgs[sigNo] << ", exiting..." << std::endl;
 				#ifdef DEBUG
 				#endif
 			}
 
 			else // An error occurred
 			{
-				std::cerr << "Client::signal handler lambda: a sytem error occurred" << std::endl
+				std::cerr << "Client::signal handler lambda: a system error occurred" << std::endl
 				<< "\tValue = " << bsec.value() << std::endl
 				<< "\tMessage = " << bsec.message() << std::endl
 				<< "The operation " << (bsec.failed() ? "failed" : "didn't fail") << std::endl;
 			}
 		}
 	);
-	//signals.async_wait(BIND_FUNCTION(&Client::signalHandler, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number)); // We will listen for signals using THIS so that we can set properties.
 	#ifdef DEBUG
 	std::clog << "Client::Client: set up asynchronous wait on SIGHUP, SIGINT, SIGQUIT, SIGTERM, and SIGTSTP" << std::endl;
 	#endif
 
 	/* Set up the network connection */
-	std::istringstream portSS; // Used to convert port # to a string
+	std::ostringstream portSS; // Used to convert port # to a string
 	portSS << port;
 	#ifdef DEBUG
-	std::clog << "Client::Client: contents of port std::istringstream are " << std::quoted(portSS.str()) << std::endl;
+	std::clog << "Client::Client: host is " << std::quoted(host) << std::endl;
+	std::clog << "Client::Client: contents of port std::ostringstream are " << std::quoted(portSS.str()) << std::endl;
 	#endif
 
-	endpoints = resolver.resolve(host, portSS.str().c_str()); // Fetch a list of endpoints that correspond to the address we were started with
-	workerThread = std::make_unique<THREAD>( // Create the thread that keeps our I/O context running in the background
+	std::string_view hostView(host); // Convert host to a string_view for async_resolve
+	std::string_view portView = portSS.str(); // Convert port string to a string view
+	resolver.async_resolve(hostView, portView, [this, &host, &portSS](const boost::system::error_code& resErr, typename boost::asio::ip::tcp::resolver::results_type results)
+		{
+			if (!resErr) // No error
+			{
+				resolveResults = results; // Store the results
+			}
+
+			else // Error occurred
+			{
+				std::cerr << "Client::resolver lambda: a system error occurred" << std::endl
+				<< "\tValue = " << resErr.value() << std::endl
+				<< "\tMessage = " << resErr.message() << std::endl
+				<< "\tThe operation " << (resErr.failed() ? "failed" : "didn't fail") << std::endl
+				<< "\tThe host name is " << std::quoted(host) << std::endl
+				<< "\tThe port number " << std::quoted(portSS.str()) << std::endl;
+			}
+		}
+	);
+	workerThread = std::make_unique<THREAD_CLASS>( // Create the thread that keeps our I/O context running in the background
 		[this]()
 		{
 			ioc.run(); // Run the I/O context so that Asio will run
 		}
 	);
-	//workerThread = std::make_unique<THREAD>(BIND_FUNCTION(&Client::threadFunc, this)); // Have our thread function run the I/O context so that asynchronous operations will execute
 }
 
 /**
 * @desc Default constructor. Initialises our state.
 **/
-Client::Client() : Client("127.0.0.1", 50001) // Connect to the default host and port
+Client::Client() : Client(std::string("127.0.0.1").c_str(), 50001) // Connect to the default host and port
 {
 }
 
@@ -146,17 +163,6 @@ bool Client::isActive() const
 	#endif
 	return active;
 }
-
-#ifdef DEBUG
-/**
-* @desc Destructor. This is only needed in debug mode, to reset std::clog's flags to their original values.
-**/
-Client::~Client()
-{
-	std::clog << "Client::~Client: restoring old clog flags (" << initFlags << ")" << std::endl;
-	std::clog.flags(initFlags); // Restore the flags as they were on construction
-}
-#endif
 
 /**
 * @desc Prompts the user for a Malayalam noun.
@@ -285,148 +291,141 @@ bool Client::isInputValidMalayalam() const
 
 /**
 * @desc Determines whether or not the current noun is singular by sending a request to the server.
+* @param issingCallback A callback that will be called once the entire chain of asynchronous operations finishes.
 * @return True if the noun is singular, false otherwise.
 **/
-bool Client::isSingular() const
+void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
 {
-	reqPtr.reset(); // Reset the pointer so that it contains a fresh Request object
-	reqPtr->SETCOM_FUNC(ISSING);
-	reqPtr->addHeader("Content-Type", ANY_CLASS("text/utf-8")); // We are sending a plain Malayalam noun
-	reqPtr->addHeader("Content-Length", ANY_CLASS(input.length())); // The server needs to know the length of the input IN BYTES, NOT codepoints!
-	reqPtr->setNoun(input); // Set the input to send
-	#ifdef DEBUG
-	std::cout << "Client::isSingular: input to send is " << std::quoted(input) << std::endl;
-	#endif
-	boost::asio::async_connect(sock, // Connect using our socket
-		endpoints, // Try to connect to the server's endpoints
-		//BIND_FUNCTION(&Client::handleConnect, this, boost::asio::placeholders::error, boost::asio::placeholders::endpoint) // Create a functor that'll call our callback method once the connection operation finishes
-		[this](const boost::system::error_code& ec, const boost::asio::ip::tcp::endpoint& endPoint)
+	isCB = issingCallback; // Save the callback for later
+	int eNo = 1; // Endpoint #
+
+	for (boost::asio::ip::tcp::endpoint endpoint : resolveResults)
+	{
+		std::clog << "Client::isSingular: details on endpoint #" << eNo << std::endl
+		<< "\tAddress: " << endpoint.address().to_string() << std::endl
+		<< "\tCapacity: " << endpoint.capacity() << std::endl
+		<< "\tPort: " << endpoint.port() << std::endl
+		<< "\tSize: " << endpoint.size() << std::endl;
+		++eNo;
+	}
+
+	boost::asio::async_connect(sock, resolveResults, [this](boost::system::error_code acErr, boost::asio::ip::tcp::endpoint ep)
 		{
-			if (!ec) // No error
+			if (!acErr) // No error
 			{
-				#ifdef DEBUG
-				std::clog << "Client::isSingular::outermost lambda: connected to server at endpoint " << endpoint.address().to_string() << std::endl;
-				#endif
-				boost::asio::async_write( // Send our request
-					sock, // Write to our socket
-					reqPtr->toBuffers(), // Convert the request to an std::vector of buffers to send
-					[this](const boost::system::error_code& ec, std::size_t bytesTransferred)
-					{
-						if (!ec) // No error
-						{
-							#ifdef DEBUG
-							std::cout << "Client::isSingular::inner lambda 1: wrote " << bytesTransferred << " bytes" << std::endl;
-							#endif
-							boost::asio::async_read( // Read a response
-								sock, // Read from our socket
-								boost::asio::buffer()
-							);
-						}
-					
-						else // An error occurred
-						{
-							std::cerr << "Client::handleWrite: a system error occurred while trying to send a request to the server" << std::endl
-							<< "\tValue = " << ec.value() << std::endl
-							<< "\tMessage = " << ec.message() << std::endl
-							<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
-						}
-					}
-				);
+				sendSingReq(); // Send the ISSING request to the server
 			}
-		
-			else // An error occurred
+
+			else // Error occurred
 			{
-				std::cerr << "Client::isSingular::outer lambda a system error occurred while trying to connect to the server." << std::endl
-				<< "\tValue = " << ec.value() << std::endl
-				<< "\tMessage = " << ec.message() << std::endl
-				<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+				std::cerr << "Client::isSingular::async_connect lambda: a system error occurred" << std::endl
+				<< "\tValue = " << acErr.value() << std::endl
+				<< "\tMessage = " << std::quoted(acErr.message()) << std::endl
+				<< "\tThe operation " << (acErr.failed() ? "failed" : "didn't fail") << std::endl
+				<< "\tAddress: " << ep.address().to_string() << std::endl
+				<< "\tCapacity: " << ep.capacity() << std::endl
+				<< "\tPort: " << ep.port() << std::endl;
 			}
 		}
 	);
 }
 
 /**
-* @desc Handles the signals that we registered to listen for. Causes the client to quit.
-* @param bsec An error code, set if an error occurred during the async. op.
-* @param sigNo The # of the signal that was caught.
+* @desc Destructor. Performs 3 functions:
+*	1) In debug mode, it resets cout's flags.
+*	2) In all modes, it closes our socket.
+*	3) In all modes, it waits for our thread to join.
 **/
-void Client::signalHandler(__attribute__((unused)) const boost::system::error_code& ec, int sigNo)
+Client::~Client()
 {
-	if (!ec) // No error
-	{
-		active = false; // Stop the client immediately
-		#ifdef DEBUG
-		std::cout << "Client::signalHandler caught " << sigMsgs[sigNo] << ", exiting..." << std::endl;
-		#endif
-	}
-	
-	else // An error occurred
-	{
-		std::cerr << "Client::signalHandler: a sytem error occurred" << std::endl
-		<< "\tValue = " << ec.value() << std::endl
-		<< "\tMessage = " << ec.message() << std::endl
-		<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
-	}
+	#ifdef DEBUG
+	std::clog.flags(initFlags); // Reset flags
+	std::cout << "Client::~Client starting." << std::endl;
+	#endif
+	/*boost::asio::post(ioc, [this]()
+		{
+			try
+			{
+				sock.shutdown(boost::asio::ip::tcp::socket::shutdown_both); // Shutdown both the send and receive parts of the socket
+				sock.close(); // Close our socket
+				resolver.cancel(); // Cancel any pending resolution operations
+				signals.cancel(); // Cancel any pending signal-handling operations
+			}
+		}
+	);*/ // Destructors close the socket, cancel any pending resolution operations, and cancel any pending signal-handling operations
+	#ifdef DEBUG
+	std::cout << "Client::~Client: stopping our I/O context" << std::endl;
+	#endif
+	ioc.stop(); // Stop any pending operations
+	#ifdef DEBUG
+	std::cout << "Client::~Client: waiting for worker thread to join." << std::endl;
+	#endif
+	workerThread->join();
+	#ifdef DEBUG
+	std::cout << "Client::~Client: worker thread has joined." << std::endl;
+	#endif
 }
 
 /**
-* @desc Runs our I/O context from our thread.
+* @desc A callback that handles a successful connection to the server.
+*	As its name implies, it sends the ISSING request to the server.
 **/
-void Client::threadFunc()
+void Client::sendSingReq()
 {
-	ioc.run();
+	#ifdef DEBUG
+	std::cout << "Client::sendSingReq: callback called from isSing lambda." << std::endl;
+	#endif
+
+
+	/* Build the request */
+	mpp::Request req;
+	req.SETCOM_FUNC(mpp::Request::ISSING); // Make it an ISSING request
+	req.setNoun(input); // The noun to send is our input
+	req.addHeader("Content-Type", ANY_CLASS(std::string("text/plain"))); // The noun is a plaintext string
+	req.addHeader("Content-Length", ANY_CLASS(input.length())); // The server's parser needs to know how long the string is to read it over the network
+	#ifdef DEBUG
+	std::cout << "Client::sendSingReq: request to send is " << std::endl
+	<< req;
+	#endif
+	boost::asio::async_write(sock, req.toBuffers(), [this, &req](const boost::system::error_code& ec, std::size_t bytesTransferred)
+		{
+			if (!ec) // No error
+			{
+				#ifdef DEBUG
+				std::cout << "Client::sendSingReq: sent " << bytesTransferred << " bytes" << std::endl
+				<< "\tRequest was " << req.size() << " bytes long" << std::endl;
+				#endif
+				
+				if (bytesTransferred < req.size()) // The entire request wasn't sent
+				{
+					std::cerr << "Client::sendSingReq: only " << bytesTransferred << " bytes of a request that was " << req.size() << " bytes long were transferred." << std::endl;
+				}
+
+				else
+				{
+					readSingRep(); // Read the reply from the server.
+				}
+			}
+
+			else // An error occurred
+			{
+				std::cerr << "Client::sendSingReq: an error occurred while sending the request to the server." << std::endl
+				<< "\tError value = " << ec.value() << std::endl
+				<< "\tError message = " << std::quoted(ec.message()) << std::endl
+				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+			}
+		}
+	);
 }
 
 /**
-* @desc Callback for an attempt to connect to the server. Tries to send a request using the current input.
-* @param ec An error code. Set if any error occurred during the connection operation.
-* @param endPoint The endpoint that we connected to, if the connection operation was successful.
+* @desc A callback that handles having successfully sent our request to the server.
+*	It attempts to read the server's response over the network to construct a Response object
+*	using the MPP library's RepParser class.
 **/
-void Client::handleConnect(const boost::system::error_code& ec, const boost::asio::ip::tcp::endpoint& endPoint)
+void Client::readSingRep()
 {
-	if (!ec) // No error
-	{
-		#ifdef DEBUG
-		std::clog << "Client::handleConnect: connected to server at endpoint " << endpoint.address().to_string() << std::endl;
-		#endif
-		boost::asio::async_write( // Send our request
-			sock, // Write to our socket
-			reqPtr->toBuffers(), // Convert the request to an std::vector of buffers to send
-			BIND_FUNCTION(&Client::handleWrite, this) // Callback
-		);
-	}
-
-	else // An error occurred
-	{
-		std::cerr << "Client::handleConnect: a system error occurred while trying to connect to the server." << std::endl
-		<< "\tValue = " << ec.value() << std::endl
-		<< "\tMessage = " << ec.message() << std::endl
-		<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
-	}
-}
-
-/**
-* @desc Callback for sending the request to the server. Tries to read a response from the server.
-* @param ec An error code. Set if an error occurred during the write operation.
-* @param bytesTransferred The # of bytes that were sent to the server.
-**/
-void Client::handleWrite(const boost::system::error_code& ec, std::size_t bytesTransferred)
-{
-	if (!ec) // No error
-	{
-		#ifdef DEBUG
-		std::cout << "Client::handleWrite: wrote " << bytesTransferred << " bytes" << std::endl;
-		#endif
-		boost::asio::async_read( // Read a response
-			sock, // Read from our socket
-		);
-	}
-
-	else // An error occurred
-	{
-		std::cerr << "Client::handleWrite: a system error occurred while trying to send a request to the server" << std::endl
-		<< "\tValue = " << ec.value() << std::endl
-		<< "\tMessage = " << ec.message() << std::endl
-		<< "The operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
-	}
+	#ifdef DEBUG
+	std::cout << "Client::readSingRep running." << std::endl;
+	#endif
 }

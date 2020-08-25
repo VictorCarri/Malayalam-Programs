@@ -7,7 +7,7 @@
 #include <boost/asio.hpp> // boost::asio::const_buffer
 
 /* Our headers */
-#include "mpp/bosmacros/any.hpp" // ANY_CLASS, BAD_ANY_CAST, ANY_CAST
+#include "bosmacros/any.hpp" // ANY_CLASS, BAD_ANY_CAST, ANY_CAST
 #include "mpp/ver.hpp" // MPP protocol version
 #include "mpp/exceptions/BadHeaderValue.hpp" // Exception thrown when the type of a header's value doesn't match the expected one
 #include "mpp/Header.hpp" // Header class
@@ -167,8 +167,8 @@ void mpp::Reply::addHeader(std::string name, ANY_CLASS val)
 mpp::Reply mpp::Reply::stockReply(mpp::Reply::Status stat)
 {
 	mpp::Reply rep;
-	rep.addHeader("Content-Type", ANY_CLASS(std::string("text/plain")));
-	rep.addHeader("Content-Length", ANY_CLASS(0));
+	rep.addHeader("Content-Type", std::string("text/plain"));
+	rep.addHeader("Content-Length", 0);
 	rep.setStatus(stat);
 	rep.setContent("");
 	return rep;

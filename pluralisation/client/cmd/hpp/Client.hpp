@@ -12,19 +12,18 @@
 #include <string> // std::string
 #include <memory> // std::unique_ptr
 #include <map> // std::map
+#include <vector> // std::vector
+#include <functional> // std::function
 
 /* Boost */
-#include <boost/asio/signal_set.hpp> // boost::asio::signal_set
-#include <boost/asio/io_context.hpp> // boost::asio::io_context
-#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket, boost::asio::ip::tcp::resolver
+#include <boost/asio.hpp> // boost::asio::signal_set, boost::asio::io_context, boost::asio::ip::tcp::socket, boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint
 #include <boost/system/error_code.hpp> // boost::system::error_code
-#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::endpoint
 
 /* MPP */
 #include "mpp/Request.hpp" // mpp::Request
 
 /* Our headers */
-#include "bosmacros/thread.hpp" // THREAD macro
+#include "bosmacros/thread.hpp" // THREAD_CLASS macro
 
 /*
 * This class encapsulates our client. It maintains state and handles all communication with the server, using input from the loop in main().
@@ -47,7 +46,7 @@ class Client
 		* @param host The host to connect to.
 		* @param port The port on the host to connect to.
 		**/
-		Client(char* host, short port);
+		Client(const char* host, unsigned port);
 
 		/**
 		* @desc Tells the caller whether or not the client is active.
@@ -55,12 +54,13 @@ class Client
 		**/
 		bool isActive() const;
 
-		#ifdef DEBUG
 		/**
-		* @desc Destructor. This is only needed in debug mode, to reset std::cout's flags to their original values.
+		* @desc Destructor. Performs 3 functions:
+		*	1) In debug mode, it resets cout's flags.
+		*	2) In all modes, it closes our socket.
+		*	3) In all modes, it waits for our thread to join.
 		**/
 		~Client();
-		#endif
 
 		/**
 		* @desc Prompts the user for a Malayalam noun.
@@ -99,9 +99,10 @@ class Client
 
 		/**
 		* @desc Determines whether or not the current noun is singular by sending a request to the server.
+		* @param issingCallback A callback that will be called once the entire chain of asynchronous operations finishes.
 		* @return True if the noun is singular, false otherwise.
 		**/
-		bool isSingular() const;
+		void isSingular(std::function<void(bool, std::string)> issingCallback);
 
 	private:
 		/*** Methods ***/
@@ -114,30 +115,17 @@ class Client
 		std::string toLower(const std::string toChange) const;
 
 		/**
-		* @desc Handles the signals that we registered to listen for. Causes the client to quit.
-		* @param bsec An error code, set if an error occurred during the async. op.
-		* @param sigNo The # of the signal that was caught.
+		* @desc A callback that handles a successful connection to the server.
+		*	As its name implies, it sends the ISSING request to the server.
 		**/
-		void signalHandler(const boost::system::error_code& ec, int sigNo);
+		void sendSingReq();
 
 		/**
-		* @desc Runs our I/O context from our thread.
+		* @desc A callback that handles having successfully sent our request to the server.
+		*	It attempts to read the server's response over the network to construct a Response object
+		*	using the MPP library's RepParser class.
 		**/
-		void threadFunc();
-
-		/**
-		* @desc Callback for an attempt to connect to the server. Tries to send a request using the current input.
-		* @param ec An error code. Set if any error occurred during the connection operation.
-		* @param endPoint The endpoint that we connected to, if the connection operation was successful.
-		**/
-		void handleConnect(const boost::system::error_code& ec, const boost::asio::ip::tcp::endpoint& endPoint);
-
-		/**
-		* @desc Callback for sending the request to the server. Tries to read a response from the server.
-		* @param ec An error code. Set if an error occurred during the write operation.
-		* @param bytesTransferred The # of bytes that were sent to the server.
-		**/
-		void handleWrite(const boost::system::error_code& ec, std::size_t bytesTransferred);
+		void readSingRep();
 
 		/*** Properties ***/
 
@@ -146,11 +134,11 @@ class Client
 		boost::asio::io_context ioc; // Req'd by signal_set
 		boost::asio::signal_set signals; // Used to catch signals that indicate that we should quit.
 		boost::asio::ip::tcp::resolver resolver; // Used to resolve the server's address
-		boost::asio::ip::tcp::resolver::results_type endpoints; // A list of possible end-points
-		std::unique_ptr<boost::asio::ip::tcp::socket> sock; // The socket which we'll use to communicate
-		std::unique_ptr<THREAD> workerThread; // The thread which keeps our I/O context running
-		std::unique_ptr<mpp::Request> reqPtr; // This must be a property because the asynchronous handler functions need to be able to access it after the method that started the async. op. ends
+		boost::asio::ip::tcp::socket sock; // The socket which we'll use to communicate
+		std::unique_ptr<THREAD_CLASS> workerThread; // The thread which keeps our I/O context running
 		std::map<int, std::string> sigMsgs; // Stores messages to be printed upon catching a particular signal
+		typename boost::asio::ip::tcp::resolver::results_type resolveResults; // Stores the results of the async_resolve operation
+		std::function<void(bool,std::string)> isCB; // The callback that will be called once the sequence of operations involved in isSingular is complete.
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.
 		#endif

@@ -16,9 +16,9 @@
 #include "mpp/Reply.hpp" // Represents a reply
 
 /* Our headers - macros to choose between Boost and std implementations */
-#include "EnabledSharedFromThis.hpp" // ENABLE_SHARED_FROM_THIS macro
-#include "ErrorCode.hpp" // ERROR_CODE macro
-#include "SharedPtr.hpp" // SHARED_PTR macro
+#include "bosmacros/enable_shared_from_this.hpp" // ENABLE_SHARED_FROM_THIS macro
+#include "bosmacros/error_code.hpp" // ERROR_CODE macro
+#include "bosmacros/shared_ptr.hpp" // SHARED_PTR macro
 
 /**
 * This class is templated so that any protocol's classes can be used with this.

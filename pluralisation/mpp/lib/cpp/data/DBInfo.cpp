@@ -10,7 +10,7 @@
 #include <boost/program_options.hpp> // boost::program_options::options_description, boost:program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::notify, boost::program_options::parse_config_file
 
 /* Our headers */
-#include "mpp/bosmacros/filesystem.hpp" // FILESYSTEM_EXISTS and IFSTREAM macros
+#include "bosmacros/filesystem.hpp" // FILESYSTEM_EXISTS and IFSTREAM macros
 #include "mpp/exceptions/MissingDBConfFile.hpp" // Thrown if the file @ the given path DNE
 #include "mpp/exceptions/MissingDBInfo.hpp" // Throw if the configuration file doesn't contain all of the needed data
 #include "mpp/data/DBInfo.hpp" // Class def'n

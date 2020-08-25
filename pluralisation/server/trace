@@ -1,0 +1,816 @@
+execve("./malPlSrv-debug-dynamic", ["./malPlSrv-debug-dynamic"], 0x7ffcca2f1320 /* 107 vars */) = 0
+brk(NULL)                               = 0x172e000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/tls/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost/tls/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/tls/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost/tls", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/boost", {st_mode=S_IFDIR|0755, st_size=18654, ...}) = 0
+openat(AT_FDCWD, "/usr/local/lib/icu/tls/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu/tls/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/tls/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu/tls", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/icu", {st_mode=S_IFDIR|0777, st_size=684, ...}) = 0
+openat(AT_FDCWD, "/usr/local/lib/cgicc/tls/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc/tls/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/tls/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc/tls", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/usr/local/lib/cgicc", {st_mode=S_IFDIR|0777, st_size=144, ...}) = 0
+openat(AT_FDCWD, "/home/victor/lib/mpp/tls/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/mpp/tls/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/mpp/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/tls/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/mpp/tls/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/tls/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/mpp/tls", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/x86_64/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/mpp/x86_64/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/mpp/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/x86_64/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/mpp/x86_64", 0x7fff7d2880a0) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libmpp-debug.so", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\300\231\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=11714904, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa4471ce000
+mmap(NULL, 2604720, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa446d2b000
+mprotect(0x7fa446da5000, 2093056, PROT_NONE) = 0
+mmap(0x7fa446fa4000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x79000) = 0x7fa446fa4000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/tls/x86_64/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/vuu/tls/x86_64/x86_64", 0x7fff7d288070) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/tls/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/vuu/tls/x86_64", 0x7fff7d288070) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/tls/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/vuu/tls/x86_64", 0x7fff7d288070) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/tls/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/vuu/tls", 0x7fff7d288070) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/x86_64/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/vuu/x86_64/x86_64", 0x7fff7d288070) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/vuu/x86_64", 0x7fff7d288070) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/x86_64/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+stat("/home/victor/lib/vuu/x86_64", 0x7fff7d288070) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libvuu-debug.so", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\300T\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1367648, ...}) = 0
+mmap(NULL, 2163512, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa446b13000
+mprotect(0x7fa446b22000, 2097152, PROT_NONE) = 0
+mmap(0x7fa446d22000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xf000) = 0x7fa446d22000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libboost_filesystem-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`\373\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1425656, ...}) = 0
+mmap(NULL, 2280480, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa4468e3000
+mprotect(0x7fa44690f000, 2093056, PROT_NONE) = 0
+mmap(0x7fa446b0e000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2b000) = 0x7fa446b0e000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libboost_program_options-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\20H\4\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=3526784, ...}) = 0
+mmap(NULL, 2732984, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa446643000
+mprotect(0x7fa4466da000, 2093056, PROT_NONE) = 0
+mmap(0x7fa4468d9000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x96000) = 0x7fa4468d9000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libboost_thread-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\360u\1\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1485520, ...}) = 0
+mmap(NULL, 2350768, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa446403000
+mprotect(0x7fa44643f000, 2093056, PROT_NONE) = 0
+mmap(0x7fa44663e000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3b000) = 0x7fa44663e000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libboost_locale-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\240?\5\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=6528992, ...}) = 0
+mmap(NULL, 3196008, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa4460f3000
+mprotect(0x7fa4461f7000, 2097152, PROT_NONE) = 0
+mmap(0x7fa4463f7000, 36864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x104000) = 0x7fa4463f7000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libboost_regex-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`\337\5\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=8889896, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa4471cc000
+mmap(NULL, 3991696, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa445d23000
+mprotect(0x7fa445ee9000, 2097152, PROT_NONE) = 0
+mmap(0x7fa4460e9000, 36864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c6000) = 0x7fa4460e9000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=212821, ...}) = 0
+mmap(NULL, 212821, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fa447193000
+close(3)                                = 0
+openat(AT_FDCWD, "/lib64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200q\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=144048, ...}) = 0
+mmap(NULL, 2220520, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa445b03000
+mprotect(0x7fa445b1c000, 2097152, PROT_NONE) = 0
+mmap(0x7fa445d1c000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x19000) = 0x7fa445d1c000
+mmap(0x7fa445d1e000, 12776, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa445d1e000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/lib64/libmariadb.so.3", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`w\1\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=336352, ...}) = 0
+mmap(NULL, 2438560, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa4458ab000
+mprotect(0x7fa4458f4000, 2093056, PROT_NONE) = 0
+mmap(0x7fa445af3000, 40960, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x48000) = 0x7fa445af3000
+mmap(0x7fa445afd000, 5536, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa445afd000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/lib64/libz.so.1", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0@'\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=92216, ...}) = 0
+mmap(NULL, 2187280, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa445693000
+mprotect(0x7fa4456a9000, 2093056, PROT_NONE) = 0
+mmap(0x7fa4458a8000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x15000) = 0x7fa4458a8000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libdl.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/lib64/libdl.so.2", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\20\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=18400, ...}) = 0
+mmap(NULL, 2109584, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa44548b000
+mprotect(0x7fa44548e000, 2093056, PROT_NONE) = 0
+mmap(0x7fa44568d000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x7fa44568d000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/lib64/libssl.so.1.1", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\300\215\1\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=442648, ...}) = 0
+mmap(NULL, 2538184, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa44521b000
+mprotect(0x7fa44527d000, 2097152, PROT_NONE) = 0
+mmap(0x7fa44547d000, 40960, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x62000) = 0x7fa44547d000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/lib64/libcrypto.so.1.1", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0@\7\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2681240, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa4471ca000
+mmap(NULL, 4791856, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa444d83000
+mprotect(0x7fa444fe8000, 2097152, PROT_NONE) = 0
+mmap(0x7fa4451e8000, 172032, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x265000) = 0x7fa4451e8000
+mmap(0x7fa445212000, 11824, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa445212000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/lib64/libstdc++.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0 \24\n\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1956752, ...}) = 0
+mmap(NULL, 4064704, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa44499b000
+mprotect(0x7fa444b6b000, 2097152, PROT_NONE) = 0
+mmap(0x7fa444d6b000, 57344, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1d0000) = 0x7fa444d6b000
+mmap(0x7fa444d79000, 9664, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa444d79000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/lib64/libm.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\217\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1355760, ...}) = 0
+mmap(NULL, 3371560, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa444663000
+mprotect(0x7fa44479a000, 2093056, PROT_NONE) = 0
+mmap(0x7fa444999000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x136000) = 0x7fa444999000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/lib64/libgcc_s.so.1", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0000\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=96936, ...}) = 0
+mmap(NULL, 2192464, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa44444b000
+mprotect(0x7fa444462000, 2093056, PROT_NONE) = 0
+mmap(0x7fa444661000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x16000) = 0x7fa444661000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`D\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2038456, ...}) = 0
+mmap(NULL, 3909496, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa44408b000
+mprotect(0x7fa44423c000, 2097152, PROT_NONE) = 0
+mmap(0x7fa44443c000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1b1000) = 0x7fa44443c000
+mmap(0x7fa444442000, 14200, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa444442000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/cgicc/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/mpp/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/home/victor/lib/vuu/librt.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/lib64/librt.so.1", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\240&\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=41592, ...}) = 0
+mmap(NULL, 2128384, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa443e83000
+mprotect(0x7fa443e8a000, 2093056, PROT_NONE) = 0
+mmap(0x7fa444089000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x7fa444089000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libboost_system-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0000\5\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=12584, ...}) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa4471c8000
+mmap(NULL, 2101288, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa443c7b000
+mprotect(0x7fa443c7c000, 2093056, PROT_NONE) = 0
+mmap(0x7fa443e7b000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0) = 0x7fa443e7b000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libboost_chrono-mt-d-x64.so.1.74.0", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\300\210\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=551200, ...}) = 0
+mmap(NULL, 2168040, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa443a63000
+mprotect(0x7fa443a73000, 2097152, PROT_NONE) = 0
+mmap(0x7fa443c73000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x10000) = 0x7fa443c73000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libicudata.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libicudata.so.67", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0F\2\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=28398728, ...}) = 0
+mmap(NULL, 30494720, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa441d4b000
+mprotect(0x7fa443860000, 2093056, PROT_NONE) = 0
+mmap(0x7fa443a5f000, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1b14000) = 0x7fa443a5f000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libicui18n.so.67", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\320\333\17\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=25464592, ...}) = 0
+mmap(NULL, 5514744, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa441803000
+mprotect(0x7fa441b34000, 2097152, PROT_NONE) = 0
+mmap(0x7fa441d34000, 69632, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x331000) = 0x7fa441d34000
+mmap(0x7fa441d45000, 1528, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa441d45000
+close(3)                                = 0
+openat(AT_FDCWD, "tls/x86_64/x86_64/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/x86_64/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "tls/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/x86_64/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "x86_64/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/boost/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+openat(AT_FDCWD, "/usr/local/lib/icu/libicuuc.so.67", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0P\256\6\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=14382920, ...}) = 0
+mmap(NULL, 4248768, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fa4413f3000
+mprotect(0x7fa4415ea000, 2097152, PROT_NONE) = 0
+mmap(0x7fa4417ea000, 77824, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1f7000) = 0x7fa4417ea000
+mmap(0x7fa4417fd000, 13504, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa4417fd000
+close(3)                                = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa447191000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa44718f000
+arch_prctl(ARCH_SET_FS, 0x7fa447190400) = 0
+mprotect(0x7fa44443c000, 12288, PROT_READ) = 0
+mprotect(0x7fa445d1c000, 4096, PROT_READ) = 0
+mprotect(0x7fa44568d000, 4096, PROT_READ) = 0
+mprotect(0x7fa444999000, 4096, PROT_READ) = 0
+mprotect(0x7fa444661000, 4096, PROT_READ) = 0
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa44718d000
+mprotect(0x7fa444d6b000, 45056, PROT_READ) = 0
+mprotect(0x7fa443a5f000, 4096, PROT_READ) = 0
+mprotect(0x7fa4417ea000, 73728, PROT_READ) = 0
+mprotect(0x7fa441d34000, 61440, PROT_READ) = 0
+mprotect(0x7fa444089000, 4096, PROT_READ) = 0
+mprotect(0x7fa443c73000, 4096, PROT_READ) = 0
+mprotect(0x7fa443e7b000, 4096, PROT_READ) = 0
+mprotect(0x7fa4458a8000, 4096, PROT_READ) = 0
+mprotect(0x7fa4451e8000, 122880, PROT_READ) = 0
+mprotect(0x7fa44547d000, 20480, PROT_READ) = 0
+mprotect(0x7fa445af3000, 32768, PROT_READ) = 0
+mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fa44718a000
+mprotect(0x7fa4460e9000, 16384, PROT_READ) = 0
+mprotect(0x7fa44663e000, 8192, PROT_READ) = 0
+mprotect(0x7fa4463f7000, 20480, PROT_READ) = 0
+mprotect(0x7fa4468d9000, 12288, PROT_READ) = 0
+mprotect(0x7fa446b0e000, 4096, PROT_READ) = 0
+mprotect(0x7fa446d22000, 4096, PROT_READ) = 0
+mprotect(0x7fa446fa4000, 8192, PROT_READ) = 0
+mprotect(0x66f000, 12288, PROT_READ)    = 0
+mprotect(0x7fa4471d0000, 4096, PROT_READ) = 0
+munmap(0x7fa447193000, 212821)          = 0
+set_tid_address(0x7fa4471906d0)         = 3182
+set_robust_list(0x7fa4471906e0, 24)     = 0
+rt_sigaction(SIGRTMIN, {sa_handler=0x7fa445b09bf0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x7fa445b162d0}, NULL, 8) = 0
+rt_sigaction(SIGRT_1, {sa_handler=0x7fa445b09c90, sa_mask=[], sa_flags=SA_RESTORER|SA_RESTART|SA_SIGINFO, sa_restorer=0x7fa445b162d0}, NULL, 8) = 0
+rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+brk(NULL)                               = 0x172e000
+brk(0x174f000)                          = 0x174f000
+futex(0x7fa445212dc4, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+getpid()                                = 3182
+getpid()                                = 3182
+openat(AT_FDCWD, "/dev/urandom", O_RDONLY) = 3
+fstat(3, {st_mode=S_IFCHR|0666, st_rdev=makedev(1, 9), ...}) = 0
+futex(0x7fa445213934, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa445213338, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa44521332c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa445213474, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+read(3, "\177\202\1\230.m\347-O;\244\325\34\217\341Q\30\270G$\327\26\375X\272Z\32.\237\372\307\354"..., 48) = 48
+close(3)                                = 0
+futex(0x7fa4452132ec, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+getpid()                                = 3182
+openat(AT_FDCWD, "/dev/urandom", O_RDONLY|O_NOCTTY|O_NONBLOCK) = 3
+fstat(3, {st_mode=S_IFCHR|0666, st_rdev=makedev(1, 9), ...}) = 0
+poll([{fd=3, events=POLLIN}], 1, 10)    = 1 ([{fd=3, revents=POLLIN}])
+read(3, "Ph3\312\353\275\230\347\274\3\337\371\235\10f\206f\264G\227!\326\232\201\262\32u\272\361@\330\355"..., 48) = 48
+close(3)                                = 0
+getuid()                                = 1000
+getpid()                                = 3182
+openat(AT_FDCWD, "/dev/urandom", O_RDONLY) = 3
+fstat(3, {st_mode=S_IFCHR|0666, st_rdev=makedev(1, 9), ...}) = 0
+read(3, "\307^\324\377C\17\306\346aN=\301-\\\236\365vj\212_T\335\6l\30\374\3245\217\"\264\342"..., 48) = 48
+close(3)                                = 0
+futex(0x7fa445212d84, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa44568e048, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+openat(AT_FDCWD, "/usr/lib64/.libcrypto.so.1.1.hmac", O_RDONLY) = -1 ENOENT (No such file or directory)
+futex(0x7fa445212c7c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa445212c70, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+brk(0x1770000)                          = 0x1770000
+futex(0x7fa445213324, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+openat(AT_FDCWD, "/proc/sys/crypto/fips_enabled", O_RDONLY) = -1 ENOENT (No such file or directory)
+access("/usr/lib64/.libcrypto.so.1.1.hmac", F_OK) = -1 ENOENT (No such file or directory)
+futex(0x7fa444d795fc, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa444d79608, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa4417fd340, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+uname({sysname="Linux", nodename="linux-1kqq", ...}) = 0
+write(2, "malPlSrv-debug-dynamic", 22)  = 22
+write(2, ": main: Port #:", 15)         = 15
+write(2, "50001", 5)                    = 5
+write(2, "\n", 1)                       = 1
+write(2, "\t# of threads: ", 15)        = 15
+write(2, "5", 1)                        = 1
+write(2, "\n", 1)                       = 1
+write(2, "\tAddress: ", 10)             = 10
+write(2, "127.0.0.1", 9)                = 9
+write(2, "\n", 1)                       = 1
+fstat(1, {st_mode=S_IFCHR|0600, st_rdev=makedev(136, 2), ...}) = 0
+write(1, "IoContextPool::IoContextPool: po"..., 44) = 44
+write(1, "IoContextPool::IoContextPool: cr"..., 56) = 56
+write(1, "IoContextPool::IoContextPool: ad"..., 66) = 66
+write(1, "IoContextPool::IoContextPool: ad"..., 62) = 62
+write(1, "IoContextPool::IoContextPool: cr"..., 56) = 56
+write(1, "IoContextPool::IoContextPool: ad"..., 66) = 66
+write(1, "IoContextPool::IoContextPool: ad"..., 62) = 62
+write(1, "IoContextPool::IoContextPool: cr"..., 56) = 56
+write(1, "IoContextPool::IoContextPool: ad"..., 66) = 66
+write(1, "IoContextPool::IoContextPool: ad"..., 62) = 62
+write(1, "IoContextPool::IoContextPool: cr"..., 56) = 56
+write(1, "IoContextPool::IoContextPool: ad"..., 66) = 66
+write(1, "IoContextPool::IoContextPool: ad"..., 62) = 62
+write(1, "IoContextPool::IoContextPool: cr"..., 56) = 56
+write(1, "IoContextPool::IoContextPool: ad"..., 66) = 66
+write(1, "IoContextPool::IoContextPool: ad"..., 62) = 62
+write(1, "IoContextPool constructor: # of "..., 48) = 48
+write(1, "\t# of work_guard objects = 5\n", 29) = 29
+write(1, "IoContextPool::getIoc: current i"..., 42) = 42
+write(1, "IoContextPool::getIoc: index aft"..., 56) = 56
+eventfd2(0, EFD_CLOEXEC|EFD_NONBLOCK)   = 3
+epoll_create1(EPOLL_CLOEXEC)            = 4
+timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC) = 5
+epoll_ctl(4, EPOLL_CTL_ADD, 3, {EPOLLIN|EPOLLERR|EPOLLET, {u32=24484968, u64=24484968}}) = 0
+write(3, "\1\0\0\0\0\0\0\0", 8)         = 8
+epoll_ctl(4, EPOLL_CTL_ADD, 5, {EPOLLIN|EPOLLERR, {u32=24484980, u64=24484980}}) = 0
+pipe([6, 7])                            = 0
+fcntl(6, F_SETFL, O_RDONLY|O_NONBLOCK)  = 0
+fcntl(7, F_SETFL, O_RDONLY|O_NONBLOCK)  = 0
+fcntl(6, F_SETFD, FD_CLOEXEC)           = 0
+fcntl(7, F_SETFD, FD_CLOEXEC)           = 0
+epoll_ctl(4, EPOLL_CTL_ADD, 6, {EPOLLIN|EPOLLPRI|EPOLLERR|EPOLLHUP|EPOLLET, {u32=24485152, u64=24485152}}) = 0
+write(1, "IoContextPool::getIoc: current i"..., 42) = 42
+write(1, "IoContextPool::getIoc: index aft"..., 56) = 56
+eventfd2(0, EFD_CLOEXEC|EFD_NONBLOCK)   = 8
+epoll_create1(EPOLL_CLOEXEC)            = 9
+timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC) = 10
+epoll_ctl(9, EPOLL_CTL_ADD, 8, {EPOLLIN|EPOLLERR|EPOLLET, {u32=24485432, u64=24485432}}) = 0
+write(8, "\1\0\0\0\0\0\0\0", 8)         = 8
+epoll_ctl(9, EPOLL_CTL_ADD, 10, {EPOLLIN|EPOLLERR, {u32=24485444, u64=24485444}}) = 0
+stat("/home/victor/info/pluraliser.dbinfo", {st_mode=S_IFREG|0644, st_size=73, ...}) = 0
+write(1, "mpp::data::DBInfo::DBInfo: data "..., 83) = 83
+write(1, "mpp::data::DBInfo::DBInfo: set u"..., 43) = 43
+write(1, "\n", 1)                       = 1
+write(1, "Database options:\n", 18)     = 18
+write(1, "  --user arg            DB usern"..., 36) = 36
+write(1, "  --password arg        DB passw"..., 36) = 36
+write(1, "  --host arg            DB host\n", 32) = 32
+write(1, "  --db arg              DB name\n", 32) = 32
+write(1, "\n", 1)                       = 1
+openat(AT_FDCWD, "/home/victor/info/pluraliser.dbinfo", O_RDONLY) = 11
+write(1, "mpp::data::DBInfo::DBInfo: opene"..., 95) = 95
+read(11, "user=pluraliser\nhost=localhost\np"..., 8191) = 73
+read(11, "", 8191)                      = 0
+write(1, "mpp::data::DBInfo::DBInfo: parse"..., 59) = 59
+write(1, "mpp::data::DBInfo::DBInfo: loade"..., 65) = 65
+write(1, "mpp::data::DBInfo::DBInfo: loade"..., 55) = 55
+write(1, "\tDB user name = \"pluraliser\"\n", 29) = 29
+write(1, "\tDB password = \"I want more of y"..., 37) = 37
+write(1, "\tDB host name = \"localhost\"\n", 28) = 28
+write(1, "\tDB name = \"malayalam\"\n", 23) = 23
+close(11)                               = 0
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 63) = 63
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 79) = 79
+socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) = 11
+connect(11, {sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"}, 110) = 0
+sendto(11, "\2\0\0\0\22\0\0\0\t\0\0\0services\0", 21, MSG_NOSIGNAL, NULL, 0) = 21
+poll([{fd=11, events=POLLIN|POLLERR|POLLHUP}], 1, 5000) = 1 ([{fd=11, revents=POLLIN|POLLHUP}])
+recvmsg(11, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="services\0", iov_len=9}, {iov_base="\310O\3\0\0\0\0\0", iov_len=8}], msg_iovlen=2, msg_control=[{cmsg_len=20, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, cmsg_data=[12]}], msg_controllen=20, msg_flags=MSG_CMSG_CLOEXEC}, MSG_CMSG_CLOEXEC) = 17
+mmap(NULL, 217032, PROT_READ, MAP_SHARED, 12, 0) = 0x7fa447153000
+close(12)                               = 0
+close(11)                               = 0
+futex(0x7fa445213420, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa445213314, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa44521330c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa4452132d8, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa44521128c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa445212ce4, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa4452132d0, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+openat(AT_FDCWD, "/etc/ssl/openssl.cnf", O_RDONLY) = 11
+fstat(11, {st_mode=S_IFREG|0644, st_size=10771, ...}) = 0
+read(11, "#\n# OpenSSL example configuratio"..., 4096) = 4096
+read(11, "ape crash on BMPStrings or UTF8S"..., 4096) = 4096
+brk(0x1791000)                          = 0x1791000
+read(11, " is omitted\n# the certificate ca"..., 4096) = 2579
+read(11, "", 4096)                      = 0
+close(11)                               = 0
+futex(0x7fa445213300, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+futex(0x7fa4454869e0, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+sysinfo({uptime=1200843, loads=[800, 11360, 13696], totalram=16530989056, freeram=3160838144, sharedram=281395200, bufferram=14524416, totalswap=8075825152, freeswap=8075825152, procs=816, totalhigh=0, freehigh=0, mem_unit=1}) = 0
+futex(0x7fa445486abc, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7fa4440c45a0}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+futex(0x7fa445afca0c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+getpid()                                = 3182
+socket(AF_UNIX, SOCK_STREAM, 0)         = 11
+fcntl(11, F_SETFL, O_RDONLY|O_NONBLOCK) = 0
+connect(11, {sa_family=AF_UNIX, sun_path="/run/mysql/mysql.sock"}, 110) = 0
+fcntl(11, F_SETFL, O_RDONLY)            = 0
+setsockopt(11, SOL_IP, IP_TOS, [8], 4)  = -1 EOPNOTSUPP (Operation not supported)
+setsockopt(11, SOL_SOCKET, SO_KEEPALIVE, [1], 4) = 0
+recvfrom(11, "Y\0\0\0\n5.5.5-10.2.32-MariaDB\0&\0\0\0000"..., 16384, MSG_DONTWAIT, NULL, NULL) = 93
+sendto(11, "\301\0\0\1\204\242\237\0\0\0\0@\10\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"..., 197, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 197
+recvfrom(11, "\7\0\0\2\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+setsockopt(11, SOL_SOCKET, SO_RCVTIMEO, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0
+setsockopt(11, SOL_SOCKET, SO_SNDTIMEO, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 16) = 0
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "\n\0\0\0\2malayalam", 14, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 14
+recvfrom(11, "\25\0\0\1\0\0\0\2@\0\0\0\f\1\n\tmalayalam", 16384, MSG_DONTWAIT, NULL, NULL) = 25
+sendto(11, "\17\0\0\0\3SET NAMES utf8", 19, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 19
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+write(1, "mpp::ReqHandler::openDBConn: set"..., 69) = 69
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+write(1, "mpp::ReqHandler::openDBConn: ope"..., 51) = 51
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "!\0\0\0\26SELECT * FROM nouns WHERE n"..., 37, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 37
+recvfrom(11, 0x1773e50, 16384, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=11, events=POLLIN}], 1, -1)   = 1 ([{fd=11, revents=POLLIN}])
+recvfrom(11, "\f\0\0\1\0\26\0\0\0\2\0\1\0\0\0\0\27\0\0\2\3def\0\0\0\1?\0\f?"..., 16384, MSG_DONTWAIT, NULL, NULL) = 163
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 104) = 104
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "\205\0\0\0\26SELECT nouns.id,pluralisabl"..., 137, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 137
+recvfrom(11, 0x1773e50, 16384, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=11, events=POLLIN}], 1, -1)   = 1 ([{fd=11, revents=POLLIN}])
+recvfrom(11, "\f\0\0\1\0\27\0\0\0\2\0\1\0\0\0\0\27\0\0\2\3def\0\0\0\1?\0\f?"..., 16384, MSG_DONTWAIT, NULL, NULL) = 203
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 103) = 103
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "l\0\0\0\26SELECT nouns.*,animacies.an"..., 112, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 112
+recvfrom(11, 0x1773e50, 16384, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=11, events=POLLIN}], 1, -1)   = 1 ([{fd=11, revents=POLLIN}])
+recvfrom(11, "\f\0\0\1\0\30\0\0\0\3\0\1\0\0\0\0\27\0\0\2\3def\0\0\0\1?\0\f?"..., 16384, MSG_DONTWAIT, NULL, NULL) = 230
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 98) = 98
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "p\0\0\0\26SELECT nouns.*,humanNouns.h"..., 116, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 116
+recvfrom(11, 0x1773e50, 16384, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=11, events=POLLIN}], 1, -1)   = 1 ([{fd=11, revents=POLLIN}])
+recvfrom(11, "\f\0\0\1\0\31\0\0\0\3\0\1\0\0\0\0\27\0\0\2\3def\0\0\0\1?\0\f?"..., 16384, MSG_DONTWAIT, NULL, NULL) = 234
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 98) = 98
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "a\0\0\0\26SELECT nouns.id,genders.gen"..., 101, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 101
+recvfrom(11, 0x1773e50, 16384, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=11, events=POLLIN}], 1, -1)   = 1 ([{fd=11, revents=POLLIN}])
+recvfrom(11, "\f\0\0\1\0\32\0\0\0\2\0\1\0\0\0\0\27\0\0\2\3def\0\0\0\1?\0\f?"..., 16384, MSG_DONTWAIT, NULL, NULL) = 171
+write(1, "mpp::ReqHandler::openDBConn:: cr"..., 82) = 82
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "v\0\0\0\26SELECT nouns.id,nouns.noun,"..., 122, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 122
+recvfrom(11, 0x1773e50, 16384, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=11, events=POLLIN}], 1, -1)   = 1 ([{fd=11, revents=POLLIN}])
+recvfrom(11, "\f\0\0\1\0\33\0\0\0\3\0\1\0\0\0\0\27\0\0\2\3def\0\0\0\1?\0\f?"..., 16384, MSG_DONTWAIT, NULL, NULL) = 230
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 90) = 90
+sendto(11, "\1\0\0\0\16", 5, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 5
+recvfrom(11, "\7\0\0\1\0\0\0\2\0\0\0", 16384, MSG_DONTWAIT, NULL, NULL) = 11
+sendto(11, "]\0\0\0\26SELECT * FROM nouns WHERE n"..., 97, MSG_DONTWAIT|MSG_NOSIGNAL, NULL, 0) = 97
+recvfrom(11, 0x1773e50, 16384, MSG_DONTWAIT, NULL, NULL) = -1 EAGAIN (Resource temporarily unavailable)
+poll([{fd=11, events=POLLIN}], 1, -1)   = 1 ([{fd=11, revents=POLLIN}])
+recvfrom(11, "\f\0\0\1\0\34\0\0\0\2\0\1\0\0\0\0\27\0\0\2\3def\0\0\0\1?\0\f?"..., 16384, MSG_DONTWAIT, NULL, NULL) = 163
+write(1, "mpp::ReqHandler::openDBConn: cre"..., 103) = 103
+rt_sigaction(SIGINT, {sa_handler=0x42d7d2, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7fa445b162d0}, NULL, 8) = 0
+rt_sigaction(SIGTERM, {sa_handler=0x42d7d2, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7fa445b162d0}, NULL, 8) = 0
+rt_sigaction(SIGQUIT, {sa_handler=0x42d7d2, sa_mask=~[RTMIN RT_1], sa_flags=SA_RESTORER, sa_restorer=0x7fa445b162d0}, NULL, 8) = 0
+write(1, "malPlSrv-debug-dynamic:Server::S"..., 58) = 58
+write(1, "malPlSrv-debug-dynamic:Server::S"..., 82) = 82
+socket(AF_INET, SOCK_STREAM, IPPROTO_TCP) = 12
+epoll_ctl(9, EPOLL_CTL_ADD, 12, {EPOLLIN|EPOLLPRI|EPOLLERR|EPOLLHUP|EPOLLET, {u32=24562144, u64=24562144}}) = 0
+write(1, "malPlSrv-debug-dynamic:Server::S"..., 68) = 68
+write(1, "\tusing 5 threads\n", 17)     = 17
+setsockopt(12, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
+bind(12, {sa_family=AF_INET, sin_port=htons(50001), sin_addr=inet_addr("127.0.0.1")}, 16) = 0
+listen(12, 128)                         = 0
+write(1, "malPlSrv-debug-dynamic:Server::S"..., 60) = 60
+write(1, "IoContextPool::getIoc: current i"..., 42) = 42
+write(1, "IoContextPool::getIoc: index aft"..., 56) = 56
+eventfd2(0, EFD_CLOEXEC|EFD_NONBLOCK)   = 13
+epoll_create1(EPOLL_CLOEXEC)            = 14
+timerfd_create(CLOCK_MONOTONIC, TFD_CLOEXEC) = 15
+epoll_ctl(14, EPOLL_CTL_ADD, 13, {EPOLLIN|EPOLLERR|EPOLLET, {u32=24582120, u64=24582120}}) = 0
+write(13, "\1\0\0\0\0\0\0\0", 8)        = 8
+epoll_ctl(14, EPOLL_CTL_ADD, 15, {EPOLLIN|EPOLLERR, {u32=24582132, u64=24582132}}) = 0
+write(1, "mpp::ReqParser::ReqParser: start"..., 60) = 60
+write(1, "Version = 2.3.1\n", 16)       = 16
+write(1, "Recognised verbs = State #9's na"..., 44) = 44
+write(1, "State #11's name is \"ISSING\"\n", 29) = 29
+open("/etc/localtime", O_RDONLY|O_CLOEXEC) = 16
+fstat(16, {st_mode=S_IFREG|0644, st_size=3494, ...}) = 0
+fstat(16, {st_mode=S_IFREG|0644, st_size=3494, ...}) = 0
+read(16, "TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\5\0\0\0\5\0\0\0\0"..., 4096) = 3494
+lseek(16, -2225, SEEK_CUR)              = 1269
+read(16, "TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\5\0\0\0\5\0\0\0\0"..., 4096) = 2225
+close(16)                               = 0
+readlink("/etc/localtime", "/usr/share/zoneinfo/America/Toro"..., 4095) = 35
+brk(0x17b2000)                          = 0x17b2000
+write(1, "malPlSrv-debug-dynamic:Server::s"..., 58) = 58
+ioctl(12, FIONBIO, [1])                 = 0
+accept(12, NULL, NULL)                  = -1 EAGAIN (Resource temporarily unavailable)
+write(1, "malPlSrv-debug-dynamic:Server::s"..., 73) = 73
+write(1, "malPlSrv-debug-dynamic:Server::r"..., 42) = 42
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7fa440bf2000
+mprotect(0x7fa440bf3000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7fa4413f1fb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7fa4413f29d0, tls=0x7fa4413f2700, child_tidptr=0x7fa4413f29d0) = 3183
+write(1, "IoContextPool::run: created thre"..., 38) = 38
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7fa4403f1000
+mprotect(0x7fa4403f2000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7fa440bf0fb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7fa440bf19d0, tls=0x7fa440bf1700, child_tidptr=0x7fa440bf19d0) = 3184
+write(1, "IoContextPool::run: created thre"..., 38) = 38
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7fa43fbf0000
+mprotect(0x7fa43fbf1000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7fa4403effb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7fa4403f09d0, tls=0x7fa4403f0700, child_tidptr=0x7fa4403f09d0) = 3185
+write(1, "IoContextPool::run: created thre"..., 38) = 38
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7fa43f3ef000
+mprotect(0x7fa43f3f0000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7fa43fbeefb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7fa43fbef9d0, tls=0x7fa43fbef700, child_tidptr=0x7fa43fbef9d0) = 3186
+write(1, "IoContextPool::run: created thre"..., 38) = 38
+mmap(NULL, 8392704, PROT_NONE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7fa43ebee000
+mprotect(0x7fa43ebef000, 8388608, PROT_READ|PROT_WRITE) = 0
+clone(child_stack=0x7fa43f3edfb0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7fa43f3ee9d0, tls=0x7fa43f3ee700, child_tidptr=0x7fa43f3ee9d0) = 3187
+write(1, "IoContextPool::run: created thre"..., 38) = 38
+write(1, "IoContextPool::run: waiting for "..., 50) = 50
+futex(0x7fa4413f29d0, FUTEX_WAIT, 3183, NULL) = ?
++++ killed by SIGSEGV (core dumped) +++

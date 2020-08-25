@@ -2,7 +2,7 @@
 #define MPP_DATA_DBINFO_HPP
 
 /* Our headers */
-#include "mpp/bosmacros/filesystem.hpp" // FILESYSTEM_PATH macro
+#include "bosmacros/filesystem.hpp" // FILESYSTEM_PATH macro
 
 namespace mpp
 {

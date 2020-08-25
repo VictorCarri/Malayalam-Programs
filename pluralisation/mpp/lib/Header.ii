@@ -27986,9 +27986,9 @@ namespace std __attribute__ ((__visibility__ ("default")))
 # 4 "cpp/Header.cpp" 2
 
 
-# 1 "./hpp/mpp/bosmacros/any.hpp" 1
+# 1 "/home/victor/include/bosmacros/any.hpp" 1
 
-#define MPP_BOSMACROS_ANY_HPP 
+#define BOSMACROS_ANY_HPP 
 
 
 
@@ -28565,7 +28565,7 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 
 }
-# 10 "./hpp/mpp/bosmacros/any.hpp" 2
+# 10 "/home/victor/include/bosmacros/any.hpp" 2
 #define ANY_CLASS std::any
 #define BAD_ANY_CAST std::bad_any_cast
 #define ANY_CAST std::any_cast

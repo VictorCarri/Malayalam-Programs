@@ -36,7 +36,7 @@ compOpts=$(addprefix -I,$(hdrDir) /home/victor/include /usr/include/mysql) $(add
 # Defines that control whether the boost or std implementations are used
 # Using boost::bind
 # Using boost::system::error_code
-boostOrStd=$(addprefix -DUSE_STD_,ENABLE_SHARED_FROM_THIS SHARED_PTR THREAD)
+boostOrStd=$(addprefix -DUSE_STD_,ENABLE_SHARED_FROM_THIS SHARED_PTR THREAD ANY)
 
 # Redirect stderr > stdout
 redirect=2>&1

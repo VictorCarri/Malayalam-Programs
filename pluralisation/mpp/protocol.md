@@ -25,12 +25,11 @@ Content-Type	|	Type of the input (text/plain;charset=utf-8)
 An attempt to specify it in BNR form:
 
 Request -> protLine headers argument
-protLine -> "MPP/" integer "." integer "." integer space verb lineTerm
+protLine -> "MPP/" integer "." integer "." integer space verb "\r\n"
 space -> ' ' | '\t';
 verb -> "ISSING" | "FOF";
-lineTerm -> "\r\n";
-headers -> header header\* lineTerm
-header -> name ':' space string lineTerm
+headers -> header header\* "\r\n"
+header -> name ':' space string "\r\n"
 string -> [char]+
 char -> [a-zA-Z0-9-] # any character except \r or \n
 argument -> [byte]+
