@@ -115,7 +115,20 @@ namespace mpp
 			std::string content; // The reply's content
 			const std::array<char, 2> crlf; // CR/LF sequence to be used in the reply
 			const std::array<char, 2> nameValSep; // Separates a header name from its value
+
+			/**
+			* Friend declaration to allow operator<< to access private members.
+			**/
+			friend std::ostream& operator<<(std::ostream& os, const mpp::Reply& req);
 	};
+
+	/**
+	* @desc An overload for the insertion operator that prints an MPP request.
+	* @param os The output stream to write to.
+	* @param req The mpp::Request object to write.
+	* @return A reference to the output stream, to allow chaining of operator<<.
+	**/
+	std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
 };
 
 #endif // MPP_REPLY_HPP

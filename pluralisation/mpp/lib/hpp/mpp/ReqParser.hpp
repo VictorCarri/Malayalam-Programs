@@ -14,7 +14,6 @@
 /* Boost */
 #include <boost/tuple/tuple.hpp> // boost::tuple
 #include <boost/logic/tribool.hpp> // boost::tribool, boost::indeterminate
-#include <boost/locale/generator.hpp> // boost::locale::generator
 #include <boost/logic/tribool_io.hpp> // operator<< for boost::logic::tribool
 
 /* Our headers */
@@ -148,7 +147,6 @@ namespace mpp
 			const ARRAY_CLASS<short, 3> version; // Current parser/server version
 			ARRAY_CLASS<std::unique_ptr<std::stringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
 			std::map<std::string, State> verbInfo; // Maps a verb to its state. The keys are iterated to check recognised verbs. The values are only used to determine which state to jump to next after parsing the first character of the verb.
-			boost::locale::generator gen; // Used to switch between US English and Malayalam locales
 			std::unique_ptr<std::stringstream> pSSHeaderName; // Use a pointer so that we can easily reset the stringstream
 			std::unique_ptr<std::stringstream> pSSHeaderVal; // Use a pointer so that we can easily reset the stringstream
 			int mNBytes; // # of bytes in Malayalam noun.

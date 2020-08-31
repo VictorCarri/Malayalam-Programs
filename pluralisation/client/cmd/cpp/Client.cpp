@@ -356,7 +356,7 @@ Client::~Client()
 	#ifdef DEBUG
 	std::cout << "Client::~Client: stopping our I/O context" << std::endl;
 	#endif
-	ioc.stop(); // Stop any pending operations
+	ioc.stop(); // Stop any pending operations. Must be called so that our worker thread will be able to stop running.
 	#ifdef DEBUG
 	std::cout << "Client::~Client: waiting for worker thread to join." << std::endl;
 	#endif
@@ -376,29 +376,29 @@ void Client::sendSingReq()
 	std::cout << "Client::sendSingReq: callback called from isSing lambda." << std::endl;
 	#endif
 
-
 	/* Build the request */
-	mpp::Request req;
-	req.SETCOM_FUNC(mpp::Request::ISSING); // Make it an ISSING request
-	req.setNoun(input); // The noun to send is our input
-	req.addHeader("Content-Type", ANY_CLASS(std::string("text/plain"))); // The noun is a plaintext string
-	req.addHeader("Content-Length", ANY_CLASS(input.length())); // The server's parser needs to know how long the string is to read it over the network
+	curReq.SETCOM_FUNC(mpp::Request::ISSING); // Make it an ISSING curRequest
+	curReq.setNoun(input); // The noun to send is our input
+	curReq.clearHeaders(); // Clear any headers that were set for the last request
+	curReq.addHeader("Content-Type", std::string("text/plain")); // The noun is a plaintext string
+	curReq.addHeader("Content-Length", input.length()); // The server's parser needs to know how long the string is to read it over the network
 	#ifdef DEBUG
-	std::cout << "Client::sendSingReq: request to send is " << std::endl
-	<< req;
+	std::cout << "Client::sendSingReq: curRequest to send is " << std::endl
+	<< curReq;
 	#endif
-	boost::asio::async_write(sock, req.toBuffers(), [this, &req](const boost::system::error_code& ec, std::size_t bytesTransferred)
+	reqBufs = curReq.toBuffers(); // Store the buffers in a member variable so that they won't go out of scope before the asynchronous write completes
+	boost::asio::async_write(sock, reqBufs, [this](const boost::system::error_code& ec, std::size_t bytesTransferred)
 		{
 			if (!ec) // No error
 			{
 				#ifdef DEBUG
-				std::cout << "Client::sendSingReq: sent " << bytesTransferred << " bytes" << std::endl
-				<< "\tRequest was " << req.size() << " bytes long" << std::endl;
+				std::cout << "Client::sendSingReq::lambda: sent " << bytesTransferred << " bytes" << std::endl
+				<< "\tRequest was " << curReq.size() << " bytes long" << std::endl;
 				#endif
 				
-				if (bytesTransferred < req.size()) // The entire request wasn't sent
+				if (bytesTransferred < curReq.size()) // The entire request wasn't sent
 				{
-					std::cerr << "Client::sendSingReq: only " << bytesTransferred << " bytes of a request that was " << req.size() << " bytes long were transferred." << std::endl;
+					std::cerr << "Client::sendSingReq::lambda: only " << bytesTransferred << " bytes of a request that was " << curReq.size() << " bytes long were transferred." << std::endl;
 				}
 
 				else
@@ -409,7 +409,7 @@ void Client::sendSingReq()
 
 			else // An error occurred
 			{
-				std::cerr << "Client::sendSingReq: an error occurred while sending the request to the server." << std::endl
+				std::cerr << "Client::sendSingReq::lambda: an error occurred while sending the request to the server." << std::endl
 				<< "\tError value = " << ec.value() << std::endl
 				<< "\tError message = " << std::quoted(ec.message()) << std::endl
 				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;

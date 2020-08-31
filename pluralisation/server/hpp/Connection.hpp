@@ -58,7 +58,7 @@ class Connection : public ENABLE_SHARED_FROM_THIS<Connection>,
 		* @desc Handles completion of a write operation.
 		* @param e Describes what error occurred, if any.
 		**/
-		void handleWrite(const ERROR_CODE& e);
+		void handleWrite(const ERROR_CODE& e, std::size_t bytesTransferred);
 
 		boost::asio::ip::tcp::socket socket; // We listen on this
 		mpp::ReqHandler& reqHandler; // Parses requests

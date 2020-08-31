@@ -74860,592 +74860,6 @@ namespace vuu
 # 25 "cpp/ReqParser.cpp" 2
 
 
-# 1 "/home/victor/include/bosmacros/any.hpp" 1
-
-#define BOSMACROS_ANY_HPP 
-
-
-
-
-
-
-# 1 "/usr/include/c++/9/any" 1 3
-# 30 "/usr/include/c++/9/any" 3
-#define _GLIBCXX_ANY 1
-
-       
-# 33 "/usr/include/c++/9/any" 3
-# 41 "/usr/include/c++/9/any" 3
-
-# 41 "/usr/include/c++/9/any" 3
-namespace std __attribute__ ((__visibility__ ("default")))
-{
-
-# 54 "/usr/include/c++/9/any" 3
-  class bad_any_cast : public bad_cast
-  {
-  public:
-    virtual const char* what() const noexcept { return "bad any_cast"; }
-  };
-
-  [[gnu::noreturn]] inline void __throw_bad_any_cast()
-  {
-
-    throw bad_any_cast{};
-
-
-
-  }
-
-#define __cpp_lib_any 201606L
-
-
-
-
-
-
-
-  class any
-  {
-
-    union _Storage
-    {
-      constexpr _Storage() : _M_ptr{nullptr} {}
-
-
-      _Storage(const _Storage&) = delete;
-      _Storage& operator=(const _Storage&) = delete;
-
-      void* _M_ptr;
-      aligned_storage<sizeof(_M_ptr), alignof(void*)>::type _M_buffer;
-    };
-
-    template<typename _Tp, typename _Safe = is_nothrow_move_constructible<_Tp>,
-      bool _Fits = (sizeof(_Tp) <= sizeof(_Storage))
-     && (alignof(_Tp) <= alignof(_Storage))>
-      using _Internal = std::integral_constant<bool, _Safe::value && _Fits>;
-
-    template<typename _Tp>
-      struct _Manager_internal;
-
-    template<typename _Tp>
-      struct _Manager_external;
-
-    template<typename _Tp>
-      using _Manager = conditional_t<_Internal<_Tp>::value,
-         _Manager_internal<_Tp>,
-         _Manager_external<_Tp>>;
-
-    template<typename _Tp, typename _Decayed = decay_t<_Tp>>
-      using _Decay = enable_if_t<!is_same<_Decayed, any>::value, _Decayed>;
-
-
-    template <typename _Tp, typename... _Args,
-       typename _Mgr = _Manager<_Tp>>
-      void __do_emplace(_Args&&... __args)
-      {
- reset();
-        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
- _M_manager = &_Mgr::_S_manage;
-      }
-
-
-
-    template <typename _Tp, typename _Up, typename... _Args,
-       typename _Mgr = _Manager<_Tp>>
-      void __do_emplace(initializer_list<_Up> __il, _Args&&... __args)
-      {
- reset();
-        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
- _M_manager = &_Mgr::_S_manage;
-      }
-
-  public:
-
-
-
-    constexpr any() noexcept : _M_manager(nullptr) { }
-
-
-    any(const any& __other)
-    {
-      if (!__other.has_value())
- _M_manager = nullptr;
-      else
- {
-   _Arg __arg;
-   __arg._M_any = this;
-   __other._M_manager(_Op_clone, &__other, &__arg);
- }
-    }
-
-
-
-
-
-
-    any(any&& __other) noexcept
-    {
-      if (!__other.has_value())
- _M_manager = nullptr;
-      else
- {
-   _Arg __arg;
-   __arg._M_any = this;
-   __other._M_manager(_Op_xfer, &__other, &__arg);
- }
-    }
-
-    template <typename _Res, typename _Tp, typename... _Args>
-    using __any_constructible =
-      enable_if<__and_<is_copy_constructible<_Tp>,
-    is_constructible<_Tp, _Args...>>::value,
-    _Res>;
-
-    template <typename _Tp, typename... _Args>
-    using __any_constructible_t =
-      typename __any_constructible<bool, _Tp, _Args...>::type;
-
-
-    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              __any_constructible_t<_Tp, _ValueType&&> = true,
-       enable_if_t<!__is_in_place_type<_Tp>::value, bool> = true>
-      any(_ValueType&& __value)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, std::forward<_ValueType>(__value));
-      }
-
-
-    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              enable_if_t<__and_v<is_copy_constructible<_Tp>,
-      __not_<is_constructible<_Tp, _ValueType&&>>,
-      __not_<__is_in_place_type<_Tp>>>,
-     bool> = false>
-      any(_ValueType&& __value)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, __value);
-      }
-
-
-    template <typename _ValueType, typename... _Args,
-       typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              __any_constructible_t<_Tp, _Args&&...> = false>
-      explicit
-      any(in_place_type_t<_ValueType>, _Args&&... __args)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
-      }
-
-
-
-    template <typename _ValueType, typename _Up, typename... _Args,
-       typename _Tp = _Decay<_ValueType>,
-       typename _Mgr = _Manager<_Tp>,
-              __any_constructible_t<_Tp, initializer_list<_Up>,
-        _Args&&...> = false>
-      explicit
-      any(in_place_type_t<_ValueType>,
-   initializer_list<_Up> __il, _Args&&... __args)
-      : _M_manager(&_Mgr::_S_manage)
-      {
-        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
-      }
-
-
-    ~any() { reset(); }
-
-
-
-
-    any& operator=(const any& __rhs)
-    {
-      *this = any(__rhs);
-      return *this;
-    }
-
-
-
-
-
-
-    any& operator=(any&& __rhs) noexcept
-    {
-      if (!__rhs.has_value())
- reset();
-      else if (this != &__rhs)
- {
-   reset();
-   _Arg __arg;
-   __arg._M_any = this;
-   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
- }
-      return *this;
-    }
-
-
-    template<typename _ValueType>
-      enable_if_t<is_copy_constructible<_Decay<_ValueType>>::value, any&>
-      operator=(_ValueType&& __rhs)
-      {
- *this = any(std::forward<_ValueType>(__rhs));
- return *this;
-      }
-
-
-    template <typename _ValueType, typename... _Args>
-      typename __any_constructible<_Decay<_ValueType>&,
-       _Decay<_ValueType>, _Args&&...>::type
-      emplace(_Args&&... __args)
-      {
- __do_emplace<_Decay<_ValueType>>(std::forward<_Args>(__args)...);
- any::_Arg __arg;
- this->_M_manager(any::_Op_access, this, &__arg);
- return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
-      }
-
-
-
-    template <typename _ValueType, typename _Up, typename... _Args>
-      typename __any_constructible<_Decay<_ValueType>&,
-       _Decay<_ValueType>,
-       initializer_list<_Up>,
-       _Args&&...>::type
-      emplace(initializer_list<_Up> __il, _Args&&... __args)
-      {
- __do_emplace<_Decay<_ValueType>, _Up>(__il,
-           std::forward<_Args>(__args)...);
- any::_Arg __arg;
- this->_M_manager(any::_Op_access, this, &__arg);
- return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
-      }
-
-
-
-
-    void reset() noexcept
-    {
-      if (has_value())
-      {
- _M_manager(_Op_destroy, this, nullptr);
- _M_manager = nullptr;
-      }
-    }
-
-
-    void swap(any& __rhs) noexcept
-    {
-      if (!has_value() && !__rhs.has_value())
- return;
-
-      if (has_value() && __rhs.has_value())
- {
-   if (this == &__rhs)
-     return;
-
-   any __tmp;
-   _Arg __arg;
-   __arg._M_any = &__tmp;
-   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
-   __arg._M_any = &__rhs;
-   _M_manager(_Op_xfer, this, &__arg);
-   __arg._M_any = this;
-   __tmp._M_manager(_Op_xfer, &__tmp, &__arg);
- }
-      else
- {
-   any* __empty = !has_value() ? this : &__rhs;
-   any* __full = !has_value() ? &__rhs : this;
-   _Arg __arg;
-   __arg._M_any = __empty;
-   __full->_M_manager(_Op_xfer, __full, &__arg);
- }
-    }
-
-
-
-
-    bool has_value() const noexcept { return _M_manager != nullptr; }
-
-
-
-    const type_info& type() const noexcept
-    {
-      if (!has_value())
- return typeid(void);
-      _Arg __arg;
-      _M_manager(_Op_get_type_info, this, &__arg);
-      return *__arg._M_typeinfo;
-    }
-
-
-    template<typename _Tp>
-      static constexpr bool __is_valid_cast()
-      { return __or_<is_reference<_Tp>, is_copy_constructible<_Tp>>::value; }
-
-  private:
-    enum _Op {
- _Op_access, _Op_get_type_info, _Op_clone, _Op_destroy, _Op_xfer
-    };
-
-    union _Arg
-    {
- void* _M_obj;
- const std::type_info* _M_typeinfo;
- any* _M_any;
-    };
-
-    void (*_M_manager)(_Op, const any*, _Arg*);
-    _Storage _M_storage;
-
-    template<typename _Tp>
-      friend void* __any_caster(const any* __any);
-
-
-    template<typename _Tp>
-      struct _Manager_internal
-      {
- static void
- _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
-
- template<typename _Up>
-   static void
-   _S_create(_Storage& __storage, _Up&& __value)
-   {
-     void* __addr = &__storage._M_buffer;
-     ::new (__addr) _Tp(std::forward<_Up>(__value));
-   }
-
- template<typename... _Args>
-   static void
-   _S_create(_Storage& __storage, _Args&&... __args)
-   {
-     void* __addr = &__storage._M_buffer;
-     ::new (__addr) _Tp(std::forward<_Args>(__args)...);
-   }
-      };
-
-
-    template<typename _Tp>
-      struct _Manager_external
-      {
- static void
- _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
-
- template<typename _Up>
-   static void
-   _S_create(_Storage& __storage, _Up&& __value)
-   {
-     __storage._M_ptr = new _Tp(std::forward<_Up>(__value));
-   }
- template<typename... _Args>
-   static void
-   _S_create(_Storage& __storage, _Args&&... __args)
-   {
-     __storage._M_ptr = new _Tp(std::forward<_Args>(__args)...);
-   }
-      };
-  };
-
-
-  inline void swap(any& __x, any& __y) noexcept { __x.swap(__y); }
-
-
-  template <typename _Tp, typename... _Args>
-    any make_any(_Args&&... __args)
-    {
-      return any(in_place_type<_Tp>, std::forward<_Args>(__args)...);
-    }
-
-
-  template <typename _Tp, typename _Up, typename... _Args>
-    any make_any(initializer_list<_Up> __il, _Args&&... __args)
-    {
-      return any(in_place_type<_Tp>, __il, std::forward<_Args>(__args)...);
-    }
-# 451 "/usr/include/c++/9/any" 3
-  template<typename _ValueType>
-    inline _ValueType any_cast(const any& __any)
-    {
-      using _Up = __remove_cvref_t<_ValueType>;
-      static_assert(any::__is_valid_cast<_ValueType>(),
-   "Template argument must be a reference or CopyConstructible type");
-      static_assert(is_constructible_v<_ValueType, const _Up&>,
-   "Template argument must be constructible from a const value.");
-      auto __p = any_cast<_Up>(&__any);
-      if (__p)
- return static_cast<_ValueType>(*__p);
-      __throw_bad_any_cast();
-    }
-# 477 "/usr/include/c++/9/any" 3
-  template<typename _ValueType>
-    inline _ValueType any_cast(any& __any)
-    {
-      using _Up = __remove_cvref_t<_ValueType>;
-      static_assert(any::__is_valid_cast<_ValueType>(),
-   "Template argument must be a reference or CopyConstructible type");
-      static_assert(is_constructible_v<_ValueType, _Up&>,
-   "Template argument must be constructible from an lvalue.");
-      auto __p = any_cast<_Up>(&__any);
-      if (__p)
- return static_cast<_ValueType>(*__p);
-      __throw_bad_any_cast();
-    }
-
-  template<typename _ValueType>
-    inline _ValueType any_cast(any&& __any)
-    {
-      using _Up = __remove_cvref_t<_ValueType>;
-      static_assert(any::__is_valid_cast<_ValueType>(),
-   "Template argument must be a reference or CopyConstructible type");
-      static_assert(is_constructible_v<_ValueType, _Up>,
-   "Template argument must be constructible from an rvalue.");
-      auto __p = any_cast<_Up>(&__any);
-      if (__p)
- return static_cast<_ValueType>(std::move(*__p));
-      __throw_bad_any_cast();
-    }
-
-
-
-  template<typename _Tp>
-    void* __any_caster(const any* __any)
-    {
-
-
-      using _Up = remove_cv_t<_Tp>;
-
-
-      if constexpr (!is_same_v<decay_t<_Up>, _Up>)
- return nullptr;
-
-      else if constexpr (!is_copy_constructible_v<_Up>)
- return nullptr;
-
-      else if (__any->_M_manager == &any::_Manager<_Up>::_S_manage
-
-   || __any->type() == typeid(_Tp)
-
-   )
- {
-   any::_Arg __arg;
-   __any->_M_manager(any::_Op_access, __any, &__arg);
-   return __arg._M_obj;
- }
-      return nullptr;
-    }
-# 546 "/usr/include/c++/9/any" 3
-  template<typename _ValueType>
-    inline const _ValueType* any_cast(const any* __any) noexcept
-    {
-      if constexpr (is_object_v<_ValueType>)
- if (__any)
-   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
-      return nullptr;
-    }
-
-  template<typename _ValueType>
-    inline _ValueType* any_cast(any* __any) noexcept
-    {
-      if constexpr (is_object_v<_ValueType>)
- if (__any)
-   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
-      return nullptr;
-    }
-
-
-  template<typename _Tp>
-    void
-    any::_Manager_internal<_Tp>::
-    _S_manage(_Op __which, const any* __any, _Arg* __arg)
-    {
-
-      auto __ptr = reinterpret_cast<const _Tp*>(&__any->_M_storage._M_buffer);
-      switch (__which)
-      {
-      case _Op_access:
- __arg->_M_obj = const_cast<_Tp*>(__ptr);
- break;
-      case _Op_get_type_info:
-
- __arg->_M_typeinfo = &typeid(_Tp);
-
- break;
-      case _Op_clone:
- ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp(*__ptr);
- __arg->_M_any->_M_manager = __any->_M_manager;
- break;
-      case _Op_destroy:
- __ptr->~_Tp();
- break;
-      case _Op_xfer:
- ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp
-   (std::move(*const_cast<_Tp*>(__ptr)));
- __ptr->~_Tp();
- __arg->_M_any->_M_manager = __any->_M_manager;
- const_cast<any*>(__any)->_M_manager = nullptr;
- break;
-      }
-    }
-
-  template<typename _Tp>
-    void
-    any::_Manager_external<_Tp>::
-    _S_manage(_Op __which, const any* __any, _Arg* __arg)
-    {
-
-      auto __ptr = static_cast<const _Tp*>(__any->_M_storage._M_ptr);
-      switch (__which)
-      {
-      case _Op_access:
- __arg->_M_obj = const_cast<_Tp*>(__ptr);
- break;
-      case _Op_get_type_info:
-
- __arg->_M_typeinfo = &typeid(_Tp);
-
- break;
-      case _Op_clone:
- __arg->_M_any->_M_storage._M_ptr = new _Tp(*__ptr);
- __arg->_M_any->_M_manager = __any->_M_manager;
- break;
-      case _Op_destroy:
- delete __ptr;
- break;
-      case _Op_xfer:
- __arg->_M_any->_M_storage._M_ptr = __any->_M_storage._M_ptr;
- __arg->_M_any->_M_manager = __any->_M_manager;
- const_cast<any*>(__any)->_M_manager = nullptr;
- break;
-      }
-    }
-
-
-
-  namespace __detail::__variant
-  {
-    template<typename> struct _Never_valueless_alt;
-
-
-
-    template<>
-      struct _Never_valueless_alt<std::any>
-      : std::true_type
-      { };
-  }
-
-
-}
-# 10 "/home/victor/include/bosmacros/any.hpp" 2
-#define ANY_CLASS std::any
-#define BAD_ANY_CAST std::bad_any_cast
-#define ANY_CAST std::any_cast
-# 28 "cpp/ReqParser.cpp" 2
 # 1 "./hpp/mpp/Reply.hpp" 1
 
 #define MPP_REPLY_HPP 
@@ -75468,6 +74882,8 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
        
 # 62 "/usr/include/c++/9/bits/stl_tree.h" 3
+# 75 "/usr/include/c++/9/bits/stl_tree.h" 3
+
 # 75 "/usr/include/c++/9/bits/stl_tree.h" 3
 namespace std __attribute__ ((__visibility__ ("default")))
 {
@@ -83021,7 +82437,590 @@ struct is_dynamic_buffer
 # 13 "./hpp/mpp/Reply.hpp" 2
 
 
+# 1 "/home/victor/include/bosmacros/any.hpp" 1
 
+#define BOSMACROS_ANY_HPP 
+
+
+
+
+
+
+# 1 "/usr/include/c++/9/any" 1 3
+# 30 "/usr/include/c++/9/any" 3
+#define _GLIBCXX_ANY 1
+
+       
+# 33 "/usr/include/c++/9/any" 3
+# 41 "/usr/include/c++/9/any" 3
+namespace std __attribute__ ((__visibility__ ("default")))
+{
+
+# 54 "/usr/include/c++/9/any" 3
+  class bad_any_cast : public bad_cast
+  {
+  public:
+    virtual const char* what() const noexcept { return "bad any_cast"; }
+  };
+
+  [[gnu::noreturn]] inline void __throw_bad_any_cast()
+  {
+
+    throw bad_any_cast{};
+
+
+
+  }
+
+#define __cpp_lib_any 201606L
+
+
+
+
+
+
+
+  class any
+  {
+
+    union _Storage
+    {
+      constexpr _Storage() : _M_ptr{nullptr} {}
+
+
+      _Storage(const _Storage&) = delete;
+      _Storage& operator=(const _Storage&) = delete;
+
+      void* _M_ptr;
+      aligned_storage<sizeof(_M_ptr), alignof(void*)>::type _M_buffer;
+    };
+
+    template<typename _Tp, typename _Safe = is_nothrow_move_constructible<_Tp>,
+      bool _Fits = (sizeof(_Tp) <= sizeof(_Storage))
+     && (alignof(_Tp) <= alignof(_Storage))>
+      using _Internal = std::integral_constant<bool, _Safe::value && _Fits>;
+
+    template<typename _Tp>
+      struct _Manager_internal;
+
+    template<typename _Tp>
+      struct _Manager_external;
+
+    template<typename _Tp>
+      using _Manager = conditional_t<_Internal<_Tp>::value,
+         _Manager_internal<_Tp>,
+         _Manager_external<_Tp>>;
+
+    template<typename _Tp, typename _Decayed = decay_t<_Tp>>
+      using _Decay = enable_if_t<!is_same<_Decayed, any>::value, _Decayed>;
+
+
+    template <typename _Tp, typename... _Args,
+       typename _Mgr = _Manager<_Tp>>
+      void __do_emplace(_Args&&... __args)
+      {
+ reset();
+        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
+ _M_manager = &_Mgr::_S_manage;
+      }
+
+
+
+    template <typename _Tp, typename _Up, typename... _Args,
+       typename _Mgr = _Manager<_Tp>>
+      void __do_emplace(initializer_list<_Up> __il, _Args&&... __args)
+      {
+ reset();
+        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
+ _M_manager = &_Mgr::_S_manage;
+      }
+
+  public:
+
+
+
+    constexpr any() noexcept : _M_manager(nullptr) { }
+
+
+    any(const any& __other)
+    {
+      if (!__other.has_value())
+ _M_manager = nullptr;
+      else
+ {
+   _Arg __arg;
+   __arg._M_any = this;
+   __other._M_manager(_Op_clone, &__other, &__arg);
+ }
+    }
+
+
+
+
+
+
+    any(any&& __other) noexcept
+    {
+      if (!__other.has_value())
+ _M_manager = nullptr;
+      else
+ {
+   _Arg __arg;
+   __arg._M_any = this;
+   __other._M_manager(_Op_xfer, &__other, &__arg);
+ }
+    }
+
+    template <typename _Res, typename _Tp, typename... _Args>
+    using __any_constructible =
+      enable_if<__and_<is_copy_constructible<_Tp>,
+    is_constructible<_Tp, _Args...>>::value,
+    _Res>;
+
+    template <typename _Tp, typename... _Args>
+    using __any_constructible_t =
+      typename __any_constructible<bool, _Tp, _Args...>::type;
+
+
+    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              __any_constructible_t<_Tp, _ValueType&&> = true,
+       enable_if_t<!__is_in_place_type<_Tp>::value, bool> = true>
+      any(_ValueType&& __value)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, std::forward<_ValueType>(__value));
+      }
+
+
+    template <typename _ValueType, typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              enable_if_t<__and_v<is_copy_constructible<_Tp>,
+      __not_<is_constructible<_Tp, _ValueType&&>>,
+      __not_<__is_in_place_type<_Tp>>>,
+     bool> = false>
+      any(_ValueType&& __value)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, __value);
+      }
+
+
+    template <typename _ValueType, typename... _Args,
+       typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              __any_constructible_t<_Tp, _Args&&...> = false>
+      explicit
+      any(in_place_type_t<_ValueType>, _Args&&... __args)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, std::forward<_Args>(__args)...);
+      }
+
+
+
+    template <typename _ValueType, typename _Up, typename... _Args,
+       typename _Tp = _Decay<_ValueType>,
+       typename _Mgr = _Manager<_Tp>,
+              __any_constructible_t<_Tp, initializer_list<_Up>,
+        _Args&&...> = false>
+      explicit
+      any(in_place_type_t<_ValueType>,
+   initializer_list<_Up> __il, _Args&&... __args)
+      : _M_manager(&_Mgr::_S_manage)
+      {
+        _Mgr::_S_create(_M_storage, __il, std::forward<_Args>(__args)...);
+      }
+
+
+    ~any() { reset(); }
+
+
+
+
+    any& operator=(const any& __rhs)
+    {
+      *this = any(__rhs);
+      return *this;
+    }
+
+
+
+
+
+
+    any& operator=(any&& __rhs) noexcept
+    {
+      if (!__rhs.has_value())
+ reset();
+      else if (this != &__rhs)
+ {
+   reset();
+   _Arg __arg;
+   __arg._M_any = this;
+   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
+ }
+      return *this;
+    }
+
+
+    template<typename _ValueType>
+      enable_if_t<is_copy_constructible<_Decay<_ValueType>>::value, any&>
+      operator=(_ValueType&& __rhs)
+      {
+ *this = any(std::forward<_ValueType>(__rhs));
+ return *this;
+      }
+
+
+    template <typename _ValueType, typename... _Args>
+      typename __any_constructible<_Decay<_ValueType>&,
+       _Decay<_ValueType>, _Args&&...>::type
+      emplace(_Args&&... __args)
+      {
+ __do_emplace<_Decay<_ValueType>>(std::forward<_Args>(__args)...);
+ any::_Arg __arg;
+ this->_M_manager(any::_Op_access, this, &__arg);
+ return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
+      }
+
+
+
+    template <typename _ValueType, typename _Up, typename... _Args>
+      typename __any_constructible<_Decay<_ValueType>&,
+       _Decay<_ValueType>,
+       initializer_list<_Up>,
+       _Args&&...>::type
+      emplace(initializer_list<_Up> __il, _Args&&... __args)
+      {
+ __do_emplace<_Decay<_ValueType>, _Up>(__il,
+           std::forward<_Args>(__args)...);
+ any::_Arg __arg;
+ this->_M_manager(any::_Op_access, this, &__arg);
+ return *static_cast<_Decay<_ValueType>*>(__arg._M_obj);
+      }
+
+
+
+
+    void reset() noexcept
+    {
+      if (has_value())
+      {
+ _M_manager(_Op_destroy, this, nullptr);
+ _M_manager = nullptr;
+      }
+    }
+
+
+    void swap(any& __rhs) noexcept
+    {
+      if (!has_value() && !__rhs.has_value())
+ return;
+
+      if (has_value() && __rhs.has_value())
+ {
+   if (this == &__rhs)
+     return;
+
+   any __tmp;
+   _Arg __arg;
+   __arg._M_any = &__tmp;
+   __rhs._M_manager(_Op_xfer, &__rhs, &__arg);
+   __arg._M_any = &__rhs;
+   _M_manager(_Op_xfer, this, &__arg);
+   __arg._M_any = this;
+   __tmp._M_manager(_Op_xfer, &__tmp, &__arg);
+ }
+      else
+ {
+   any* __empty = !has_value() ? this : &__rhs;
+   any* __full = !has_value() ? &__rhs : this;
+   _Arg __arg;
+   __arg._M_any = __empty;
+   __full->_M_manager(_Op_xfer, __full, &__arg);
+ }
+    }
+
+
+
+
+    bool has_value() const noexcept { return _M_manager != nullptr; }
+
+
+
+    const type_info& type() const noexcept
+    {
+      if (!has_value())
+ return typeid(void);
+      _Arg __arg;
+      _M_manager(_Op_get_type_info, this, &__arg);
+      return *__arg._M_typeinfo;
+    }
+
+
+    template<typename _Tp>
+      static constexpr bool __is_valid_cast()
+      { return __or_<is_reference<_Tp>, is_copy_constructible<_Tp>>::value; }
+
+  private:
+    enum _Op {
+ _Op_access, _Op_get_type_info, _Op_clone, _Op_destroy, _Op_xfer
+    };
+
+    union _Arg
+    {
+ void* _M_obj;
+ const std::type_info* _M_typeinfo;
+ any* _M_any;
+    };
+
+    void (*_M_manager)(_Op, const any*, _Arg*);
+    _Storage _M_storage;
+
+    template<typename _Tp>
+      friend void* __any_caster(const any* __any);
+
+
+    template<typename _Tp>
+      struct _Manager_internal
+      {
+ static void
+ _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
+
+ template<typename _Up>
+   static void
+   _S_create(_Storage& __storage, _Up&& __value)
+   {
+     void* __addr = &__storage._M_buffer;
+     ::new (__addr) _Tp(std::forward<_Up>(__value));
+   }
+
+ template<typename... _Args>
+   static void
+   _S_create(_Storage& __storage, _Args&&... __args)
+   {
+     void* __addr = &__storage._M_buffer;
+     ::new (__addr) _Tp(std::forward<_Args>(__args)...);
+   }
+      };
+
+
+    template<typename _Tp>
+      struct _Manager_external
+      {
+ static void
+ _S_manage(_Op __which, const any* __anyp, _Arg* __arg);
+
+ template<typename _Up>
+   static void
+   _S_create(_Storage& __storage, _Up&& __value)
+   {
+     __storage._M_ptr = new _Tp(std::forward<_Up>(__value));
+   }
+ template<typename... _Args>
+   static void
+   _S_create(_Storage& __storage, _Args&&... __args)
+   {
+     __storage._M_ptr = new _Tp(std::forward<_Args>(__args)...);
+   }
+      };
+  };
+
+
+  inline void swap(any& __x, any& __y) noexcept { __x.swap(__y); }
+
+
+  template <typename _Tp, typename... _Args>
+    any make_any(_Args&&... __args)
+    {
+      return any(in_place_type<_Tp>, std::forward<_Args>(__args)...);
+    }
+
+
+  template <typename _Tp, typename _Up, typename... _Args>
+    any make_any(initializer_list<_Up> __il, _Args&&... __args)
+    {
+      return any(in_place_type<_Tp>, __il, std::forward<_Args>(__args)...);
+    }
+# 451 "/usr/include/c++/9/any" 3
+  template<typename _ValueType>
+    inline _ValueType any_cast(const any& __any)
+    {
+      using _Up = __remove_cvref_t<_ValueType>;
+      static_assert(any::__is_valid_cast<_ValueType>(),
+   "Template argument must be a reference or CopyConstructible type");
+      static_assert(is_constructible_v<_ValueType, const _Up&>,
+   "Template argument must be constructible from a const value.");
+      auto __p = any_cast<_Up>(&__any);
+      if (__p)
+ return static_cast<_ValueType>(*__p);
+      __throw_bad_any_cast();
+    }
+# 477 "/usr/include/c++/9/any" 3
+  template<typename _ValueType>
+    inline _ValueType any_cast(any& __any)
+    {
+      using _Up = __remove_cvref_t<_ValueType>;
+      static_assert(any::__is_valid_cast<_ValueType>(),
+   "Template argument must be a reference or CopyConstructible type");
+      static_assert(is_constructible_v<_ValueType, _Up&>,
+   "Template argument must be constructible from an lvalue.");
+      auto __p = any_cast<_Up>(&__any);
+      if (__p)
+ return static_cast<_ValueType>(*__p);
+      __throw_bad_any_cast();
+    }
+
+  template<typename _ValueType>
+    inline _ValueType any_cast(any&& __any)
+    {
+      using _Up = __remove_cvref_t<_ValueType>;
+      static_assert(any::__is_valid_cast<_ValueType>(),
+   "Template argument must be a reference or CopyConstructible type");
+      static_assert(is_constructible_v<_ValueType, _Up>,
+   "Template argument must be constructible from an rvalue.");
+      auto __p = any_cast<_Up>(&__any);
+      if (__p)
+ return static_cast<_ValueType>(std::move(*__p));
+      __throw_bad_any_cast();
+    }
+
+
+
+  template<typename _Tp>
+    void* __any_caster(const any* __any)
+    {
+
+
+      using _Up = remove_cv_t<_Tp>;
+
+
+      if constexpr (!is_same_v<decay_t<_Up>, _Up>)
+ return nullptr;
+
+      else if constexpr (!is_copy_constructible_v<_Up>)
+ return nullptr;
+
+      else if (__any->_M_manager == &any::_Manager<_Up>::_S_manage
+
+   || __any->type() == typeid(_Tp)
+
+   )
+ {
+   any::_Arg __arg;
+   __any->_M_manager(any::_Op_access, __any, &__arg);
+   return __arg._M_obj;
+ }
+      return nullptr;
+    }
+# 546 "/usr/include/c++/9/any" 3
+  template<typename _ValueType>
+    inline const _ValueType* any_cast(const any* __any) noexcept
+    {
+      if constexpr (is_object_v<_ValueType>)
+ if (__any)
+   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
+      return nullptr;
+    }
+
+  template<typename _ValueType>
+    inline _ValueType* any_cast(any* __any) noexcept
+    {
+      if constexpr (is_object_v<_ValueType>)
+ if (__any)
+   return static_cast<_ValueType*>(__any_caster<_ValueType>(__any));
+      return nullptr;
+    }
+
+
+  template<typename _Tp>
+    void
+    any::_Manager_internal<_Tp>::
+    _S_manage(_Op __which, const any* __any, _Arg* __arg)
+    {
+
+      auto __ptr = reinterpret_cast<const _Tp*>(&__any->_M_storage._M_buffer);
+      switch (__which)
+      {
+      case _Op_access:
+ __arg->_M_obj = const_cast<_Tp*>(__ptr);
+ break;
+      case _Op_get_type_info:
+
+ __arg->_M_typeinfo = &typeid(_Tp);
+
+ break;
+      case _Op_clone:
+ ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp(*__ptr);
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ break;
+      case _Op_destroy:
+ __ptr->~_Tp();
+ break;
+      case _Op_xfer:
+ ::new(&__arg->_M_any->_M_storage._M_buffer) _Tp
+   (std::move(*const_cast<_Tp*>(__ptr)));
+ __ptr->~_Tp();
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ const_cast<any*>(__any)->_M_manager = nullptr;
+ break;
+      }
+    }
+
+  template<typename _Tp>
+    void
+    any::_Manager_external<_Tp>::
+    _S_manage(_Op __which, const any* __any, _Arg* __arg)
+    {
+
+      auto __ptr = static_cast<const _Tp*>(__any->_M_storage._M_ptr);
+      switch (__which)
+      {
+      case _Op_access:
+ __arg->_M_obj = const_cast<_Tp*>(__ptr);
+ break;
+      case _Op_get_type_info:
+
+ __arg->_M_typeinfo = &typeid(_Tp);
+
+ break;
+      case _Op_clone:
+ __arg->_M_any->_M_storage._M_ptr = new _Tp(*__ptr);
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ break;
+      case _Op_destroy:
+ delete __ptr;
+ break;
+      case _Op_xfer:
+ __arg->_M_any->_M_storage._M_ptr = __any->_M_storage._M_ptr;
+ __arg->_M_any->_M_manager = __any->_M_manager;
+ const_cast<any*>(__any)->_M_manager = nullptr;
+ break;
+      }
+    }
+
+
+
+  namespace __detail::__variant
+  {
+    template<typename> struct _Never_valueless_alt;
+
+
+
+    template<>
+      struct _Never_valueless_alt<std::any>
+      : std::true_type
+      { };
+  }
+
+
+}
+# 10 "/home/victor/include/bosmacros/any.hpp" 2
+#define ANY_CLASS std::any
+#define BAD_ANY_CAST std::bad_any_cast
+#define ANY_CAST std::any_cast
+# 16 "./hpp/mpp/Reply.hpp" 2
 # 1 "./hpp/mpp/Header.hpp" 1
 
 #define MPP_HEADER_HPP 
@@ -83195,7 +83194,7 @@ namespace mpp
    const std::array<char, 2> nameValSep;
  };
 };
-# 29 "cpp/ReqParser.cpp" 2
+# 28 "cpp/ReqParser.cpp" 2
 # 1 "./hpp/mpp/Request.hpp" 1
 
 #define MPP_REQUEST_HPP 
@@ -83293,7 +83292,7 @@ namespace mpp
  std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
 
 };
-# 30 "cpp/ReqParser.cpp" 2
+# 29 "cpp/ReqParser.cpp" 2
 # 1 "./hpp/mpp/ver.hpp" 1
 
 #define MPP_VER_HPP 
@@ -83305,7 +83304,7 @@ namespace mpp
  const short VER_MINOR = 3;
  const short VER_PATCH = 1;
 };
-# 31 "cpp/ReqParser.cpp" 2
+# 30 "cpp/ReqParser.cpp" 2
 
 # 1 "./hpp/mpp/functors/PtrResetter.hpp" 1
 
@@ -83333,7 +83332,7 @@ namespace mpp
   };
  };
 };
-# 33 "cpp/ReqParser.cpp" 2
+# 32 "cpp/ReqParser.cpp" 2
 # 1 "./hpp/mpp/functors/Printer.hpp" 1
 
 #define MPP_FUNCTORS_PRINTER_HPP 
@@ -83401,7 +83400,7 @@ namespace mpp
   };
  };
 };
-# 34 "cpp/ReqParser.cpp" 2
+# 33 "cpp/ReqParser.cpp" 2
 # 1 "./hpp/mpp/ReqParser.hpp" 1
 
 #define MPP_REQPARSER_HPP 
@@ -85307,283 +85306,6 @@ template<std::size_t I, class H, class T> class tuple_element< I, boost::tuples:
 }
 # 16 "./hpp/mpp/ReqParser.hpp" 2
 
-# 1 "/usr/local/include/boost/locale/generator.hpp" 1 3
-# 9 "/usr/local/include/boost/locale/generator.hpp" 3
-#define BOOST_LOCALE_GENERATOR_HPP 
-# 1 "/usr/local/include/boost/locale/config.hpp" 1 3
-# 9 "/usr/local/include/boost/locale/config.hpp" 3
-#define BOOST_LOCALE_CONFIG_HPP_INCLUDED 
-
-# 1 "/usr/local/include/boost/locale/definitions.hpp" 1 3
-# 9 "/usr/local/include/boost/locale/definitions.hpp" 3
-#define BOOST_LOCALE_DEFINITIONS_HPP_INCLUDED 
-# 27 "/usr/local/include/boost/locale/definitions.hpp" 3
-#define BOOST_LOCALE_DECL 
-# 12 "/usr/local/include/boost/locale/config.hpp" 2 3
-# 21 "/usr/local/include/boost/locale/config.hpp" 3
-#define BOOST_LIB_NAME boost_locale
-# 31 "/usr/local/include/boost/locale/config.hpp" 3
-# 1 "/usr/local/include/boost/config/auto_link.hpp" 1 3
-# 497 "/usr/local/include/boost/config/auto_link.hpp" 3
-#undef BOOST_LIB_NAME
-# 32 "/usr/local/include/boost/locale/config.hpp" 2 3
-# 11 "/usr/local/include/boost/locale/generator.hpp" 2 3
-# 1 "/usr/local/include/boost/cstdint.hpp" 1 3
-# 12 "/usr/local/include/boost/locale/generator.hpp" 2 3
-
-
-
-
-
-
-
-# 1 "/usr/local/include/boost/locale/hold_ptr.hpp" 1 3
-# 9 "/usr/local/include/boost/locale/hold_ptr.hpp" 3
-#define BOOST_LOCALE_HOLD_PTR_H 
-
-namespace boost {
-namespace locale {
-
-
-
-
-    template<typename T>
-    class hold_ptr {
-        hold_ptr(hold_ptr const &other);
-        hold_ptr const &operator=(hold_ptr const &other);
-    public:
-
-
-
-        hold_ptr() : ptr_(0) {}
-
-
-
-        explicit hold_ptr(T *v) : ptr_(v) {}
-
-
-
-
-        ~hold_ptr()
-        {
-            delete ptr_;
-        }
-
-
-
-
-        T const *get() const { return ptr_; }
-
-
-
-        T *get() { return ptr_; }
-
-
-
-
-        T const &operator *() const { return *ptr_; }
-
-
-
-        T &operator *() { return *ptr_; }
-
-
-
-        T const *operator->() const { return ptr_; }
-
-
-
-        T *operator->() { return ptr_; }
-
-
-
-
-        T *release() { T *tmp=ptr_; ptr_=0; return tmp; }
-
-
-
-
-        void reset(T *p=0)
-        {
-            if(ptr_) delete ptr_;
-            ptr_=p;
-        }
-
-        void swap(hold_ptr &other)
-        {
-            T *tmp=other.ptr_;
-            other.ptr_=ptr_;
-            ptr_=tmp;
-        }
-    private:
-        T *ptr_;
-    };
-
-}
-}
-# 20 "/usr/local/include/boost/locale/generator.hpp" 2 3
-
-namespace boost {
-
-    template<typename Type>
-    class shared_ptr;
-
-
-
-
-    namespace locale {
-
-        class localization_backend;
-        class localization_backend_manager;
-
-        static const uint32_t nochar_facet = 0;
-        static const uint32_t char_facet = 1 << 0;
-        static const uint32_t wchar_t_facet = 1 << 1;
-        static const uint32_t char16_t_facet = 1 << 2;
-        static const uint32_t char32_t_facet = 1 << 3;
-
-        static const uint32_t character_first_facet = char_facet;
-        static const uint32_t character_last_facet = char32_t_facet;
-        static const uint32_t all_characters = 0xFFFF;
-
-        typedef uint32_t character_facet_type;
-
-        static const uint32_t convert_facet = 1 << 0;
-        static const uint32_t collation_facet = 1 << 1;
-        static const uint32_t formatting_facet= 1 << 2;
-        static const uint32_t parsing_facet = 1 << 3;
-        static const uint32_t message_facet = 1 << 4;
-        static const uint32_t codepage_facet = 1 << 5;
-        static const uint32_t boundary_facet = 1 << 6;
-
-        static const uint32_t per_character_facet_first = convert_facet;
-        static const uint32_t per_character_facet_last = boundary_facet;
-
-        static const uint32_t calendar_facet = 1 << 16;
-        static const uint32_t information_facet = 1 << 17;
-
-        static const uint32_t non_character_facet_first = calendar_facet;
-        static const uint32_t non_character_facet_last = information_facet;
-
-
-        static const uint32_t all_categories = 0xFFFFFFFFu;
-
-        typedef uint32_t locale_category_type;
-# 75 "/usr/local/include/boost/locale/generator.hpp" 3
-        class generator {
-        public:
-
-
-
-
-            generator();
-
-
-
-            generator(localization_backend_manager const &);
-
-            ~generator();
-
-
-
-
-            void categories(locale_category_type cats);
-
-
-
-            locale_category_type categories() const;
-
-
-
-
-            void characters(character_facet_type chars);
-
-
-
-            character_facet_type characters() const;
-# 127 "/usr/local/include/boost/locale/generator.hpp" 3
-            void add_messages_domain(std::string const &domain);
-
-
-
-
-            void set_default_messages_domain(std::string const &domain);
-
-
-
-
-            void clear_domains();
-# 153 "/usr/local/include/boost/locale/generator.hpp" 3
-            void add_messages_path(std::string const &path);
-
-
-
-
-            void clear_paths();
-
-
-
-
-            void clear_cache();
-
-
-
-
-            void locale_cache_enabled(bool on);
-
-
-
-
-            bool locale_cache_enabled() const;
-
-
-
-
-            bool use_ansi_encoding() const;
-# 187 "/usr/local/include/boost/locale/generator.hpp" 3
-            void use_ansi_encoding(bool enc);
-
-
-
-
-            std::locale generate(std::string const &id) const;
-
-
-
-
-            std::locale generate(std::locale const &base,std::string const &id) const;
-
-
-
-            std::locale operator()(std::string const &id) const
-            {
-                return generate(id);
-            }
-
-
-
-
-            void set_option(std::string const &name,std::string const &value);
-
-
-
-
-            void clear_options();
-
-        private:
-
-            void set_all_options(shared_ptr<localization_backend> backend,std::string const &id) const;
-
-            generator(generator const &);
-            void operator=(generator const &);
-
-            struct data;
-            hold_ptr<data> d;
-        };
-
-    }
-}
-# 18 "./hpp/mpp/ReqParser.hpp" 2
 # 1 "/usr/local/include/boost/logic/tribool_io.hpp" 1 3
 
 
@@ -85821,7 +85543,7 @@ operator>>(std::basic_istream<CharT, Traits>& in, tribool& x)
 }
 
 } }
-# 19 "./hpp/mpp/ReqParser.hpp" 2
+# 18 "./hpp/mpp/ReqParser.hpp" 2
 
 
 # 1 "/home/victor/include/bosmacros/array.hpp" 1
@@ -85832,12 +85554,12 @@ operator>>(std::basic_istream<CharT, Traits>& in, tribool& x)
 
 
 #define ARRAY_CLASS std::array
-# 22 "./hpp/mpp/ReqParser.hpp" 2
+# 21 "./hpp/mpp/ReqParser.hpp" 2
 
 
 
 
-# 25 "./hpp/mpp/ReqParser.hpp"
+# 24 "./hpp/mpp/ReqParser.hpp"
 namespace mpp
 {
 
@@ -85855,7 +85577,7 @@ namespace mpp
 
 
    void reset();
-# 50 "./hpp/mpp/ReqParser.hpp"
+# 49 "./hpp/mpp/ReqParser.hpp"
    template<typename InputIterator>
    boost::tuple<boost::tribool, InputIterator> parse(Request& req, InputIterator begin, InputIterator end)
    {
@@ -85957,7 +85679,6 @@ namespace mpp
    const std::array<short, 3> version;
    std::array<std::unique_ptr<std::stringstream>, 3> verSS;
    std::map<std::string, State> verbInfo;
-   boost::locale::generator gen;
    std::unique_ptr<std::stringstream> pSSHeaderName;
    std::unique_ptr<std::stringstream> pSSHeaderVal;
    int mNBytes;
@@ -85968,7 +85689,7 @@ namespace mpp
 
  };
 };
-# 35 "cpp/ReqParser.cpp" 2
+# 34 "cpp/ReqParser.cpp" 2
 
 
 
@@ -86022,11 +85743,6 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m),
   std::cout << "State #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
  }
 
-
-
- gen.locale_cache_enabled(true);
- gen("en_US.UTF-8");
- gen("ml_IN.UTF-8");
 }
 
 
@@ -86058,9 +85774,6 @@ void mpp::ReqParser::reset()
 
 boost::tribool mpp::ReqParser::consume(Request& req, char input)
 {
-
- std::locale usLoc = gen("en_US.UTF-8");
- std::locale mlLoc = gen("ml_IN.UTF-8");
  boost::tribool toReturn;
 
 
@@ -86177,7 +85890,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case major:
   {
-   if (std::isdigit(input, usLoc))
+   if (std::isdigit(input))
    {
     *verSS[0] << input;
     toReturn = boost::indeterminate;
@@ -86236,7 +85949,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case minor:
   {
-   if (std::isdigit(input, usLoc))
+   if (std::isdigit(input))
    {
     *verSS[1] << input;
 
@@ -86291,21 +86004,21 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case patch:
   {
-   if (std::isdigit(input, usLoc))
+   if (std::isdigit(input))
    {
     *verSS[2] << input;
     toReturn = boost::indeterminate;
 
 
-    std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a digit in the locale " << usLoc.name() << std::endl
+    std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a digit" << std::endl
     << "\tverSS[2]->str() = \"" << verSS[2]->str() << "\"" << std::endl;
 
    }
 
-   else if (std::isspace(input, usLoc))
+   else if (std::isspace(input))
    {
 
-    std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a space character in the locale " << usLoc.name() << std::endl;
+    std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a space character" << std::endl;
 
 
     short readVerNum;
@@ -86355,13 +86068,13 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
    std::cout << "mpp::ReqParser::consume: at start of verb_start state handler." << std::endl;
 
 
-   if (std::isalpha(input, usLoc))
+   if (std::isalpha(input))
    {
 
-    std::cout << "mpp::ReqParser::consume: verb_start: input (" << input << ") is alphabetic in the locale " << usLoc.name() << std::endl;
+    std::cout << "mpp::ReqParser::consume: verb_start: input (" << input << ") is alphabetic" << std::endl;
 
 
-    char upper = std::toupper(input, usLoc);
+    char upper = std::toupper(input);
 
 
     std::cout << "mpp::ReqParser::consume: verb_start: uppercase input is '" << upper << "'" << std::endl;
@@ -86442,7 +86155,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case fof_o:
   {
-   if (std::toupper(input, usLoc) == 'O')
+   if (std::toupper(input) == 'O')
    {
     curStat = fof_f;
     toReturn = boost::indeterminate;
@@ -86468,7 +86181,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case fof_f:
   {
-   if (std::toupper(input, usLoc) == 'F')
+   if (std::toupper(input) == 'F')
    {
     req.setCommand(Request::FOF);
     curStat = backslash_r_after_verb;
@@ -86494,7 +86207,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case issing_first_s:
   {
-   if (std::toupper(input, usLoc) == 'S')
+   if (std::toupper(input) == 'S')
    {
 
     std::cout << "mpp::ReqParser::consume: issing_first_s: found first '" << input << "' of \"ISSING\"" << std::endl;
@@ -86507,7 +86220,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
    else
    {
 
-    std::cout << "mpp::ReqParser::consume: toupper of input ('" << input << "') [" << std::toupper(input, usLoc) << "] != " << 'S' << std::endl;
+    std::cout << "mpp::ReqParser::consume: toupper of input ('" << input << "') [" << std::toupper(input) << "] != " << 'S' << std::endl;
 
 
     status = Reply::badReq;
@@ -86519,13 +86232,13 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case issing_second_s:
   {
-   if (std::toupper(input, usLoc) == 'S')
+   if (std::toupper(input) == 'S')
    {
     curStat = issing_second_i;
     toReturn = boost::indeterminate;
 
 
-    std::cout << "mpp::ReqParser::consume: issing_second_s: input = '" << input << "', toupper(input) = '" << std::toupper(input, usLoc) << "', as expected." << std::endl;
+    std::cout << "mpp::ReqParser::consume: issing_second_s: input = '" << input << "', toupper(input) = '" << std::toupper(input) << "', as expected." << std::endl;
 
    }
 
@@ -86535,7 +86248,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
     toReturn = false;
 
 
-    std::cout << "mpp::ReqParser::consume: issing_second_s: incorrect input '" << input << "' (toupper = '" << std::toupper(input, usLoc) << "'" << std::endl;
+    std::cout << "mpp::ReqParser::consume: issing_second_s: incorrect input '" << input << "' (toupper = '" << std::toupper(input) << "'" << std::endl;
 
    }
 
@@ -86544,12 +86257,12 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case issing_second_i:
   {
-   if (std::toupper(input, usLoc) == 'I')
+   if (std::toupper(input) == 'I')
    {
     curStat = issing_n;
     toReturn = boost::indeterminate;
 
-    std::cout << "mpp::ReqParser::consume: issing_second_i: input = '" << input << "', toupper(input) = '" << std::toupper(input, usLoc) << "', as expected." << std::endl;
+    std::cout << "mpp::ReqParser::consume: issing_second_i: input = '" << input << "', toupper(input) = '" << std::toupper(input) << "', as expected." << std::endl;
 
    }
 
@@ -86558,7 +86271,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
     status = Reply::badReq;
     toReturn = false;
 
-    std::cout << "mpp::ReqParser::consume: issing_second_i: incorrect input '" << input << "' (toupper = '" << std::toupper(input, usLoc) << "'" << std::endl;
+    std::cout << "mpp::ReqParser::consume: issing_second_i: incorrect input '" << input << "' (toupper = '" << std::toupper(input) << "'" << std::endl;
 
    }
 
@@ -86567,12 +86280,12 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case issing_n:
   {
-   if (std::toupper(input, usLoc) == 'N')
+   if (std::toupper(input) == 'N')
    {
     curStat = issing_g;
     toReturn = boost::indeterminate;
 
-    std::cout << "mpp::ReqParser::consume: issing_n: input = '" << input << "', toupper(input) = '" << std::toupper(input, usLoc) << "', as expected." << std::endl;
+    std::cout << "mpp::ReqParser::consume: issing_n: input = '" << input << "', toupper(input) = '" << std::toupper(input) << "', as expected." << std::endl;
 
    }
 
@@ -86581,7 +86294,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
     status = Reply::badReq;
     toReturn = false;
 
-    std::cout << "mpp::ReqParser::consume: issing_n: incorrect input '" << input << "' (toupper = '" << std::toupper(input, usLoc) << "'" << std::endl;
+    std::cout << "mpp::ReqParser::consume: issing_n: incorrect input '" << input << "' (toupper = '" << std::toupper(input) << "'" << std::endl;
 
    }
 
@@ -86590,7 +86303,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case issing_g:
   {
-   if (std::toupper(input, usLoc) == 'G')
+   if (std::toupper(input) == 'G')
    {
     req.setCommand(Request::ISSING);
     curStat = backslash_r_after_verb;
@@ -86667,7 +86380,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case header_name:
   {
-   if (std::isalpha(input, usLoc) || input == '-')
+   if (std::isalpha(input) || input == '-')
    {
     (*pSSHeaderName) << input;
     toReturn = boost::indeterminate;
@@ -86713,7 +86426,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
   case space_after_header_name:
   {
-   if (std::isspace(input, usLoc))
+   if (std::isspace(input))
    {
     curStat = header_value;
     toReturn = boost::indeterminate;
@@ -86750,7 +86463,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
      if (isValidDecimalInt(pSSHeaderVal->str()))
      {
       (*pSSHeaderVal) >> mNBytes;
-      req.addHeader(pSSHeaderName->str(), std::any(mNBytes));
+      req.addHeader(pSSHeaderName->str(), mNBytes);
 
       std::cout << "ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
 
@@ -86765,7 +86478,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
     else
     {
-     req.addHeader(pSSHeaderName->str(), std::any(pSSHeaderVal->str()));
+     req.addHeader(pSSHeaderName->str(), pSSHeaderVal->str());
 
 
      std::cout << "ReqParser::consume: header_value: read header \"" << pSSHeaderName->str() << "\", with value \"" << pSSHeaderVal->str() << "\"" << std::endl;

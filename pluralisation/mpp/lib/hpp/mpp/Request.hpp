@@ -27,9 +27,9 @@ namespace mpp
 		public:
 			enum Command
 			{
+				INVALID = 0, // A Request object is initialised to use this 
 				FOF, // Find opposite form (singular -> plural, plural -> singular),
 				ISSING, // Determine whether or not the current form is singular
-				INVALID // A Request object is initialised to use this 
 			};
 
 			typedef ANY_CLASS any_type ; // To make things easier for library clients
@@ -87,7 +87,21 @@ namespace mpp
 			**/
 			typename std::string::size_type size() const;
 
+			/**
+			* @desc Clears our list of headers.
+			**/
+			void clearHeaders();
+
 		private:
+			/*** Methods ***/
+
+			/**
+			* @desc Write ourselves to a stream.
+			* @param os The stream to write to.
+			**/
+			void writeToStream(std::ostream& os) const;
+
+			/*** Properties ***/
 			Command c; // The command which this request asks the server to perform
 			std::forward_list<mpp::Header> headers; // A list of request headers
 			std::string noun; // The noun given with this request

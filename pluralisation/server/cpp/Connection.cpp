@@ -4,11 +4,12 @@
 /* Standard C++ */
 #ifdef DEBUG
 #include <iostream> // std::cout, std::cerr
+#include <iomanip> // std::quoted
 #endif
 #include <bitset> // std::bitset
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::io_context, boost::asio::buffer, boost::asio::async_write, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred, boost::asio::ip::tcp::socket::shutdown_both
+#include <boost/asio.hpp> // boost::asio::io_context, boost::asio::buffer, boost::asio::async_write, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred, boost::asio::ip::tcp::socket::shutdown_both, boost::asio::async_read_until
 #include <boost/logic/tribool.hpp> // boost::tribool
 #include <boost/logic/tribool_io.hpp> // operator<< for boost::tribool
 #include <boost/tuple/tuple.hpp> // boost::tie, boost::tuples::ignore
@@ -46,21 +47,25 @@ boost::asio::ip::tcp::socket& Connection::getSocket()
 **/
 void Connection::start()
 {
+	#ifdef DEBUG
+	std::cout << "Connection::start called." << std::endl;
+	#endif
 	socket.async_read_some(
 		boost::asio::buffer(
 			buffer
 		),
-		BIND_FUNCTION(
+		/*BIND_FUNCTION(
 			&Connection::handleRead,
 			shared_from_this(),
 			boost::asio::placeholders::error,
 			boost::asio::placeholders::bytes_transferred
-		)
-		/*[this](const ERROR_CODE& e, std::size_t bytesTransferred)
+		)*/
+		[this](const ERROR_CODE& e, std::size_t bTrans)
 		{
-			handleRead(e, bytesTransferred);
-		}*/
+			handleRead(e, bTrans);
+		}
 	);
+	//boost::asio::async_read_until(socket, boost::asio::buffer(buffer), "\r\n", BIND_FUNCTION(&Connection::handleRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
 /**
@@ -158,15 +163,15 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				BIND_FUNCTION(
+				/*BIND_FUNCTION(
 					&Connection::handleWrite,
 					shared_from_this(),
 					boost::asio::placeholders::error
-				)
-				/*[this](const ERROR_CODE& err, std::size_t bytesTrans)
+				)*/
+				[this](const ERROR_CODE& err, std::size_t bytesTrans)
 				{
-					handleWrite(err);
-				}*/
+					handleWrite(err, bytesTrans);
+				}
 			);
 		}
 
@@ -180,15 +185,15 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				BIND_FUNCTION(
+				/*BIND_FUNCTION(
 					&Connection::handleWrite,
 					shared_from_this(),
 					boost::asio::placeholders::error
-				)
-				/*[this](const ERROR_CODE& err)
+				)*/
+				[this](const ERROR_CODE& err, std::size_t bTrans)
 				{
-					handleWrite(err);
-				}*/
+					handleWrite(err, bTrans);
+				}
 			);
 		}
 
@@ -200,18 +205,39 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 
 			socket.async_read_some(
 				boost::asio::buffer(buffer),
+				/*BIND_FUNCTION(
+					&Connection::handleRead,
+					shared_from_this(),
+					boost::asio::placeholders::error,
+					boost::asio::placeholders::bytes_transferred
+				)*/
+				[this](const ERROR_CODE& err, std::size_t bTrans)
+				{
+					handleRead(err, bTrans);
+				}
+			);
+			/*boost::asio::async_read_until(
+				socket,
+				boost::asio::buffer(buffer),
+				"\r\n",
 				BIND_FUNCTION(
 					&Connection::handleRead,
 					shared_from_this(),
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred
 				)
-				/*[this](const ERROR_CODE& e, std::size_t bTrans)
-				{
-					handleRead(e, bTrans);
-				}*/
-			);
+			);*/
 		}
+	}
+	
+	else
+	{
+		#ifdef DEBUG
+		std::cerr << "Connection::handleRead: an error occurred while handling the previous read operation." << std::endl
+		<< "\tError value = " << e.value() << std::endl
+		<< "\tError message = " << std::quoted(e.message()) << std::endl
+		<< "\tThe operation " << (e.failed() ? "failed" : "didn't fail") << std::endl;
+		#endif
 	}
 
 	/*
@@ -226,10 +252,10 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 * @desc Handles completion of a write operation.
 * @param e Describes what error occurred, if any.
 **/
-void Connection::handleWrite(const ERROR_CODE& e)
+void Connection::handleWrite(const ERROR_CODE& e, std::size_t bytesTransferred)
 {
 	#ifdef DEBUG
-	std::cout << "Connection::handleWrite called." << std::endl;
+	std::cout << "Connection::handleWrite: wrote " << bytesTransferred << " bytes" << std::endl;
 	#endif
 
 	if (!e) // No error
@@ -247,8 +273,18 @@ void Connection::handleWrite(const ERROR_CODE& e)
 		#endif
 	}
 
+	else
+	{
+		#ifdef DEBUG
+		std::cerr << "Connection::handleRead: an error occurred while handling the previous read operation." << std::endl
+		<< "\tError value = " << e.value() << std::endl
+		<< "\tError message = " << std::quoted(e.message()) << std::endl
+		<< "\tThe operation " << (e.failed() ? "failed" : "didn't fail") << std::endl;
+		#endif
+	}
+
 	/*
-	* No new async. ops. are started. THus, all shared_ptr references to the
+	* No new async. ops. are started. Thus, all shared_ptr references to the
 	* Connection object will disappear, and the object will be destroyed
 	* automatically after this handler returns. The connection class'
 	* (automatic) destructor closes the socket.

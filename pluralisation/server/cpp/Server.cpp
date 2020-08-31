@@ -11,6 +11,7 @@
 
 /* Our headers */
 #include "bosmacros/bind.hpp" // Defines the macro BIND_FUNCTION, that resolves to either boost::bind or std::bind
+#include "bosmacros/error_code.hpp" // ERROR_CODE macro
 #include "Connection.hpp" // Connection class
 #include "Server.hpp" // Class definition
 
@@ -38,12 +39,15 @@ Server::Server(const std::string& address, int port, std::size_t numThreads, std
 	#ifdef SIGQUIT
 	signals.add(SIGQUIT);
 	#endif
-	signals.async_wait(BIND_FUNCTION(&Server::handleStop, this));
-	/*signals.async_wait([this]() // Need to use this object
+	//signals.async_wait(BIND_FUNCTION(&Server::handleStop, this));
+	signals.async_wait([this](const ERROR_CODE& e, int sigNo) // Need to use this object
 		{
+			#ifdef DEBUG
+			std::cout << "Server::Server: caught signal #" << sigNo << ", exiting...." << std::endl;
+			#endif
 			handleStop(); // Call our handler
 		}
-	);*/
+	);
 
 	#ifdef DEBUG
 	std::cout << pName << ":Server::Server: registered signals" << std::endl;
@@ -121,15 +125,15 @@ void Server::startAccept()
 	#endif
 	acceptor.async_accept(
 		newConn->getSocket(),
-		BIND_FUNCTION(
+		/*BIND_FUNCTION(
 			&Server::handleAccept,
 			this,
 			boost::asio::placeholders::error
-		)
-		/*[this](const boost::system::error_code& e)
+		)*/
+		[this](const boost::system::error_code& e)
 		{
 			handleAccept(e);
-		}*/
+		}
 	);
 	#ifdef DEBUG
 	std::cout << pName << ":Server::startAccept: called acceptor.async_accept" << std::endl;

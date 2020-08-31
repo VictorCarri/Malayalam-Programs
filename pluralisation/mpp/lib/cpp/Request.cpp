@@ -5,6 +5,7 @@
 #include <vector> // std::vector
 #include <iomanip> // std::quoted
 #include <ostream> // std::endl
+#include <stdexcept> // std::out_of_range
 
 /* Boost */
 #include <boost/asio/buffer.hpp> // boost::asio::buffer
@@ -23,7 +24,8 @@
 mpp::Request::Request() : c(INVALID),
 	verbNames { // Set up map of enum values to verb names
 		{FOF, "FOF"},
-		{ISSING, "ISSING"}
+		{ISSING, "ISSING"},
+		{INVALID, "INVALID"}
 	},
 	crlf {'\r', '\n'}, // Initialise CRLF buffer
 	nameValSep {':', ' '} // Initialise the separator that comes between a header name and its value
@@ -174,9 +176,38 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers() const
 **/
 std::ostream& mpp::operator<<(std::ostream& os, const mpp::Request& req)
 {
-	os << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " " << req.verbNames.at(req.c) << "\r\n"; // Create the first line
+	req.writeToStream(os);
+	return os;
+}
 
-	for (mpp::Header h : req.headers)
+/**
+* @desc Calculates the size of the request as a string.
+* @return The size of this request as a string.
+**/
+typename std::string::size_type mpp::Request::size() const
+{
+	std::ostringstream ss; // Used to convert this to a string
+	writeToStream(ss); // Write ourselves to the stream
+	return ss.str().length(); // Return the length of the string (the size of the request in bytes).
+}
+
+/**
+* @desc Write ourselves to a stream.
+* @param os The stream to write to.
+**/
+void mpp::Request::writeToStream(std::ostream& os) const
+{
+	try
+	{
+		os << "MPP/" << VER_MAJOR << "." << VER_MINOR << "." << VER_PATCH << " " << verbNames.at(c) << "\r\n"; // Create the firstline
+	}
+
+	catch (std::out_of_range& stdoor)
+	{
+		os << "mpp::Request::writeToStream: caught std::out_of_range while trying to writ ethe name of the command " << c << std::endl;
+	}
+
+	for (mpp::Header h : headers)
 	{
 		os << h.getName() // First, send the header's name
 		<< ": "; // Then add the separator
@@ -196,7 +227,7 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Request& req)
 			catch (BAD_ANY_CAST& bace) // Invalid data type
 			{
 				std::ostringstream ess;
-				ess << "mpp::Request::toBuffers: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("std::string::size_type") << " value, but doesn't!" << std::endl
+				ess << "mpp::Request::writeToStream: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("std::string::size_type") << " value, but doesn't!" << std::endl
 				<< "Error: " << bace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue mebhv(ess.str());
 				throw mebhv;
@@ -213,7 +244,7 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Request& req)
 			catch (BAD_ANY_CAST& bace) // Invalid data type
 			{
 				std::ostringstream ess;
-				ess << "mpp::Request::toBuffers: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("std::string") << " value, but doesn't!" << std::endl
+				ess << "mpp::Request::writeToStream: the header named " << std::quoted(h.getName()) << " should contain an " << std::quoted("std::string") << " value, but doesn't!" << std::endl
 				<< "Error: " << bace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue mebhv(ess.str());
 				throw mebhv;
@@ -225,17 +256,13 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Request& req)
 	}
 	
 	os << "\r\n" // End the headers
-	<< req.noun; // Write the noun
-	return os;
+	<< noun; // Write the noun
 }
 
 /**
-* @desc Calculates the size of the request as a string.
-* @return The size of this request as a string.
+* @desc Clears our list of headers.
 **/
-typename std::string::size_type mpp::Request::size() const
+void mpp::Request::clearHeaders()
 {
-	std::ostringstream ss; // Used to convert this to a string
-	ss << this; // Insert ourselves, so that operator<< will convert the request to a string.
-	return ss.str().length(); // Return the length of the string (the size of the request in bytes).
+	headers.clear();
 }

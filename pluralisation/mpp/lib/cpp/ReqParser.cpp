@@ -24,7 +24,6 @@
 #include "vuu/CodepointFinder.hpp" // vuu::CodepointFinder, to find the list of codepoints in the UTF-8 string
 
 /* Our headers */
-#include "bosmacros/any.hpp" // ANY_CLASS macro
 #include "mpp/Reply.hpp" // Reply::FailureCode, to indicate why the parser failed
 #include "mpp/Request.hpp" // Request class
 #include "mpp/ver.hpp" // Protocol version info
@@ -85,11 +84,6 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 		std::cout << "State #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
 	}
 	#endif
-	
-	/* Set up locale cache */
-	gen.locale_cache_enabled(true);
-	gen("en_US.UTF-8"); // Add US English
-	gen("ml_IN.UTF-8"); // Add Malayalam
 }
 
 /**
@@ -121,9 +115,6 @@ void mpp::ReqParser::reset()
 **/
 boost::tribool mpp::ReqParser::consume(Request& req, char input)
 {
-	/* Locales for parsing */
-	std::locale usLoc = gen("en_US.UTF-8"); // US English, UTF-8
-	std::locale mlLoc = gen("ml_IN.UTF-8"); // Malayalam
 	boost::tribool toReturn;
 
 	#ifdef DEBUG
@@ -240,7 +231,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case major: // Reading a digit in the major version #
 		{
-			if (std::isdigit(input, usLoc)) // The current character is a digit
+			if (std::isdigit(input)) // The current character is a digit
 			{
 				*verSS[0] << input; // Append it to the end of the current version #
 				toReturn = boost::indeterminate; // Keep parsing
@@ -299,7 +290,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case minor: // Reading a digit in the minor version #
 		{
-			if (std::isdigit(input, usLoc)) // The current character is a digit
+			if (std::isdigit(input)) // The current character is a digit
 			{
 				*verSS[1] << input; // Append it to the end of the current version #
 				#ifdef DEBUG
@@ -354,21 +345,21 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case patch: // Reading a digit in the patch #
 		{
-			if (std::isdigit(input, usLoc)) // The current character is a digit
+			if (std::isdigit(input)) // The current character is a digit
 			{
 				*verSS[2] << input; // Append it to the end of the current version #
 				toReturn = boost::indeterminate; // Keep parsing
 
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a digit in the locale " << usLoc.name() << std::endl
+				std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a digit" << std::endl
 				<< "\tverSS[2]->str() = \"" << verSS[2]->str() << "\"" << std::endl;
 				#endif
 			}
 
-			else if (std::isspace(input, usLoc)) // Finished reading all 3 version #s, need to check the patch version
+			else if (std::isspace(input)) // Finished reading all 3 version #s, need to check the patch version
 			{
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a space character in the locale " << usLoc.name() << std::endl;
+				std::cout << "mpp::ReqParser::consume: patch: character '" << input << "' is a space character" << std::endl;
 				#endif
 
 				short readVerNum; // Holds the version # which we read, for comparison
@@ -418,13 +409,13 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 			std::cout << "mpp::ReqParser::consume: at start of verb_start state handler." << std::endl;
 			#endif
 
-			if (std::isalpha(input, usLoc)) // Expecting an alphabetic char as the first char of the verb
+			if (std::isalpha(input)) // Expecting an alphabetic char as the first char of the verb
 			{
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: verb_start: input (" << input << ") is alphabetic in the locale " << usLoc.name() << std::endl;
+				std::cout << "mpp::ReqParser::consume: verb_start: input (" << input << ") is alphabetic" << std::endl;
 				#endif
 
-				char upper = std::toupper(input, usLoc); // Convert first char. of verb to uppercase
+				char upper = std::toupper(input); // Convert first char. of verb to uppercase
 
 				#ifdef DEBUG
 				std::cout << "mpp::ReqParser::consume: verb_start: uppercase input is '" << upper << "'" << std::endl;
@@ -505,7 +496,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case fof_o: // Expect to parse the remainder of the verb 'O'
 		{
-			if (std::toupper(input, usLoc) == 'O') // Correct
+			if (std::toupper(input) == 'O') // Correct
 			{
 				curStat = fof_f; // Expect final 'F' of 'FOF'
 				toReturn = boost::indeterminate; // Continue parsing
@@ -531,7 +522,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case fof_f: // Expecting second 'f' of "FOF"
 		{
-			if (std::toupper(input, usLoc) == 'F') // Correct
+			if (std::toupper(input) == 'F') // Correct
 			{
 				req.SETCOM_FUNC(Request::FOF); // We have received a valid command, so we can set it
 				curStat = backslash_r_after_verb;
@@ -557,7 +548,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case issing_first_s: // Expecting first 'S' of "ISSING"
 		{
-			if (std::toupper(input, usLoc) == 'S') // Correct
+			if (std::toupper(input) == 'S') // Correct
 			{
 				#ifdef DEBUG
 				std::cout << "mpp::ReqParser::consume: issing_first_s: found first '" << input << "' of \"ISSING\"" << std::endl;
@@ -570,7 +561,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 			else // Error
 			{
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: toupper of input ('" << input << "') [" << std::toupper(input, usLoc) << "] != " << 'S' << std::endl;
+				std::cout << "mpp::ReqParser::consume: toupper of input ('" << input << "') [" << std::toupper(input) << "] != " << 'S' << std::endl;
 				#endif
 
 				status = Reply::badReq;
@@ -582,13 +573,13 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case issing_second_s: // Expecting second 'S' in "ISSING"
 		{
-			if (std::toupper(input, usLoc) == 'S') // Correct
+			if (std::toupper(input) == 'S') // Correct
 			{
 				curStat = issing_second_i; // Expecting second 'I' in "ISSING"
 				toReturn = boost::indeterminate;
 
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: issing_second_s: input = '" << input << "', toupper(input) = '" << std::toupper(input, usLoc) << "', as expected." << std::endl;
+				std::cout << "mpp::ReqParser::consume: issing_second_s: input = '" << input << "', toupper(input) = '" << std::toupper(input) << "', as expected." << std::endl;
 				#endif
 			}
 
@@ -598,7 +589,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 				toReturn = false;
 
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: issing_second_s: incorrect input '" << input << "' (toupper = '" << std::toupper(input, usLoc) << "'" << std::endl;
+				std::cout << "mpp::ReqParser::consume: issing_second_s: incorrect input '" << input << "' (toupper = '" << std::toupper(input) << "'" << std::endl;
 				#endif
 			}
 
@@ -607,12 +598,12 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case issing_second_i: // Expecting second 'I' in "ISSING"
 		{
-			if (std::toupper(input, usLoc) == 'I') // Correct
+			if (std::toupper(input) == 'I') // Correct
 			{
 				curStat = issing_n; // Expecting 'N' in "ISSING"
 				toReturn = boost::indeterminate;
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: issing_second_i: input = '" << input << "', toupper(input) = '" << std::toupper(input, usLoc) << "', as expected." << std::endl;
+				std::cout << "mpp::ReqParser::consume: issing_second_i: input = '" << input << "', toupper(input) = '" << std::toupper(input) << "', as expected." << std::endl;
 				#endif
 			}
 
@@ -621,7 +612,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 				status = Reply::badReq;
 				toReturn = false;
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: issing_second_i: incorrect input '" << input << "' (toupper = '" << std::toupper(input, usLoc) << "'" << std::endl;
+				std::cout << "mpp::ReqParser::consume: issing_second_i: incorrect input '" << input << "' (toupper = '" << std::toupper(input) << "'" << std::endl;
 				#endif
 			}
 
@@ -630,12 +621,12 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case issing_n: // Expecting 'N' in "ISSING"
 		{
-			if (std::toupper(input, usLoc) == 'N') // Correct
+			if (std::toupper(input) == 'N') // Correct
 			{
 				curStat = issing_g; // Expecting 'G' in "ISSING"
 				toReturn = boost::indeterminate;
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: issing_n: input = '" << input << "', toupper(input) = '" << std::toupper(input, usLoc) << "', as expected." << std::endl;
+				std::cout << "mpp::ReqParser::consume: issing_n: input = '" << input << "', toupper(input) = '" << std::toupper(input) << "', as expected." << std::endl;
 				#endif
 			}
 
@@ -644,7 +635,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 				status = Reply::badReq;
 				toReturn = false;
 				#ifdef DEBUG
-				std::cout << "mpp::ReqParser::consume: issing_n: incorrect input '" << input << "' (toupper = '" << std::toupper(input, usLoc) << "'" << std::endl;
+				std::cout << "mpp::ReqParser::consume: issing_n: incorrect input '" << input << "' (toupper = '" << std::toupper(input) << "'" << std::endl;
 				#endif
 			}
 
@@ -653,7 +644,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case issing_g: // Expecting 'G' in "ISSING"
 		{
-			if (std::toupper(input, usLoc) == 'G') // Correct
+			if (std::toupper(input) == 'G') // Correct
 			{
 				req.SETCOM_FUNC(Request::ISSING); // We have received a valid command, so we can set it
 				curStat = backslash_r_after_verb; // Expecting a gr
@@ -730,7 +721,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case header_name: // Reading the header's name
 		{
-			if (std::isalpha(input, usLoc) || input == '-') // The header must contain only [a-zA-Z] and '-'
+			if (std::isalpha(input) || input == '-') // The header must contain only [a-zA-Z] and '-'
 			{
 				(*pSSHeaderName) << input; // Insert the input into the stream
 				toReturn = boost::indeterminate;
@@ -776,7 +767,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 		case space_after_header_name:
 		{
-			if (std::isspace(input, usLoc)) // Found a space
+			if (std::isspace(input)) // Found a space
 			{
 				curStat = header_value; // Read the header's value next
 				toReturn = boost::indeterminate;
@@ -813,7 +804,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 					if (isValidDecimalInt(pSSHeaderVal->str())) // Ensure that the value we have read so far is a valid int
 					{
 						(*pSSHeaderVal) >> mNBytes; // Read the # of bytes in the noun
-						req.addHeader(pSSHeaderName->str(), ANY_CLASS(mNBytes)); // Pass the Request object the name and value. It will create and add the Header object internally.
+						req.addHeader(pSSHeaderName->str(), mNBytes); // Pass the Request object the name and value. It will create and add the Header object internally.
 						#ifdef DEBUG
 						std::cout << "ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
 						#endif
@@ -828,7 +819,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 
 				else // Treat it as a regular header
 				{
-					req.addHeader(pSSHeaderName->str(), ANY_CLASS(pSSHeaderVal->str()));
+					req.addHeader(pSSHeaderName->str(), pSSHeaderVal->str());
 
 					#ifdef DEBUG
 					std::cout << "ReqParser::consume: header_value: read header \"" << pSSHeaderName->str() << "\", with value \"" << pSSHeaderVal->str() << "\"" << std::endl;
