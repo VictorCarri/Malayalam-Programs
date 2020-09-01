@@ -2,6 +2,7 @@
 #include <string> // std::string
 #include <sstream> // std::ostringstream
 #include <utility> // std::exchange, std::move, std::swap
+#include <stdexcept> // std::out_of_range
 
 /* Boost */
 #include <boost/asio.hpp> // boost::asio::const_buffer
@@ -205,4 +206,35 @@ mpp::Reply& mpp::Reply::operator=(const mpp::Reply& other)
 	statText = other.statText;
 	content = other.content;
 	return *this; // Allow chaining
+}
+
+/**
+* @desc An overload for the insertion operator that prints an MPP reply.
+* @param os The output stream to write to.
+* @param req The mpp::Reply object to write.
+* @return A reference to the output stream, to allow chaining of operator<<.
+**/
+std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
+{
+	try
+	{
+		os << "MPP/" << VER_MAJOR << VER_MINOR << VER_PATCH << " " << rep.statText.at(rep.stat) << "\r\n"; // Write the first line of the response
+	}
+
+	catch (std::out_of_range& stdoor)
+	{
+		os << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): caught std::out_of_range while trying to write the name of the status " << rep.stat << std::endl;
+	}
+
+	for (mpp::Header h : headers)
+	{
+	}
+}
+
+/**
+* @desc Clears this Reply object's list of headers.
+**/
+void mpp::Reply::clearHeaders()
+{
+	headers.clear();
 }

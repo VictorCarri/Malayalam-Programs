@@ -204,7 +204,7 @@ void mpp::Request::writeToStream(std::ostream& os) const
 
 	catch (std::out_of_range& stdoor)
 	{
-		os << "mpp::Request::writeToStream: caught std::out_of_range while trying to writ ethe name of the command " << c << std::endl;
+		os << "mpp::Request::writeToStream: caught std::out_of_range while trying to write the name of the command " << c << std::endl;
 	}
 
 	for (mpp::Header h : headers)

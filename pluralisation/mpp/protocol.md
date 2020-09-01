@@ -40,10 +40,25 @@ Responses
 ==========
 A response will be of the form:
 	
-	MPP/1.0{space}{code}\r\n{codeText}\r\n{response}?\r\n\r\n
+	MPP/{version}{space}{code}\r\n
+	{headerName}:{space}{headerVal}\r\n...
+	\r\n
+	{response}
 ,
 
 where {code} is a numeric code which follows the same format as HTTP codes. (2xx for OK, 4xx for client error, 5xx for server error).
+
+In BNR form:
+
+Reply -> protLine headers argument
+protLine -> "MPP/" integer "." integer "." integer space code "\r\n"
+headers -> header header\* "\r\n"
+header -> string ':' space string "\r\n"
+space -> ' ' | '\t'
+integer -> [0-9]+
+string -> [byte]+
+byte -> 0 | 1 | ... | 255
+argument -> [byte]+
 
 Acceptable commands:
 =====================

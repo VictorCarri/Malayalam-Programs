@@ -182,6 +182,8 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			#endif
 
 			rep = mpp::Reply::stockReply(reqParser.getStatus()); // Generate a stock reply using the error code which the parser identified
+			rep.setContent(""); // Clear the reply's content
+			rep.clearHeaders(); // Clear the reply's headers
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),

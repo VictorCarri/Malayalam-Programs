@@ -107,6 +107,11 @@ namespace mpp
 			* @return A reference to this.
 			**/
 			Reply& operator=(const Reply& other);
+
+			/**
+			* @desc Clears this Reply object's list of headers.
+			**/
+			void clearHeaders();
 	
 		private:
 			Status stat; // This reply's status
@@ -123,12 +128,12 @@ namespace mpp
 	};
 
 	/**
-	* @desc An overload for the insertion operator that prints an MPP request.
+	* @desc An overload for the insertion operator that prints an MPP reply.
 	* @param os The output stream to write to.
-	* @param req The mpp::Request object to write.
+	* @param req The mpp::Reply object to write.
 	* @return A reference to the output stream, to allow chaining of operator<<.
 	**/
-	std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
+	std::ostream& operator<<(std::ostream& os, const Reply& req);
 };
 
 #endif // MPP_REPLY_HPP
