@@ -83185,6 +83185,11 @@ namespace mpp
 
    Reply& operator=(const Reply& other);
 
+
+
+
+   void clearHeaders();
+
   private:
    Status stat;
    std::forward_list<mpp::Header> headers;
@@ -83192,7 +83197,20 @@ namespace mpp
    std::string content;
    const std::array<char, 2> crlf;
    const std::array<char, 2> nameValSep;
+
+
+
+
+   friend std::ostream& operator<<(std::ostream& os, const mpp::Reply& req);
  };
+
+
+
+
+
+
+
+ std::ostream& operator<<(std::ostream& os, const Reply& req);
 };
 # 28 "cpp/ReqParser.cpp" 2
 # 1 "./hpp/mpp/Request.hpp" 1
@@ -83209,9 +83227,9 @@ namespace mpp
   public:
    enum Command
    {
+    INVALID = 0,
     FOF,
     ISSING,
-    INVALID
    };
 
    typedef std::any any_type ;
@@ -83269,7 +83287,21 @@ namespace mpp
 
    typename std::string::size_type size() const;
 
+
+
+
+   void clearHeaders();
+
   private:
+
+
+
+
+
+
+   void writeToStream(std::ostream& os) const;
+
+
    Command c;
    std::forward_list<mpp::Header> headers;
    std::string noun;
@@ -83300,9 +83332,9 @@ namespace mpp
 namespace mpp
 {
 
- const short VER_MAJOR = 2;
- const short VER_MINOR = 3;
- const short VER_PATCH = 1;
+ const unsigned short VER_MAJOR = 2;
+ const unsigned short VER_MINOR = 3;
+ const unsigned short VER_PATCH = 3;
 };
 # 30 "cpp/ReqParser.cpp" 2
 

@@ -91,7 +91,7 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
-				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
+				ess << "mpp::Reply::toBuffers(): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
 				<< "Error: " << stdbace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue toThrow(ess.str());
 				throw toThrow;
@@ -108,7 +108,7 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
-				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
+				ess << "mpp::Reply::toBuffers(): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
 				<< "Error: " << stdbace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue toThrow(ess.str());
 				throw toThrow;
@@ -226,9 +226,57 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
 		os << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): caught std::out_of_range while trying to write the name of the status " << rep.stat << std::endl;
 	}
 
-	for (mpp::Header h : headers)
+	for (mpp::Header h : rep.headers)
 	{
+		std::string headerName = h.getName();
+		os << headerName << ": "; // Write the header's name and a colon to separate it from its value
+
+		/* Does the header's ANY_CLASS object contain a string or an int? */
+		if (headerName == "Content-Length") // Integer value
+		{
+			try
+			{
+				os << ANY_CAST<int>(h.getValue()); // Fetch the length as an int and write it to the stream
+			}
+	
+			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
+			{
+				std::ostringstream ess;
+				ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
+				<< "Error: " << stdbace.what() << std::endl;
+				mpp::exceptions::BadHeaderValue toThrow(ess.str());
+				throw toThrow;
+			}
+		}
+
+		else // String value
+		{
+			try
+			{
+				os << ANY_CAST<std::string>(h.getValue()); // Fetch the header's value as a string and write it to the stream
+			}
+	
+			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
+			{
+				std::ostringstream ess;
+				ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
+				<< "Error: " << stdbace.what() << std::endl;
+				mpp::exceptions::BadHeaderValue toThrow(ess.str());
+				throw toThrow;
+			}
+		}
+
+		os << "\r\n"; // End this header line
 	}
+	
+	os << "\r\n"; // End the headers
+
+	if (!rep.content.empty()) // There is content
+	{
+		os << rep.content; // Write it
+	}
+
+	return os;
 }
 
 /**

@@ -76471,9 +76471,9 @@ namespace mpp
 namespace mpp
 {
 
- const short VER_MAJOR = 2;
- const short VER_MINOR = 3;
- const short VER_PATCH = 1;
+ const unsigned short VER_MAJOR = 2;
+ const unsigned short VER_MINOR = 3;
+ const unsigned short VER_PATCH = 3;
 };
 # 18 "cpp/Request.cpp" 2
 # 1 "./hpp/mpp/exceptions/BadHeaderValue.hpp" 1
@@ -82387,7 +82387,7 @@ void mpp::Request::writeToStream(std::ostream& os) const
 
  catch (std::out_of_range& stdoor)
  {
-  os << "mpp::Request::writeToStream: caught std::out_of_range while trying to writ ethe name of the command " << c << std::endl;
+  os << "mpp::Request::writeToStream: caught std::out_of_range while trying to write the name of the command " << c << std::endl;
  }
 
  for (mpp::Header h : headers)
