@@ -16,7 +16,7 @@
 #include <functional> // std::function
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::signal_set, boost::asio::io_context, boost::asio::ip::tcp::socket, boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint, boost::asio::const_buffer
+#include <boost/asio.hpp> // boost::asio::signal_set, boost::asio::io_context, boost::asio::ip::tcp::socket, boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint, boost::asio::const_buffer, boost::asio::mutable_buffer
 #include <boost/system/error_code.hpp> // boost::system::error_code
 
 /* MPP */
@@ -141,6 +141,7 @@ class Client
 		std::function<void(bool,std::string)> isCB; // The callback that will be called once the sequence of operations involved in isSingular is complete.
 		std::vector<boost::asio::const_buffer> reqBufs; // Holds the request buffers so that they won't be destroyed when a method ends and the vector goes out of scope.
 		mpp::Request curReq; // The current request
+		std::vector<boost::asio::mutable_buffer> repBufs; // Holds the reply from the server. This is a member variable, so that it won't be destroyed before the asynchronous operation completes.
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.
 		#endif

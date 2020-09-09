@@ -18,9 +18,10 @@
 #include <memory> // std::make_unique
 #include <string_view> // std::string_view
 #include <iomanip> // std::quoted
+#include <vector> // std::vector
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::placeholders::error, boost::asio::placeholders::signal_number, boost::asio::placeholders::endpoint, boost::asio::ip::tcp::socket, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver, boost::asio::buffer, boost::asio::async_write, boost::asio::async_connect, boost::asio::async_read, boost::asio::ip::tcp::socket::shutdown_both, boost::asio::mutable_buffer
+#include <boost/asio.hpp> // boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver, boost::asio::async_write, boost::asio::async_connect, boost::asio::async_read, boost::asio::mutable_buffer
 #include <boost/system/error_code.hpp> // boost::system::error_code
 #include <boost/system/system_error.hpp> // boost::system::system_error
 
@@ -428,4 +429,30 @@ void Client::readSingRep()
 	#ifdef DEBUG
 	std::cout << "Client::readSingRep running." << std::endl;
 	#endif
+	repBufs.clear(); // Clear any old buffers
+	boost::asio::async_read(sock, repBufs, [this](const boost::system::error_code& ec, std::size_t bytesTransferred)
+		{
+			if (!ec) // No error
+			{
+				#ifdef DEBUG
+				std::cout << "Client::readSingRep::lambda: no error" << std::endl
+				<< "\tRead " << bytesTransferred << " bytes"
+				<< "Data is: " << std::endl << std::endl;
+
+				for (boost::asio::mutable_buffer buf : repBufs)
+				{
+					std::cout << static_cast<char*>(buf.data());
+				}
+				#endif
+			}
+
+			else // An error occurred
+			{
+				std::cerr << "Client::readSingRep::lambda: an error occurred while reading the reply from the server." << std::endl
+				<< "\tError value = " << ec.value() << std::endl
+				<< "\tError message = " << std::quoted(ec.message()) << std::endl
+				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+			}
+		}
+	);
 }

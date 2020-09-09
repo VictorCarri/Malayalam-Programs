@@ -65,6 +65,9 @@ void Connection::start()
 			handleRead(e, bTrans);
 		}
 	);
+	#ifdef DEBUG
+	std::cout << "Connection::start ending." << std::endl;
+	#endif
 	//boost::asio::async_read_until(socket, boost::asio::buffer(buffer), "\r\n", BIND_FUNCTION(&Connection::handleRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
@@ -278,7 +281,7 @@ void Connection::handleWrite(const ERROR_CODE& e, std::size_t bytesTransferred)
 	else
 	{
 		#ifdef DEBUG
-		std::cerr << "Connection::handleRead: an error occurred while handling the previous read operation." << std::endl
+		std::cerr << "Connection::handleWrite: an error occurred while handling the previous write operation." << std::endl
 		<< "\tError value = " << e.value() << std::endl
 		<< "\tError message = " << std::quoted(e.message()) << std::endl
 		<< "\tThe operation " << (e.failed() ? "failed" : "didn't fail") << std::endl;
