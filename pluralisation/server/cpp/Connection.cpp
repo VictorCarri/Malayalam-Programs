@@ -16,7 +16,6 @@
 #include <boost/system/error_code.hpp> // boost::system::error_code
 
 /* Our headers */
-#include "bosmacros/bind.hpp" // BIND_FUNCTION macro
 #include "bosmacros/error_code.hpp" // ERROR_CODE macro
 #include "bosmacros/filesystem.hpp" // FILESYSTEM_PATH
 #include "mpp/ReqHandler.hpp" // Request handler class
@@ -31,6 +30,9 @@ Connection::Connection(boost::asio::io_context& io_context, mpp::ReqHandler& han
 	socket(io_context),
 	reqHandler(handler)
 {
+	#ifdef DEBUG
+	std::cout << "Connection::Connection running" << std::endl;
+	#endif
 }
 
 /**
@@ -54,12 +56,6 @@ void Connection::start()
 		boost::asio::buffer(
 			buffer
 		),
-		/*BIND_FUNCTION(
-			&Connection::handleRead,
-			shared_from_this(),
-			boost::asio::placeholders::error,
-			boost::asio::placeholders::bytes_transferred
-		)*/
 		[this](const ERROR_CODE& e, std::size_t bTrans)
 		{
 			handleRead(e, bTrans);
@@ -68,7 +64,6 @@ void Connection::start()
 	#ifdef DEBUG
 	std::cout << "Connection::start ending." << std::endl;
 	#endif
-	//boost::asio::async_read_until(socket, boost::asio::buffer(buffer), "\r\n", BIND_FUNCTION(&Connection::handleRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
 /**
@@ -166,11 +161,6 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				/*BIND_FUNCTION(
-					&Connection::handleWrite,
-					shared_from_this(),
-					boost::asio::placeholders::error
-				)*/
 				[this](const ERROR_CODE& err, std::size_t bytesTrans)
 				{
 					handleWrite(err, bytesTrans);
@@ -190,11 +180,6 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				/*BIND_FUNCTION(
-					&Connection::handleWrite,
-					shared_from_this(),
-					boost::asio::placeholders::error
-				)*/
 				[this](const ERROR_CODE& err, std::size_t bTrans)
 				{
 					handleWrite(err, bTrans);
@@ -210,28 +195,11 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 
 			socket.async_read_some(
 				boost::asio::buffer(buffer),
-				/*BIND_FUNCTION(
-					&Connection::handleRead,
-					shared_from_this(),
-					boost::asio::placeholders::error,
-					boost::asio::placeholders::bytes_transferred
-				)*/
 				[this](const ERROR_CODE& err, std::size_t bTrans)
 				{
 					handleRead(err, bTrans);
 				}
 			);
-			/*boost::asio::async_read_until(
-				socket,
-				boost::asio::buffer(buffer),
-				"\r\n",
-				BIND_FUNCTION(
-					&Connection::handleRead,
-					shared_from_this(),
-					boost::asio::placeholders::error,
-					boost::asio::placeholders::bytes_transferred
-				)
-			);*/
 		}
 	}
 	

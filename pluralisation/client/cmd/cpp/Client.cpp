@@ -436,7 +436,7 @@ void Client::readSingRep()
 			{
 				#ifdef DEBUG
 				std::cout << "Client::readSingRep::lambda: no error" << std::endl
-				<< "\tRead " << bytesTransferred << " bytes"
+				<< "\tRead " << bytesTransferred << " bytes" << std::endl
 				<< "Data is: " << std::endl << std::endl;
 
 				for (boost::asio::mutable_buffer buf : repBufs)

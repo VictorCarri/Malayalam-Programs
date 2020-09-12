@@ -34,9 +34,7 @@ standard=gnu++17
 compOpts=$(addprefix -I,$(hdrDir) /home/victor/include /usr/include/mysql) $(addprefix -W,all error) -std=$(standard) $(shell mariadb_config --cflags)
 
 # Defines that control whether the boost or std implementations are used
-# Using boost::bind
-# Using boost::system::error_code
-boostOrStd=$(addprefix -DUSE_STD_,ENABLE_SHARED_FROM_THIS SHARED_PTR THREAD ANY)
+boostOrStd=$(addprefix -DUSE_STD_,ENABLE_SHARED_FROM_THIS SHARED_PTR THREAD ANY BIND)
 
 # Redirect stderr > stdout
 redirect=2>&1
