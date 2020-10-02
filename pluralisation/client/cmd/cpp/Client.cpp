@@ -314,6 +314,13 @@ void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
 		{
 			if (!acErr) // No error
 			{
+				#ifdef DEBUG
+				std::cout << "Client::isSingular: async_connect succeeded." << std::endl
+				<< "\tEndpoint address: " << ep.address().to_string() << std::endl
+				<< "\tEndpoint capacity: " << ep.capacity() << std::endl
+				<< "\tEndpoint port: " << ep.port() << std::endl
+				<< "\tEndpoint size: " << ep.size() << std::endl;
+				#endif
 				sendSingReq(); // Send the ISSING request to the server
 			}
 
@@ -404,6 +411,9 @@ void Client::sendSingReq()
 
 				else
 				{
+					#ifdef DEBUG
+					std::cout << "Client::sendSingReq::lambda: calling readSingRep" << std::endl;
+					#endif
 					readSingRep(); // Read the reply from the server.
 				}
 			}

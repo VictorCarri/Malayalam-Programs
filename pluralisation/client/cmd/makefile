@@ -42,7 +42,7 @@ compiler=g++-9
 objDir=./obj
 
 # The name that's common to all executables
-exeName=mpp-client
+exeName=mpp-cmd-client
 
 # List of files to compile, in order from self-contained classes to main
 files=Client main
