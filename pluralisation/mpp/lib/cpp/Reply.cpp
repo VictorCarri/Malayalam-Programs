@@ -5,7 +5,7 @@
 #include <stdexcept> // std::out_of_range
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::const_buffer
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS, BAD_ANY_CAST, ANY_CAST

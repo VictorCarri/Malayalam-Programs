@@ -79070,7 +79070,7 @@ namespace std __attribute__ ((__visibility__ ("default")))
 # 1357 "/usr/local/include/boost/asio/detail/config.hpp" 3
 # 1 "/usr/include/linux/version.h" 1 3 4
 # 35 "/usr/include/linux/version.h" 3 4
-#define LINUX_VERSION_CODE 265984
+#define LINUX_VERSION_CODE 328448
 #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 # 1358 "/usr/local/include/boost/asio/detail/config.hpp" 2 3
 
@@ -83279,7 +83279,7 @@ namespace mpp
 
 
 
-   std::vector<boost::asio::const_buffer> toBuffers() const;
+   std::vector<boost::asio::const_buffer> toBuffers();
 
 
 
@@ -83308,6 +83308,8 @@ namespace mpp
    std::map<Command, std::string> verbNames;
    const std::array<char, 2> crlf;
    const std::array<char, 2> nameValSep;
+   std::vector<boost::asio::const_buffer> bufs;
+   std::vector<std::string> sdata;
 
 
 
@@ -85741,6 +85743,16 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m),
  pNounSS(new std::stringstream)
 {
 
+ if (pSSHeaderName)
+ {
+  std::cout << "mpp::ReqParser::ReqParser: pSSHeaderName is valid." << std::endl;
+ }
+
+ else
+ {
+  std::cout << "mpp::ReqParser::ReqParser: pSSHeaderName is invalid!" << std::endl;
+ }
+
 
  stateNames[protocol_name_m] = "protocol_name_m";
  stateNames[protocol_name_first_p] = "protocol_name_first_p";
@@ -85772,7 +85784,7 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m),
 
  for (std::pair<std::string, State> pair : verbInfo)
  {
-  std::cout << "State #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
+  std::cout << "\tState #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
  }
 
 }
@@ -85793,9 +85805,22 @@ void mpp::ReqParser::reset()
   ptr.reset();
  }
 
- pSSHeaderName.reset();
- pSSHeaderVal.reset();
- pNounSS.reset();
+ pSSHeaderName.reset(new std::stringstream);
+
+
+ if (pSSHeaderName)
+ {
+  std::cout << "mpp::ReqParser::reset: pSSHeaderName owns a new stringstream after reset." << std::endl;
+ }
+
+ else
+ {
+  std::cout << "mpp::ReqParser::reset: pSSHeaderName owns nothing after reset!" << std::endl;
+ }
+
+
+ pSSHeaderVal.reset(new std::stringstream);
+ pNounSS.reset(new std::stringstream);
 }
 
 
@@ -86414,6 +86439,18 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
   {
    if (std::isalpha(input) || input == '-')
    {
+
+    if (pSSHeaderName)
+    {
+     std::cout << "mpp::ReqParser::consume: The pointer to the string stream for the header's name is: " << pSSHeaderName.get() << std::endl;
+    }
+
+    else
+    {
+     std::cout << "mpp::ReqParser::consume: pSSHeaderName doesn't own an object!" << std::endl;
+    }
+
+
     (*pSSHeaderName) << input;
     toReturn = boost::indeterminate;
 
@@ -86497,7 +86534,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
       (*pSSHeaderVal) >> mNBytes;
       req.addHeader(pSSHeaderName->str(), mNBytes);
 
-      std::cout << "ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
+      std::cout << "mpp::ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
 
      }
 
@@ -86513,13 +86550,27 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
      req.addHeader(pSSHeaderName->str(), pSSHeaderVal->str());
 
 
-     std::cout << "ReqParser::consume: header_value: read header \"" << pSSHeaderName->str() << "\", with value \"" << pSSHeaderVal->str() << "\"" << std::endl;
+     std::cout << "mpp::ReqParser::consume: header_value: read header \"" << pSSHeaderName->str() << "\", with value \"" << pSSHeaderVal->str() << "\"" << std::endl;
 
     }
 
 
-    pSSHeaderName.reset();
-    pSSHeaderVal.reset();
+    pSSHeaderName.reset(new std::stringstream);
+    std::cout << "mpp::ReqParser::consume: header_value: read '\r' and reset pSSHeaderName" << std::endl;
+
+
+    if (pSSHeaderName)
+    {
+     std::cout << "mpp::ReqParser::consume: header_value: pSSHeaderName is valid after reset." << std::endl;
+    }
+
+    else
+    {
+     std::cout << "mpp::ReqParser::consume: header_value: pSSHeaderName is invalid after reset!" << std::endl;
+    }
+
+
+    pSSHeaderVal.reset(new std::stringstream);
 
    }
 

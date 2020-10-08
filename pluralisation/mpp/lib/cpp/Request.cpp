@@ -6,6 +6,9 @@
 #include <iomanip> // std::quoted
 #include <ostream> // std::endl
 #include <stdexcept> // std::out_of_range
+#ifdef DEBUG
+#include <iostream> // std::cout
+#endif
 
 /* Boost */
 #include <boost/asio/buffer.hpp> // boost::asio::buffer
@@ -106,19 +109,42 @@ std::string mpp::Request::getNoun() const
 * @desc Converts the Request object to a sequence of constant buffers, suitable for network transport.
 * @return A vector of constant buffers, containing text that represents this Request object.
 **/
-std::vector<boost::asio::const_buffer> mpp::Request::toBuffers() const
+std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
 {
-	std::vector<boost::asio::const_buffer> toReturn;
 	std::ostringstream flss; // Used to build the first line
 
+	sdata.clear(); // Clear old string data. We keep this vector because it's a member variable that'll last for the duration of the request. If we don't do this, the stringstream and temporary string variables below will go out of scope, causing the buffers that hold shallow references to their contents to point to garbage. This'll result in a garbage request.
+	bufs.clear(); // Clear any old buffers
+
+	#ifdef DEBUG
+	std::cout << "mpp::Request::toBuffers: bufs after being cleared:" << std::endl;
+
+	for (boost::asio::const_buffer buf : bufs)
+	{
+		std::cout << static_cast<const unsigned char*>(buf.data());
+	}
+	#endif
+
 	flss << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " " << verbNames.at(c); // Create the first line
-	toReturn.push_back(boost::asio::buffer(flss.str())); // Push back the first line
-	toReturn.push_back(boost::asio::buffer(crlf)); // End this line
+	sdata.push_back(flss.str());
+	bufs.push_back(boost::asio::buffer(sdata.back())); // Push back the first line
+
+	#ifdef DEBUG
+	std::cout << "mpp::Request::toBuffers: bufs after adding protocol line: " << std::endl;
+
+	for (boost::asio::const_buffer buf : bufs)
+	{
+		std::cout << static_cast<const unsigned char*>(buf.data());
+	}
+	#endif
+
+	bufs.push_back(boost::asio::buffer(crlf)); // End this line
 
 	for (mpp::Header h : headers) // Loop through the list of headers
 	{
-		toReturn.push_back(boost::asio::buffer(h.getName())); // First, send the header's name
-		toReturn.push_back(boost::asio::buffer(nameValSep)); // Then, add the separator
+		sdata.push_back(h.getName());
+		bufs.push_back(boost::asio::buffer(sdata.back())); // First, send the header's name
+		bufs.push_back(boost::asio::buffer(nameValSep)); // Then, add the separator
 		std::string val; // Will represent the value that we fetch from the ANY_CLASS that contains the header's value
 
 		/* Determine what type the header's value is */
@@ -159,13 +185,14 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers() const
 			}
 		}
 
-		toReturn.push_back(boost::asio::buffer(val)); // Add the header's value
-		toReturn.push_back(boost::asio::buffer(crlf)); // End this header line
+		sdata.push_back(val);
+		bufs.push_back(boost::asio::buffer(sdata.back())); // Add the header's value
+		bufs.push_back(boost::asio::buffer(crlf)); // End this header line
 	} // for
 
-	toReturn.push_back(boost::asio::buffer(crlf)); // End the headers
-	toReturn.push_back(boost::asio::buffer(noun)); // Add the noun
-	return toReturn;
+	bufs.push_back(boost::asio::buffer(crlf)); // End the headers
+	bufs.push_back(boost::asio::buffer(noun)); // Add the noun
+	return bufs;
 }
 
 /**

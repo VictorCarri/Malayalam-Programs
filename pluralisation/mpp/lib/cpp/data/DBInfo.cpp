@@ -7,7 +7,10 @@
 #endif
 
 /* Boost */
-#include <boost/program_options.hpp> // boost::program_options::options_description, boost:program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::notify, boost::program_options::parse_config_file
+#include <boost/program_options/options_description.hpp> // boost::program_options::options_description
+#include <boost/program_options/value_semantic.hpp> // boost::program_options::value
+#include <boost/program_options/variables_map.hpp> // boost::program_options::variables_map, boost::program_options::store, boost::program_options::notify
+#include <boost/program_options/parsers.hpp> // boost::program_options::parse_config_file
 
 /* Our headers */
 #include "bosmacros/filesystem.hpp" // FILESYSTEM_EXISTS and IFSTREAM macros

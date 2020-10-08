@@ -56,7 +56,7 @@ void Connection::start()
 		boost::asio::buffer(
 			buffer
 		),
-		[this](const ERROR_CODE& e, std::size_t bTrans)
+		[lifetime = shared_from_this(), this](const ERROR_CODE& e, std::size_t bTrans)
 		{
 			handleRead(e, bTrans);
 		}
@@ -161,7 +161,7 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				[this](const ERROR_CODE& err, std::size_t bytesTrans)
+				[lifetime = shared_from_this(), this](const ERROR_CODE& err, std::size_t bytesTrans)
 				{
 					handleWrite(err, bytesTrans);
 				}
@@ -180,7 +180,7 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),
-				[this](const ERROR_CODE& err, std::size_t bTrans)
+				[lifetime = shared_from_this(), this](const ERROR_CODE& err, std::size_t bTrans)
 				{
 					handleWrite(err, bTrans);
 				}
@@ -195,7 +195,7 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 
 			socket.async_read_some(
 				boost::asio::buffer(buffer),
-				[this](const ERROR_CODE& err, std::size_t bTrans)
+				[lifetime = shared_from_this(), this](const ERROR_CODE& err, std::size_t bTrans)
 				{
 					handleRead(err, bTrans);
 				}

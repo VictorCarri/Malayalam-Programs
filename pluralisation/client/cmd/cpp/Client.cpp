@@ -21,7 +21,11 @@
 #include <vector> // std::vector
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver, boost::asio::async_write, boost::asio::async_connect, boost::asio::async_read, boost::asio::mutable_buffer
+#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver
+#include <boost/asio/write.hpp> // boost::asio::async_write
+#include <boost/asio/connect.hpp> // boost::asio::async_connect
+#include <boost/asio/read.hpp> // boost::asio::async_read
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 #include <boost/system/error_code.hpp> // boost::system::error_code
 #include <boost/system/system_error.hpp> // boost::system::system_error
 
@@ -93,8 +97,6 @@ sigMsgs { // Construct the map of signal values to strings
 			{
 				active = false; // Stop the client immediately
 				std::cout << "Client: signal handler lambda: caught " << sigMsgs[sigNo] << ", exiting..." << std::endl;
-				#ifdef DEBUG
-				#endif
 			}
 
 			else // An error occurred
@@ -125,6 +127,20 @@ sigMsgs { // Construct the map of signal values to strings
 			if (!resErr) // No error
 			{
 				resolveResults = results; // Store the results
+				#ifdef DEBUG
+				std::cout << "Client::Client::resolver lambda: resolution results are: " << std::endl;
+				int eNo = 1;
+
+				for (boost::asio::ip::tcp::endpoint endpoint : resolveResults)
+				{
+					std::clog << "Endpoint #" << eNo << std::endl << "----------" << std::endl
+					<< "\tAddress: " << endpoint.address().to_string() << std::endl
+					<< "\tCapacity: " << endpoint.capacity() << std::endl
+					<< "\tPort: " << endpoint.port() << std::endl
+					<< "\tSize: " << endpoint.size() << std::endl << std::endl;
+					++eNo;
+				}
+				#endif
 			}
 
 			else // Error occurred
@@ -149,7 +165,7 @@ sigMsgs { // Construct the map of signal values to strings
 /**
 * @desc Default constructor. Initialises our state.
 **/
-Client::Client() : Client(std::string("127.0.0.1").c_str(), 50001) // Connect to the default host and port
+Client::Client() : Client("127.0.0.1", 50001) // Connect to the default host and port
 {
 }
 
@@ -310,7 +326,7 @@ void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
 		++eNo;
 	}
 
-	boost::asio::async_connect(sock, resolveResults, [this](boost::system::error_code acErr, boost::asio::ip::tcp::endpoint ep)
+	boost::asio::async_connect(sock, resolveResults, [this](const boost::system::error_code& acErr, const boost::asio::ip::tcp::endpoint& ep)
 		{
 			if (!acErr) // No error
 			{
@@ -395,6 +411,27 @@ void Client::sendSingReq()
 	<< curReq;
 	#endif
 	reqBufs = curReq.toBuffers(); // Store the buffers in a member variable so that they won't go out of scope before the asynchronous write completes
+
+	#ifdef DEBUG
+	std::cout << "Client::sendSingReq: buffers are: " << std::endl;
+
+	/* Print the buffers' contents, just in case */
+	for (boost::asio::const_buffer buf : reqBufs)
+	{
+		std::size_t bufSiz = buf.size();
+		const unsigned char* bufDat = static_cast<const unsigned char*>(buf.data());
+		
+		for (std::size_t i = 0; i < bufSiz; i++)
+		{
+			std::cout << bufDat[i];
+		}
+
+		std::cout << std::endl;
+	}
+
+	std::cout << std::endl;
+	#endif
+
 	boost::asio::async_write(sock, reqBufs, [this](const boost::system::error_code& ec, std::size_t bytesTransferred)
 		{
 			if (!ec) // No error
@@ -449,9 +486,9 @@ void Client::readSingRep()
 				<< "\tRead " << bytesTransferred << " bytes" << std::endl
 				<< "Data is: " << std::endl << std::endl;
 
-				for (boost::asio::mutable_buffer buf : repBufs)
+				for (boost::asio::const_buffer buf : repBufs)
 				{
-					std::cout << static_cast<char*>(buf.data());
+					std::cout << static_cast<const char*>(buf.data());
 				}
 				#endif
 			}

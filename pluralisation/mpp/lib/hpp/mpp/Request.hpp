@@ -79,7 +79,7 @@ namespace mpp
 			* @desc Converts the Request object to a sequence of constant buffers, suitable for network transport.
 			* @return A vector of constant buffers, containing text that represents this Request object.
 			**/
-			std::vector<boost::asio::const_buffer> toBuffers() const;
+			std::vector<boost::asio::const_buffer> toBuffers();
 
 			/**
 			* @desc Calculates the size of the request as a string.
@@ -108,6 +108,8 @@ namespace mpp
 			std::map<Command, std::string> verbNames; // Maps a verb enum to a string describing it for network transport
 			const std::array<char, 2> crlf; // Used to represent the sequence "\r\n"
 			const std::array<char, 2> nameValSep; // Contains the ':' and space that separate a header name from its value
+			std::vector<boost::asio::const_buffer> bufs; // Holds the request when converted to buffers. Made a member to prevent it from being deleted before the Request ends, since that causes errors when we try to send the buffers over the network.
+			std::vector<std::string> sdata; // Holds string data so that the buffers that refer to them won't contain garbage
 
 			/**
 			* Friend declaration to allow operator<< to access private members.

@@ -50,6 +50,16 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 	pNounSS(new std::stringstream)
 {
 	#ifdef DEBUG
+	if (pSSHeaderName)
+	{
+		std::cout << "mpp::ReqParser::ReqParser: pSSHeaderName is valid." << std::endl;
+	}
+
+	else
+	{
+		std::cout << "mpp::ReqParser::ReqParser: pSSHeaderName is invalid!" << std::endl;
+	}
+
 	/* Set up map of states to state names */
 	stateNames[protocol_name_m] = "protocol_name_m";
 	stateNames[protocol_name_first_p] = "protocol_name_first_p";
@@ -81,7 +91,7 @@ mpp::ReqParser::ReqParser() : curStat(protocol_name_m), // Construct in start st
 
 	for (std::pair<std::string, State> pair : verbInfo)
 	{
-		std::cout << "State #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
+		std::cout << "\tState #" << static_cast<unsigned int>(pair.second) << "'s name is \"" << pair.first << "\"" << std::endl;
 	}
 	#endif
 }
@@ -102,9 +112,22 @@ void mpp::ReqParser::reset()
 		ptr.reset();
 	}
 
-	pSSHeaderName.reset(); // Reset the header stringstream
-	pSSHeaderVal.reset(); // Reset the header stringstream
-	pNounSS.reset(); // Reset the noun's stringstream
+	pSSHeaderName.reset(new std::stringstream); // Reset the header stringstream
+
+	#ifdef DEBUG
+	if (pSSHeaderName)
+	{
+		std::cout << "mpp::ReqParser::reset: pSSHeaderName owns a new stringstream after reset." << std::endl;
+	}
+	
+	else
+	{
+		std::cout << "mpp::ReqParser::reset: pSSHeaderName owns nothing after reset!" << std::endl;
+	}
+	#endif
+
+	pSSHeaderVal.reset(new std::stringstream); // Reset the header stringstream
+	pNounSS.reset(new std::stringstream); // Reset the noun's stringstream
 }
 
 /**
@@ -723,6 +746,18 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 		{
 			if (std::isalpha(input) || input == '-') // The header must contain only [a-zA-Z] and '-'
 			{
+				#ifdef DEBUG
+				if (pSSHeaderName) // Check to make sure that the stringstream exists
+				{
+					std::cout << "mpp::ReqParser::consume: The pointer to the string stream for the header's name is: " << pSSHeaderName.get() << std::endl;
+				}
+
+				else
+				{
+					std::cout << "mpp::ReqParser::consume: pSSHeaderName doesn't own an object!" << std::endl;
+				}
+				#endif
+
 				(*pSSHeaderName) << input; // Insert the input into the stream
 				toReturn = boost::indeterminate;
 
@@ -806,7 +841,7 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 						(*pSSHeaderVal) >> mNBytes; // Read the # of bytes in the noun
 						req.addHeader(pSSHeaderName->str(), mNBytes); // Pass the Request object the name and value. It will create and add the Header object internally.
 						#ifdef DEBUG
-						std::cout << "ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
+						std::cout << "mpp::ReqParser::consume: header_value: noun has length " << mNBytes << " (in bytes)" << std::endl;
 						#endif
 					}
 
@@ -822,13 +857,27 @@ boost::tribool mpp::ReqParser::consume(Request& req, char input)
 					req.addHeader(pSSHeaderName->str(), pSSHeaderVal->str());
 
 					#ifdef DEBUG
-					std::cout << "ReqParser::consume: header_value: read header \"" << pSSHeaderName->str() << "\", with value \"" << pSSHeaderVal->str() << "\"" << std::endl;
+					std::cout << "mpp::ReqParser::consume: header_value: read header \"" << pSSHeaderName->str() << "\", with value \"" << pSSHeaderVal->str() << "\"" << std::endl;
 					#endif
 				}
 
 				/* Reset stringstream pointers for the next header */
-				pSSHeaderName.reset();
-				pSSHeaderVal.reset();
+				pSSHeaderName.reset(new std::stringstream);
+				std::cout << "mpp::ReqParser::consume: header_value: read '\r' and reset pSSHeaderName" << std::endl;
+			
+				#ifdef DEBUG
+				if (pSSHeaderName)
+				{
+					std::cout << "mpp::ReqParser::consume: header_value: pSSHeaderName is valid after reset." << std::endl;
+				}
+
+				else
+				{
+					std::cout << "mpp::ReqParser::consume: header_value: pSSHeaderName is invalid after reset!" << std::endl;
+				}
+				#endif
+
+				pSSHeaderVal.reset(new std::stringstream);
 
 			}
 
