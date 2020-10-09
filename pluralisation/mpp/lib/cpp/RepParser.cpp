@@ -1,7 +1,9 @@
 /* C++ versions of C headers */
-#include <cctype> // std::toupper
+#include <cctype> // std::isdigit, std::isspace
 
 /* STL */
+#include <sstream> // std::ostringstream
+
 #ifdef DEBUG
 #include <bitset> // std::bitset
 #include <iostream> // std::cout, std::endl
@@ -32,14 +34,9 @@ mpp::RepParser::RepParser() : curStat(initial_m), // Start off by expecting the 
 		{first_code_digit, "first_code_digit"},
 		{second_code_digit, "second_code_digit"},
 		{third_code_digit, "third_code_digit"},
-		{protline_backslash_r, "protline_backslash_r"},
-		{protline_backslash_n, "protline_backslash_n"},
 		{header_name, "header_name"},
 		{space_after_header_name, "space_after_header_name"},
 		{header_value, "header_value"},
-		{backslash_r_after_header_val, "backslash_r_after_header_val"},
-		{backslash_n_after_header_val, "backslash_n_after_header_val"},
-		{final_backslash_n, "final_backslash_n"},
 		{noun, "noun"}
 	}
 {
@@ -95,6 +92,9 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
 			else // Bad character
 			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: bad char '" << input << "' for current state " << stateNames[curStat] << std::endl;
+				#endif
 				toReturn = false; // Stop parsing
 			}
 
@@ -106,11 +106,208 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 			if (input == 'P') // Correct
 			{
 				#ifdef DEBUG
+				std::cout << "mpp::RepParser::consume: first_p: read '" << input << "', as expected." << std::endl
+				<< "\tGoing to state ";
 				#endif
+				curStat = second_p;
+				#ifdef DEBUG
+				std::cout << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = boost::indeterminate; // Need more data
 			}
 
-			else
+			else // Invalid input
 			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: bad char '" << input << "' for current state " << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = false; // Stop parsing
+			}
+
+			break;
+		}
+
+		case second_p: // Expecting second 'P' in "MPP"
+		{
+			if (input == 'P') // Correct
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::RepParser::consume: second_p: read '" << input << "', as expected." << std::endl
+				<< "\tGoing to state ";
+				#endif
+				curStat = slash;
+				#ifdef DEBUG
+				std::cout << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = boost::indeterminate; // Need more data
+			}
+
+			else // Invalid input
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: bad char '" << input << "' for current state " << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = false; // Stop parsing
+			}
+
+			break;
+		}
+
+		case slash: // Expecting the '/' that separates "MPP" from the protocol version
+		{
+			if (input == '/') // Correct
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::RepParser::consume: slash: read '" << input << "', as expected." << std::endl
+				<< "\tGoing to state ";
+				#endif
+
+				curStat = major;
+				pMajSS.reset(new std::ostringstream); // Needed by the state that reads the major version #
+
+				#ifdef DEBUG
+				std::cout << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = boost::indeterminate; // Need more data
+			}
+
+			else // Invalid input
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: bad char '" << input << "' for current state " << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = false; // Stop parsing
+			}
+
+			break;
+		}
+
+		case major: // Expecting either a digit in the major version number or a dot to terminate it
+		{
+			if (std::isdigit(input)) // The current character is a digit
+			{
+				(*pMajSS) << input; // Insert it into the stream
+				toReturn = boost::indeterminate; // Keep parsing
+			}
+
+			else if (input == '.') // Terminator character
+			{
+				/* Check the major version */
+				short majVer;
+				(*pMajSS) >> majVer; // Read it as an int
+
+				if (majVer != version.at(0)) // Not compatible with this version of the parser
+				{
+					status = Reply::badMajor;
+					toReturn = false;
+
+					#ifdef DEBUG
+					std::cout << "mpp::RepParser::consume: major: expected major version #" << version.at(0) << ", but read " << majVer << std::endl;
+					#endif
+				}
+
+				else // Correct version #
+				{
+					pMinSS.reset(new std::ostringstream);
+					curStat = minor; // Read the minor version # next
+					toReturn = boost::indeterminate; // Keep parsing
+					#ifdef DEBUG
+					std::cout << "mpp::RepParser::consume: major: read correct version #" << majVer << ", going to state " << stateNames[curStat] << std::endl;
+					#endif
+				}
+			}
+
+			else // Invalid input
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: bad char '" << input << "' for current state " << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = false; // Stop parsing
+			}
+
+			break;
+		}
+
+		case minor: // Expects digits in the minor version # or a '.' to terminate
+		{
+			if (std::isdigit(input)) // This is a digit
+			{
+				(*pMinSS) << input; // Store it
+				toReturn = boost::indeterminate; // Keep parsing
+			}
+
+			else if (input == '.') // Terminator character
+			{
+				short minVer;
+				(*pMinSS) >> minVer;
+				
+				if (minVer != version.at(1)) // Bad minor version
+				{
+					toReturn = false; // We can't handle this
+					#ifdef DEBUG
+					std::cout << "mpp::RepParser::consume: minor: expected minor version #" << version.at(1) << ", but read " << minVer << std::endl;
+					#endif
+				}
+
+				else // Correct minor version
+				{
+					pPatchSS.reset(new std::ostringstream);
+					curStat = patch;
+					toReturn = boost::indeterminate; // Keep parsing
+					#ifdef DEBUG
+					std::cout << "mpp::RepParser::parse: read correct minor version # " << minVer << ", going to state " << stateNames[curStat] << std::endl;
+					#endif
+				}
+			}
+
+			else // Invalid input
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: bad char '" << input << "' for current state " << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = false; // Stop parsing
+			}
+
+			break;
+		}
+
+		case patch: // Expect either a digit in the patch # or a space character to terminate it
+		{
+			if (std::isdigit(input)) // Digit in patch #
+			{
+				(*pPatchSS) << input;
+				toReturn = boost::indeterminate;
+			}
+
+			else if (std::isspace(input)) // Space character, finished reading
+			{
+				short patch;
+				(*pPatchSS) >> patch;
+
+				if (patch != version.at(2)) // Bad version #
+				{
+					toReturn = false;
+					#ifdef DEBUG
+					std::cout << "mpp::RepParser::parse: patch: expected patch #" << version.at(2) << ", but read " << patch << std::endl;
+					#endif
+				}
+
+				else
+				{
+					curStat = space_after_patch; // Expecting a space after the patch #
+					toReturn = boost::indeterminate; // Keep parsing
+					#ifdef DEBUG
+					std::cout << "mpp::RepParser::consume: patch: read correct version #" << patch << ", going to state " << stateNames[curStat] << std::endl;
+					#endif
+				}
+			}
+
+			else // Invalid input
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: bad char '" << input << "' for current state " << stateNames[curStat] << std::endl;
+				#endif
+				toReturn = false; // Stop parsing
 			}
 
 			break;

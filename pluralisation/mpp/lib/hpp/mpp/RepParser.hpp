@@ -7,7 +7,10 @@
 #include <map> // std::map
 #include <string> // std::string
 #endif
+
 #include <array> // std::array
+#include <memory> // std::unique_ptr
+#include <sstream> // std::ostringstream
 
 /* Boost */
 #include <boost/tuple/tuple.hpp> // boost::tuple, boost::make_tuple
@@ -46,7 +49,7 @@ namespace mpp
 					std::cout << std::endl;
 					#endif
 
-					boost::tribool res = consume(req, *begin++); // Have our internal parser try to parse as much data as it can before reaching the end or encountering malformed data
+					boost::tribool res = consume(req, *begin++); // Handle the current character and see what happens
 
 					if (res || !res) // We have either successfully parsed a response, or encountered a malformed response
 					{
@@ -114,7 +117,12 @@ namespace mpp
 
 			State curStat; // Parser's current state
 			std::array<short, 3> version; // Current parser/client version
+			std::unique_ptr<std::ostringstream> pMajSS; // Stores the major version number
+			std::unique_ptr<std::ostringstream> pMinSS; // Used to read the minor version #
+			std::unique_ptr<std::ostringstream> pPatchSS; // Used to read the patch #
+			#ifdef DEBUG
 			std::map<std::string, State> stateNames; // Used for debugging
+			#endif
 	}; // class RepParser
 }; // namespace mpp
 
