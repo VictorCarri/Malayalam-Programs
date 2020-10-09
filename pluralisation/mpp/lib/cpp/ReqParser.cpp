@@ -136,7 +136,7 @@ void mpp::ReqParser::reset()
 * @param input The next character of input.
 * @returns True if a valid request was parsed, false if invalid or unexpected input was received, boost::indeterminate if more info is required
 **/
-boost::tribool mpp::ReqParser::consume(Request& req, char input)
+boost::tribool mpp::ReqParser::consume(mpp::Request& req, char input)
 {
 	boost::tribool toReturn;
 

@@ -52,7 +52,7 @@ namespace mpp
 				while (begin != end)
 				{
 					#ifdef DEBUG
-					std::cout << "ReqParser::parse: Character at begin = ";
+					std::cout << "mpp::ReqParser::parse: Character at begin = ";
 					std::wcout << *begin;
 					std::cout << std::endl;
 					#endif
@@ -70,7 +70,7 @@ namespace mpp
 				}
 	
 				#ifdef DEBUG
-				std::cout << "ReqParser::parse: reached end of input." << std::endl
+				std::cout << "mpp::ReqParser::parse: reached end of input." << std::endl
 				<< "\tReturning (" << boost::indeterminate << ", " << *begin << ")" << std::endl;
 				#endif
 	

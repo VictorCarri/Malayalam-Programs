@@ -1,7 +1,7 @@
 cppDir=./cpp
 compiler=g++-9
 objDir=./obj
-files=functors/PtrResetter $(addprefix exceptions/,Exception BadHeaderValue DBError $(addprefix MissingDB,ConfFile Info) $(addprefix Unknown,Header Noun)) $(addprefix data/,DBInfo) Header Reply Request ReqParser ReqHandler
+files=functors/PtrResetter $(addprefix exceptions/,Exception BadHeaderValue DBError $(addprefix MissingDB,ConfFile Info) $(addprefix Unknown,Header Noun)) $(addprefix data/,DBInfo) Header $(addprefix Req,uest Parser Handler) $(addprefix Rep,ly Parser)
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
 dbgDynObjs=$(addprefix $(objDir)/debug/dynamic/,$(addsuffix .o,$(files)))
 prodStatObjs=$(addprefix $(objDir)/production/static/,$(addsuffix .o,$(files)))

@@ -26,6 +26,8 @@
 #include <boost/asio/connect.hpp> // boost::asio::async_connect
 #include <boost/asio/read.hpp> // boost::asio::async_read
 #include <boost/asio/buffer.hpp> // boost::asio::const_buffer
+#include <boost/asio/read_until.hpp> // boost::asio::async_read_until
+#include <boost/asio/streambuf.hpp> // boost::asio::streambuf::const_buffers_type
 #include <boost/system/error_code.hpp> // boost::system::error_code
 #include <boost/system/system_error.hpp> // boost::system::system_error
 
@@ -449,9 +451,9 @@ void Client::sendSingReq()
 				else
 				{
 					#ifdef DEBUG
-					std::cout << "Client::sendSingReq::lambda: calling readSingRep" << std::endl;
+					std::cout << "Client::sendSingReq::lambda: calling readSingRepStatus" << std::endl;
 					#endif
-					readSingRep(); // Read the reply from the server.
+					readSingRepStatus();
 				}
 			}
 
@@ -467,39 +469,60 @@ void Client::sendSingReq()
 }
 
 /**
-* @desc A callback that handles having successfully sent our request to the server.
-*	It attempts to read the server's response over the network to construct a Response object
-*	using the MPP library's RepParser class.
+* @desc Called after the ISSING request has been sent.
+*	It reads the status line, and then decides how to proceed.
 **/
-void Client::readSingRep()
+void Client::readSingRepStatus()
 {
 	#ifdef DEBUG
-	std::cout << "Client::readSingRep running." << std::endl;
+	std::cout << "Client::readSingRepStatus running." << std::endl;
 	#endif
-	repBufs.clear(); // Clear any old buffers
-	boost::asio::async_read(sock, repBufs, [this](const boost::system::error_code& ec, std::size_t bytesTransferred)
+	/*sock.async_read_some(
+		boost::asio::buffer(repBuf),
+		[this](const boost::system::error_code& e, std::size_t bytesTransferred)
+		{
+			if (!e) // No error
+			{
+			}
+
+			else // An error occurred
+			{
+				std::cerr << "Client::readSingRepStatus::lambda: an error occurred while sending the request to the server." << std::endl
+				<< "\tError value = " << ec.value() << std::endl
+				<< "\tError message = " << std::quoted(ec.message()) << std::endl
+				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+			}
+		}
+	);*/
+	boost::asio::async_read_until(sock, repBuf, "\r\n", [this](const boost::system::error_code& ec, std::size_t bytesTrans)
 		{
 			if (!ec) // No error
 			{
 				#ifdef DEBUG
-				std::cout << "Client::readSingRep::lambda: no error" << std::endl
-				<< "\tRead " << bytesTransferred << " bytes" << std::endl
-				<< "Data is: " << std::endl << std::endl;
+				std::cout << "Client::readSingRepStatus::lambda: successfully read " << bytesTrans << " bytes of data" << std::endl
+				<< "Data is: " << std::endl;
+				typename boost::asio::streambuf::const_buffers_type data = repBuf.data();
 
-				for (boost::asio::const_buffer buf : repBufs)
+				for (boost::asio::const_buffer buf : data)
 				{
-					std::cout << static_cast<const char*>(buf.data());
+					const char* data = static_cast<const char*>(buf.data()); // Fetch the data as a C string
+					std::cout << data << std::endl; // Print it
 				}
+
+				std::cout << std::endl;
 				#endif
 			}
 
 			else // An error occurred
 			{
-				std::cerr << "Client::readSingRep::lambda: an error occurred while reading the reply from the server." << std::endl
+				std::cerr << "Client::readSingRepStatus::lambda: an error occurred while sending the request to the server." << std::endl
 				<< "\tError value = " << ec.value() << std::endl
 				<< "\tError message = " << std::quoted(ec.message()) << std::endl
 				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
 			}
 		}
 	);
+	#ifdef DEBUG
+	std::cout << "Client::readSingRepStatus finished." << std::endl;
+	#endif
 }

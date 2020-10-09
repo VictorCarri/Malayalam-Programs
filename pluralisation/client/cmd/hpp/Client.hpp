@@ -14,12 +14,14 @@
 #include <map> // std::map
 #include <vector> // std::vector
 #include <functional> // std::function
+#include <array> // std::array
 
 /* Boost */
 #include <boost/asio/signal_set.hpp> // boost::asio::signal_set
 #include <boost/asio/io_context.hpp> // boost::asio::io_context
 #include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket, boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint
 #include <boost/asio/buffer.hpp> // boost::asio::const_buffer, boost::asio::mutable_buffer
+#include <boost/asio/streambuf.hpp> // boost::asio::streambuf
 #include <boost/system/error_code.hpp> // boost::system::error_code
 
 /* MPP */
@@ -124,11 +126,10 @@ class Client
 		void sendSingReq();
 
 		/**
-		* @desc A callback that handles having successfully sent our request to the server.
-		*	It attempts to read the server's response over the network to construct a Response object
-		*	using the MPP library's RepParser class.
+		* @desc Called after the ISSING request has been sent.
+		*	It reads the status line, and then decides how to proceed.
 		**/
-		void readSingRep();
+		void readSingRepStatus();
 
 		/*** Properties ***/
 
@@ -144,7 +145,8 @@ class Client
 		std::function<void(bool,std::string)> isCB; // The callback that will be called once the sequence of operations involved in isSingular is complete.
 		std::vector<boost::asio::const_buffer> reqBufs; // Holds the request buffers so that they won't be destroyed when a method ends and the vector goes out of scope.
 		mpp::Request curReq; // The current request
-		std::vector<boost::asio::mutable_buffer> repBufs; // Holds the reply from the server. This is a member variable, so that it won't be destroyed before the asynchronous operation completes.
+		//std::array<char, 8192> repBuf; // Holds the reply data to be parsed
+		boost::asio::streambuf repBuf; // Holds the reply data to be parsed
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.
 		#endif

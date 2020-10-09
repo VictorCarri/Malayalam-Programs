@@ -27,7 +27,7 @@ mpp::Reply::Reply() :
 	nameValSep {':', ' '}
 {
 	std::ostringstream verSS; // Used to build version string
-	verSS << "MPP/" << mpp::VER_MAJOR << mpp::VER_MINOR << mpp::VER_PATCH << " ";
+	verSS << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " ";
 
 	/** Set up status text map **/
 

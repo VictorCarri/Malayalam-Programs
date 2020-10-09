@@ -51,13 +51,14 @@ where {code} is a numeric code which follows the same format as HTTP codes. (2xx
 In BNR form:
 
 Reply -> protLine headers argument
-protLine -> "MPP/" integer "." integer "." integer space code "\r\n"
+protLine -> "MPP/" digit "." digit "." digit space code "\r\n"
+code -> digit{3}
 headers -> header header\* "\r\n"
 header -> string ':' space string "\r\n"
 space -> ' ' | '\t'
-integer -> [0-9]+
-string -> [byte]+
-byte -> 0 | 1 | ... | 255
+digit -> [0-9]
+string -> byte+
+byte -> [0-255] # Interpreted as a character
 argument -> [byte]+
 
 Acceptable commands:
@@ -136,4 +137,4 @@ The initial version of the protocol uses only 1 header.
 
 Content-Length: {integer}
 =========================
-The length of the following data IN <b>BYTES</b>.
+The length of the following data in <b>BYTES</b>.
