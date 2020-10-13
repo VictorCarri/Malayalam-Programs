@@ -51,15 +51,18 @@ where {code} is a numeric code which follows the same format as HTTP codes. (2xx
 In BNR form:
 
 Reply -> protLine headers argument
-protLine -> "MPP/" digit "." digit "." digit space code "\r\n"
-code -> digit{3}
-headers -> header header\* "\r\n"
-header -> string ':' space string "\r\n"
+protLine -> "MPP/" integer "." integer "." integer space code lineTerm
+code -> digit{3} space codeStr lineTerm
+codeStr -> "Singular" | "Plural" | "Plural Form" | "Singular Form" | ...
+headers -> header header\* lineTerm
+header -> string ':' space string lineTerm
 space -> ' ' | '\t'
+integer -> digit+
 digit -> [0-9]
 string -> byte+
-byte -> [0-255] # Interpreted as a character
-argument -> [byte]+
+byte -> static_cast<char>([0-255]) # Interpreted as a character
+response -> [byte]+ | NULL # The response may be empty (eg. in a response to an ISSING request)
+lineTerm -> "\r\n"
 
 Acceptable commands:
 =====================
@@ -88,46 +91,45 @@ Finds the opposite form of the given noun. If it is singular, the plural form is
 	MPP/1.0 202 Plural Form\r\n{plural form}\r\n\r\n
 
 or
+
 	MPP/1.0 203 Singular Form\r\n{singular form}\r\n\r\n
 
-If {noun} contains invalid Malayalam code points, the response:
-	
-	MPP/1.0 405 Invalid Malayalam Codepoints in Input
+or
 
-will be returned.
+	MPP/1.0 204 No Plural Form\r\n\r\n
+		Used when the singular Malayalam noun given in a FOF request has no plural
+
+or
+
+	MPP/1.0 205 No Singular Form
+		Used when the plural Malayalam noun given in a FOF request has no singular
 
 Misc Errors
 ------------
-MTP/1.0 400 Bad Request
+MPP/1.0 400 Bad Request
 	- Reply used when a request is malformed in general
 
-MTP/1.0 401 Bad Major #
+MPP/1.0 401 Bad Major #
 	- Reply used when the server doesn't recognize the major # of the procotol in the request
 
-MTP/1.0 402 Bad Minor #
+MPP/1.0 402 Bad Minor #
 	- Reply used when the server doesn't recognize the minor # of the procotol in the request
 
-MTP/1.0 403 Bad Patch #
+MPP/1.0 403 Bad Patch #
 	- Reply used when the server doesn't recognize the patch # of the procotol in the request
 
-MTP/1.0 404 Unknown Verb
+MPP/1.0 404 Unknown Verb
 	- Used when the server doesn't recognise the verb which a request included
 
-MTP/1.0 405 Malformed UTF-8 Input
+MPP/1.0 405 Malformed UTF-8 Input
 	- Used when the Malayalam noun isn't a valid UTF-8 string
 
-MTP/1.0 406 No Plural Form
-	- Used when the singular Malayalam noun given in a FOF request has no plural
-
-MTP/1.0 407 No Singular Form
-	- Used when the plural Malayalam noun given in a FOF request has no singular
-
-MTP/1.0 500 Internal Server Error
+MPP/1.0 500 Internal Server Error
 	- Used when some sort of error occurs while handling a request
 
-MTP/1.0 501 Not Implemented
+MPP/1.0 501 Not Implemented
 
-MTP/1.0 502 Service Unavailable
+MPP/1.0 502 Service Unavailable
 
 Blahblah
 

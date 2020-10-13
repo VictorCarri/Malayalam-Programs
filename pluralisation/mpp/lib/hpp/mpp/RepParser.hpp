@@ -10,12 +10,14 @@
 
 #include <array> // std::array
 #include <memory> // std::unique_ptr
-#include <sstream> // std::ostringstream
+#include <sstream> // std::stringstream
 
 /* Boost */
 #include <boost/tuple/tuple.hpp> // boost::tuple, boost::make_tuple
 #include <boost/logic/tribool.hpp> // boost::tribool, boost::indeterminate
+#ifdef DEBUG
 #include <boost/logic/tribool_io.hpp> // operator<< for boost::tribool
+#endif
 
 /* MPP */
 #include "mpp/Reply.hpp" // Represents a Reply to parse
@@ -28,60 +30,6 @@ namespace mpp
 	class RepParser
 	{
 		public:
-			/**
-			* @desc Default constructor. Constructs the parser in a state such that it is ready to parse the beginning of a reply.
-			**/
-			RepParser();
-
-			/**
-			* @desc Resets the parser to its initial state.
-			**/
-			void reset();
-
-			template<typename InputIterator>
-			boost::tuple<boost::tribool, InputIterator> parse(Reply& rep, InputIterator begin, InputIterator end)
-			{
-				while (begin != end)
-				{
-					#ifdef DEBUG
-					std::cout << "mpp::RepParser::parse: character at begin = '";
-					std::wcout << *begin;
-					std::cout << std::endl;
-					#endif
-
-					boost::tribool res = consume(req, *begin++); // Handle the current character and see what happens
-
-					if (res || !res) // We have either successfully parsed a response, or encountered a malformed response
-					{
-						#ifdef DEBUG
-						std::cout << "mpp::RepParser::parse: either finished parsing or encountered malformed data." << std::endl;
-						std::cout << "\tReturning (" << res << "," << *begin << ")" << std::endl;
-						#endif
-						return boost::make_tuple(res, begin);
-					}
-				}
-
-				#ifdef DEBUG
-				std::cout << "mpp::RepParser::parse: reached end of input." << std::endl;
-				std::cout << "\tReturning (" << boost::indeterminate << ", " << *begin << ")" << std::endl;
-				#endif
-				return boost::make_tuple(boost::indeterminate, begin);
-			}
-
-			/**
-			* @desc Sets our state before parsing more data.
-			* @param newStat The new state to change to.
-			**/
-			void setState(State newStat);
-
-		private:
-			/**
-			* @desc Handles the current character in the input stream.
-			* @param rep The Reply object whose parameters we'll set while parsing.
-			* @param input The next character of input.
-			**/
-			boost::tribool consume(Reply& rep, char input);
-
 			/**
 			* We don't include states for '\r' and '\n's because the Client program that uses us
 			* is expected to read until encountering a sequence of "\r\n", and
@@ -99,7 +47,6 @@ namespace mpp
 				major, // Protocol major version number
 				minor,
 				patch, // Patch #
-				space_after_patch, // Expecting a single space character
 
 				/* Reading the code */
 				first_code_digit, // Expecting the first digit of the reply code
@@ -107,21 +54,92 @@ namespace mpp
 				third_code_digit,
 
 				/* Reading headers */
-				header_name, // Reading a header's name
-				space_after_header_name,
-				header_value,
-
-				/* Reading the noun that the server sent (if any) */	
-				noun
+				header_name,
+				space_after_colon,
+				header_val
 			};
 
-			State curStat; // Parser's current state
-			std::array<short, 3> version; // Current parser/client version
-			std::unique_ptr<std::ostringstream> pMajSS; // Stores the major version number
-			std::unique_ptr<std::ostringstream> pMinSS; // Used to read the minor version #
-			std::unique_ptr<std::ostringstream> pPatchSS; // Used to read the patch #
+			/**
+			* @desc Default constructor. Constructs the parser in a state such that it is ready to parse the beginning of a reply.
+			**/
+			RepParser();
+
+			/**
+			* @desc Resets the parser to its initial state.
+			**/
+			void reset();
+
+			template<typename InputIterator>
+			boost::tuple<boost::tribool, InputIterator> parse(Reply& rep, InputIterator begin, InputIterator end)
+			{
+				boost::tribool res;
+
+				while (begin != end)
+				{
+					#ifdef DEBUG
+					std::cout << "mpp::RepParser::parse: character at begin = '";
+					std::wcout << *begin;
+					std::cout << "'" << std::endl;
+					#endif
+
+					res = consume(rep, *begin++); // Handle the current character and see what happens
+
+					if (res || !res) // We have either successfully parsed a response, or encountered a malformed response
+					{
+						#ifdef DEBUG
+						std::cout << "mpp::RepParser::parse: either finished parsing or encountered malformed data." << std::endl;
+						std::cout << "\tReturning (" << res << "," << *begin << ")" << std::endl;
+						#endif
+						return boost::make_tuple(res, begin);
+					}
+
+					#ifdef DEBUG
+					std::cout << std::endl;
+					#endif
+				}
+
+				res = boost::indeterminate;
+				#ifdef DEBUG
+				std::cout << "mpp::RepParser::parse: reached end of input." << std::endl;
+				std::cout << "\tReturning (" << res << ", " << *begin << ")" << std::endl;
+				#endif
+				return boost::make_tuple(res, begin);
+			}
+
+			/**
+			* @desc Sets our state before parsing more data.
+			* @param newStat The new state to change to.
+			**/
+			void setState(State newStat);
+
+			/**
+			* @desc Fetches the parser's current state.
+			* @return The parser's current state.
+			**/
+			State getState() const;
+
 			#ifdef DEBUG
-			std::map<std::string, State> stateNames; // Used for debugging
+			std::string getStateName(State stat);
+			#endif
+
+		private:
+			/**
+			* @desc Handles the current character in the input stream.
+			* @param rep The Reply object whose parameters we'll set while parsing.
+			* @param input The next character of input.
+			**/
+			boost::tribool consume(Reply& rep, char input);
+
+			State curStat; // Parser's current state
+			Reply::Status curRepStat; // To provide feedback to the client
+			std::array<short, 3> version; // Current parser/client version
+			std::unique_ptr<std::stringstream> pMajSS; // Stores the major version number
+			std::unique_ptr<std::stringstream> pMinSS; // Used to read the minor version #
+			std::unique_ptr<std::stringstream> pPatchSS; // Used to read the patch #
+			std::unique_ptr<std::stringstream> pCodeSS; // Used to build the string that'll be converted into a numeric code
+			std::unique_ptr<std::stringstream> pHeaderNameSS; // Used to read a header's name
+			#ifdef DEBUG
+			std::map<State, std::string> stateNames; // Used for debugging
 			#endif
 	}; // class RepParser
 }; // namespace mpp

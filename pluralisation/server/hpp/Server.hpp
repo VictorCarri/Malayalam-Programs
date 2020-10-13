@@ -6,15 +6,15 @@
 
 /* STL */
 #include <string> // std::string
+#ifdef DEBUG
+#include <map> // std::map
+#endif
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
 #include <boost/asio/signal_set.hpp> // boost::asio::signal_set
 #include <boost/asio/ip/tcp.hpp> // boost:asio::ip::tcp::acceptor
 #include <boost/system/error_code.hpp> // boost::system::error_code
-
-/* MPP headers */
-#include "mpp/ReqHandler.hpp" // Handles a request
 
 /* Our headers */
 #include "IoContextPool.hpp" // IoContextPool
@@ -61,8 +61,11 @@ class Server : private boost::noncopyable
 		boost::asio::signal_set signals; // Used to receive signals
 		boost::asio::ip::tcp::acceptor acceptor; // Used to listen for incoming connections
 		ConnectionPtr newConn; // Pointer to a new connection
-		mpp::ReqHandler reqHandler; // Handdles a request
 		std::string pName; // Program name
+		std::string dbCnfFlPth; // DB configuration file path
+		#ifdef DEBUG
+		std::map<int, std::string> sigNames; // Signal names for debugging
+		#endif
 };
 
 #endif // SERVER_HPP

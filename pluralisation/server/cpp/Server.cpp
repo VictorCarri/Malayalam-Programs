@@ -26,8 +26,15 @@ Server::Server(const std::string& address, int port, std::size_t numThreads, std
 	: 	iocp(numThreads),
 		signals(iocp.getIoc()),
 		acceptor(iocp.getIoc()),
-		reqHandler(dbConfPath), // Pass the request-handler the path to the DB config file
-		pName(progName)
+		pName(progName),
+		dbCnfFlPth(dbConfPath)
+		#ifdef DEBUG
+		,sigNames {
+			{SIGINT, "SIGINT"},
+			{SIGTERM, "SIGTERM"},
+			{SIGQUIT, "SIGQUIT"}
+		}
+		#endif
 {
 	/*
 	* Register to handle signals that indicate that the server should exit.
@@ -39,11 +46,10 @@ Server::Server(const std::string& address, int port, std::size_t numThreads, std
 	#ifdef SIGQUIT
 	signals.add(SIGQUIT);
 	#endif
-	//signals.async_wait(BIND_FUNCTION(&Server::handleStop, this));
 	signals.async_wait([this](const ERROR_CODE& e, int sigNo) // Need to use this object
 		{
 			#ifdef DEBUG
-			std::cout << "Server::Server: caught signal #" << sigNo << ", exiting...." << std::endl;
+			std::cout << "Server::Server: caught " << sigNames[sigNo] << "(#" << sigNo << "), exiting...." << std::endl;
 			#endif
 			handleStop(); // Call our handler
 		}
@@ -117,7 +123,7 @@ void Server::startAccept()
 	newConn.reset(
 		new Connection(
 			iocp.getIoc(),
-			reqHandler
+			dbCnfFlPth // Connection needs this to construct its request handler object
 		)
 	);
 	#ifdef DEBUG

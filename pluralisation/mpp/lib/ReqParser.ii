@@ -83107,6 +83107,8 @@ namespace mpp
     plural,
     pluralForm,
     singularForm,
+    noPlural,
+    noSingular,
 
 
     badReq = 400,
@@ -83115,12 +83117,17 @@ namespace mpp
     badPatch,
     unknownVerb,
     invUTF8,
-    noPlural,
-    noSingular,
 
 
     invalid = -1
    };
+
+
+
+
+
+
+   void setStatus(short code);
 
 
 
@@ -85615,15 +85622,17 @@ namespace mpp
    template<typename InputIterator>
    boost::tuple<boost::tribool, InputIterator> parse(Request& req, InputIterator begin, InputIterator end)
    {
+    boost::tribool res;
+
     while (begin != end)
     {
 
-     std::cout << "ReqParser::parse: Character at begin = ";
+     std::cout << "mpp::ReqParser::parse: Character at begin = ";
      std::wcout << *begin;
      std::cout << std::endl;
 
 
-     boost::tribool res = consume(req, *begin++);
+     res = consume(req, *begin++);
 
      if (res || !res)
      {
@@ -85636,11 +85645,11 @@ namespace mpp
     }
 
 
-    std::cout << "ReqParser::parse: reached end of input." << std::endl
+    std::cout << "mpp::ReqParser::parse: reached end of input." << std::endl
     << "\tReturning (" << boost::indeterminate << ", " << *begin << ")" << std::endl;
 
 
-    boost::tribool res = boost::indeterminate;
+    res = boost::indeterminate;
     return boost::make_tuple(res, begin);
    }
 
@@ -85829,7 +85838,7 @@ void mpp::ReqParser::reset()
 
 
 
-boost::tribool mpp::ReqParser::consume(Request& req, char input)
+boost::tribool mpp::ReqParser::consume(mpp::Request& req, char input)
 {
  boost::tribool toReturn;
 

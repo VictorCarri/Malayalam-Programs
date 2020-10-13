@@ -49,6 +49,8 @@ namespace mpp
 			template<typename InputIterator>
 			boost::tuple<boost::tribool, InputIterator> parse(Request& req, InputIterator begin, InputIterator end)
 			{
+				boost::tribool res;
+
 				while (begin != end)
 				{
 					#ifdef DEBUG
@@ -57,7 +59,7 @@ namespace mpp
 					std::cout << std::endl;
 					#endif
 	
-					boost::tribool res = consume(req, *begin++);
+					res = consume(req, *begin++);
 					
 					if (res || !res)
 					{
@@ -74,7 +76,7 @@ namespace mpp
 				<< "\tReturning (" << boost::indeterminate << ", " << *begin << ")" << std::endl;
 				#endif
 	
-				boost::tribool res = boost::indeterminate;
+				res = boost::indeterminate;
 				return boost::make_tuple(res, begin);
 			}
 	

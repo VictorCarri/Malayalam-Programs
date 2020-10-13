@@ -64258,6 +64258,8 @@ namespace mpp
     plural,
     pluralForm,
     singularForm,
+    noPlural,
+    noSingular,
 
 
     badReq = 400,
@@ -64266,12 +64268,23 @@ namespace mpp
     badPatch,
     unknownVerb,
     invUTF8,
-    noPlural,
-    noSingular,
 
 
     invalid = -1
    };
+
+
+
+
+
+   Status getStatus() const;
+
+
+
+
+
+
+   void setStatus(short code);
 
 
 
@@ -64301,7 +64314,7 @@ namespace mpp
 
 
 
-   std::string getStatText(Status s);
+   std::string getStatText(Status s) const;
 
 
 
@@ -64378,7 +64391,7 @@ mpp::Reply::Reply() :
  nameValSep {':', ' '}
 {
  std::ostringstream verSS;
- verSS << "MPP/" << mpp::VER_MAJOR << mpp::VER_MINOR << mpp::VER_PATCH << " ";
+ verSS << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " ";
 
 
 
@@ -64387,6 +64400,8 @@ mpp::Reply::Reply() :
  statText[plural] = verSS.str() + "201 Plural";
  statText[pluralForm] = verSS.str() + "202 Plural Form";
  statText[singularForm] = verSS.str() + "203 Singular Form";
+ statText[noPlural] = verSS.str() + "204 No Plural Form";
+ statText[noSingular] = verSS.str() + "205 No Singular Form";
 
 
  statText[badReq] = verSS.str() + "400 Bad Request";
@@ -64395,8 +64410,6 @@ mpp::Reply::Reply() :
  statText[badPatch] = verSS.str() + "403 Unrecognised Protocol Patch Number";
  statText[unknownVerb] = verSS.str() + "404 Unrecognised Verb";
  statText[invUTF8] = verSS.str() + "405 Malformed UTF-8 Input";
- statText[noPlural] = verSS.str() + "406 No Plural Form";
- statText[noSingular] = verSS.str() + "407 No Singular Form";
 
 
  statText[invalid] = "Error: invalid Reply object!";
@@ -64487,7 +64500,7 @@ void mpp::Reply::addHeader(mpp::Header toAdd)
 
 
 
-std::string mpp::Reply::getStatText(mpp::Reply::Status s)
+std::string mpp::Reply::getStatText(mpp::Reply::Status s) const
 {
  return statText.at(s);
 }
@@ -64636,4 +64649,23 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
 void mpp::Reply::clearHeaders()
 {
  headers.clear();
+}
+
+
+
+
+
+
+void mpp::Reply::setStatus(short code)
+{
+ setStatus(static_cast<mpp::Reply::Status>(code));
+}
+
+
+
+
+
+mpp::Reply::Status mpp::Reply::getStatus() const
+{
+ return stat;
 }

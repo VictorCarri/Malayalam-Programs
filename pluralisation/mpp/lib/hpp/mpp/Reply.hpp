@@ -30,6 +30,8 @@ namespace mpp
 				plural, // Negative response to an ISSING query
 				pluralForm, // Responding to a FOF query with the plural form of singular input
 				singularForm, // Responding to a FOF query with the singular form of plural input
+				noPlural, // The given noun in a FOF query that seeks the plural form has no plural form, according to the DB
+				noSingular, // The given noun in a FOF query that seeks the singular form has no singular form, according to the DB
 
 				/* Client error (4xx) codes */
 				badReq = 400, // Malformed request
@@ -38,12 +40,23 @@ namespace mpp
 				badPatch, // Bad patch #
 				unknownVerb, // Unrecognised MPP verb
 				invUTF8, // Invalid UTF-8 characters in input
-				noPlural, // The given noun in a FOF query that seeks the plural form has no plural form, according to the DB
-				noSingular, // The given noun in a FOF query that seeks the singular form has no singular form, according to the DB
 
 				/* Other */
-				invalid = -1 // Used when a Reply is default-constructed.
+				invalid = -1 // Used when a Reply is default-constructed, or when an invalid code is set
 			};
+
+			/**
+			* @desc Fetches the reply's status.
+			* @return This reply's status.
+			**/
+			Status getStatus() const;
+
+			/**
+			* @desc Attempts to set the Reply's status to that of the numeric code given.
+			*	RepParser ensures that the numeric code is in the valid range for the enumeration.
+			* @param code The code to set.
+			**/
+			void setStatus(short code);
 	
 			/**
 			* @desc Sets a reply's status.
@@ -73,7 +86,7 @@ namespace mpp
 			* @desc Fetches the string associated with the given status.
 			* @param s THe status to fetch a string for.
 			**/
-			std::string getStatText(Status s);
+			std::string getStatText(Status s) const;
 
 			/**
 			* @desc Sets the content to send with the reply.

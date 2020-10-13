@@ -24,11 +24,10 @@
 /**
 * @desc Constructs a Connection with the givne io_context & request handler.
 * @param io_context The io_context to use.
-* @param handler The request handler object to use.
+* @param dbConfFilePath Path to configuration file containing DB vars. Used to construct ReqHandler.
 **/
-Connection::Connection(boost::asio::io_context& io_context, mpp::ReqHandler& handler) :
-	socket(io_context),
-	reqHandler(handler)
+Connection::Connection(boost::asio::io_context& io_context, std::string dbConfFilePath) : socket(io_context), // Create our socket
+	reqHandler(dbConfFilePath) // Construct our own ReqHandler so that it won't try to maintain a connection to the DB for too long
 {
 	#ifdef DEBUG
 	std::cout << "Connection::Connection running" << std::endl;

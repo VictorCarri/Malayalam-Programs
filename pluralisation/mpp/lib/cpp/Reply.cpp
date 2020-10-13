@@ -36,6 +36,8 @@ mpp::Reply::Reply() :
 	statText[plural] = verSS.str() + "201 Plural";
 	statText[pluralForm] = verSS.str() + "202 Plural Form";
 	statText[singularForm] = verSS.str() + "203 Singular Form";
+	statText[noPlural] = verSS.str() + "204 No Plural Form";
+	statText[noSingular] = verSS.str() + "205 No Singular Form";
 
 	/* Set up error (4xx) responses */
 	statText[badReq] = verSS.str() + "400 Bad Request";
@@ -44,8 +46,6 @@ mpp::Reply::Reply() :
 	statText[badPatch] = verSS.str() + "403 Unrecognised Protocol Patch Number";
 	statText[unknownVerb] = verSS.str() + "404 Unrecognised Verb";
 	statText[invUTF8] = verSS.str() + "405 Malformed UTF-8 Input";
-	statText[noPlural] = verSS.str() + "406 No Plural Form";
-	statText[noSingular] = verSS.str() + "407 No Singular Form";
 
 	/* Set up invalid status text */
 	statText[invalid] = "Error: invalid Reply object!";
@@ -136,7 +136,7 @@ void mpp::Reply::addHeader(mpp::Header toAdd)
 * @desc Fetches the string associated with the given status.
 * @param s THe status to fetch a string for.
 **/
-std::string mpp::Reply::getStatText(mpp::Reply::Status s)
+std::string mpp::Reply::getStatText(mpp::Reply::Status s) const
 {
 	return statText.at(s);
 }
@@ -285,4 +285,23 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
 void mpp::Reply::clearHeaders()
 {
 	headers.clear();
+}
+
+/**
+* @desc Attempts to set the Reply's status to that of the numeric code given.
+*	RepParser ensures that the numeric code is in the valid range for the enumeration.
+* @param code The code to set.
+**/
+void mpp::Reply::setStatus(short code)
+{
+	setStatus(static_cast<mpp::Reply::Status>(code)); // Convert it to an enum value (which we know will be valid)
+}
+
+/**
+* @desc Fetches the reply's status.
+* @return This reply's status.
+**/
+mpp::Reply::Status mpp::Reply::getStatus() const
+{
+	return stat;
 }

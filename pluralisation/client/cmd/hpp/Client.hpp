@@ -26,6 +26,8 @@
 
 /* MPP */
 #include "mpp/Request.hpp" // mpp::Request
+#include "mpp/RepParser.hpp" // mpp::RepParser
+#include "mpp/Reply.hpp" // mpp::Reply
 
 /* Our headers */
 #include "bosmacros/thread.hpp" // THREAD_CLASS macro
@@ -145,8 +147,9 @@ class Client
 		std::function<void(bool,std::string)> isCB; // The callback that will be called once the sequence of operations involved in isSingular is complete.
 		std::vector<boost::asio::const_buffer> reqBufs; // Holds the request buffers so that they won't be destroyed when a method ends and the vector goes out of scope.
 		mpp::Request curReq; // The current request
-		//std::array<char, 8192> repBuf; // Holds the reply data to be parsed
 		boost::asio::streambuf repBuf; // Holds the reply data to be parsed
+		mpp::RepParser repParser; // Parses a reply from the buffer
+		mpp::Reply rep; // The server's reply
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.
 		#endif

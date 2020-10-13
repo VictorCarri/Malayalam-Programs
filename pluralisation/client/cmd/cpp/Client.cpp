@@ -30,6 +30,8 @@
 #include <boost/asio/streambuf.hpp> // boost::asio::streambuf::const_buffers_type
 #include <boost/system/error_code.hpp> // boost::system::error_code
 #include <boost/system/system_error.hpp> // boost::system::system_error
+#include <boost/tuple/tuple.hpp> // boost::tuple, boost::tie, boost::tuples::ignore
+#include <boost/logic/tribool.hpp> // boost::tribool
 
 /* My Unicode utilities library */
 #include "vuu/UTF8Validator.hpp" // vuu::UTF8Validator, to ensure that an std::string is valid UTF-8 text
@@ -38,7 +40,7 @@
 
 /* MPP library */
 #include "mpp/Request.hpp" // mpp::Request
-#include "mpp/Reply.hpp" // mpp::Reply
+#include "mpp/RepParser.hpp" // mpp::RepParser::State
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
@@ -406,7 +408,7 @@ void Client::sendSingReq()
 	curReq.SETCOM_FUNC(mpp::Request::ISSING); // Make it an ISSING curRequest
 	curReq.setNoun(input); // The noun to send is our input
 	curReq.clearHeaders(); // Clear any headers that were set for the last request
-	curReq.addHeader("Content-Type", std::string("text/plain")); // The noun is a plaintext string
+	curReq.addHeader("Content-Type", std::string("text/plain;charset=utf-8")); // The noun is a plaintext UTF-8 string
 	curReq.addHeader("Content-Length", input.length()); // The server's parser needs to know how long the string is to read it over the network
 	#ifdef DEBUG
 	std::cout << "Client::sendSingReq: curRequest to send is " << std::endl
@@ -477,45 +479,82 @@ void Client::readSingRepStatus()
 	#ifdef DEBUG
 	std::cout << "Client::readSingRepStatus running." << std::endl;
 	#endif
-	/*sock.async_read_some(
-		boost::asio::buffer(repBuf),
-		[this](const boost::system::error_code& e, std::size_t bytesTransferred)
-		{
-			if (!e) // No error
-			{
-			}
-
-			else // An error occurred
-			{
-				std::cerr << "Client::readSingRepStatus::lambda: an error occurred while sending the request to the server." << std::endl
-				<< "\tError value = " << ec.value() << std::endl
-				<< "\tError message = " << std::quoted(ec.message()) << std::endl
-				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
-			}
-		}
-	);*/
 	boost::asio::async_read_until(sock, repBuf, "\r\n", [this](const boost::system::error_code& ec, std::size_t bytesTrans)
 		{
 			if (!ec) // No error
 			{
-				#ifdef DEBUG
-				std::cout << "Client::readSingRepStatus::lambda: successfully read " << bytesTrans << " bytes of data" << std::endl
-				<< "Data is: " << std::endl;
-				typename boost::asio::streambuf::const_buffers_type data = repBuf.data();
+				typename boost::asio::streambuf::const_buffers_type datBufs = repBuf.data();
+				std::ostringstream dataSS; // Used to convert the data to a single string
+				std::size_t bytesInserted = 0; // # of bytes inserted into the stringstream
 
-				for (boost::asio::const_buffer buf : data)
+				for (boost::asio::const_buffer buf : datBufs)
 				{
-					const char* data = static_cast<const char*>(buf.data()); // Fetch the data as a C string
-					std::cout << data << std::endl; // Print it
+					const char* curBufDat = static_cast<const char*>(buf.data()); // Fetch the data as a C string
+					#ifdef DEBUG
+					std::cout << "Client::readSingRepStatus::lambda: current buffer's contents are: \"";
+					#endif
+					std::size_t curBufSiz = buf.size();
+
+					for (std::size_t i = 0; i < curBufSiz; i++)
+					{
+						#ifdef DEBUG
+						std::cout << curBufDat[i];
+						#endif
+
+						if (bytesInserted < bytesTrans) // Can still insert data
+						{
+							dataSS << curBufDat[i];
+							++bytesInserted;
+						}
+					}
+
+					#ifdef DEBUG
+					std::cout << std::endl;
+					#endif
 				}
 
-				std::cout << std::endl;
+				std::string data = dataSS.str();
+
+				#ifdef DEBUG
+				std::cout << "Client::readSingRepStatus::lambda: successfully read " << bytesTrans << " bytes of data" << std::endl;
 				#endif
+	
+				/* Parse the status line */
+				boost::tribool parseRes;
+				repParser.reset(); // Start the parser in its initial state
+				#ifdef DEBUG
+				std::cout << "Client::readSingRepStatus::lambda: data to parse: " << data << std::endl;
+				#endif
+				boost::tie(parseRes, boost::tuples::ignore) = repParser.parse(rep, data.cbegin(), data.cend()); // Parse the data in the buffer, but only up to the number of bytes transferred
+
+				if (parseRes) // Entire request parsed - how?!
+				{
+					#ifdef DEBUG
+					std::cout << "Client::readSingRepStatus::lambda: reply parser claims to have parsed an entire response! How?!" << std::endl;
+					#endif
+				}
+
+				else if (!parseRes) // Invalid status line - possible
+				{
+					std::cerr << "Client::readSingRepStatus::lambda: invalid status line found!" << std::endl;
+
+					#ifdef DEBUG
+					mpp::RepParser::State parserStat = repParser.getState(); // To find out where the error occurred
+					std::cerr << "\tStatus: " << repParser.getStateName(parserStat) << std::endl;
+					#endif
+				}
+
+				else // Indeterminate - what should happen
+				{
+					#ifdef DEBUG
+					std::cout << "Client::readSingRepStatus::lambda: need to read more data to finish parsing the reply, as expected" << std::endl;
+					#endif
+				}
 			}
 
 			else // An error occurred
 			{
-				std::cerr << "Client::readSingRepStatus::lambda: an error occurred while sending the request to the server." << std::endl
+				std::cerr << "Client::readSingRepStatus::lambda: an error occurred while reading the server's response." << std::endl
 				<< "\tError value = " << ec.value() << std::endl
 				<< "\tError message = " << std::quoted(ec.message()) << std::endl
 				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;

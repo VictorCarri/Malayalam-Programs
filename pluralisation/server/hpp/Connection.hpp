@@ -1,9 +1,12 @@
 #ifndef CONNECTION_HPP
 #define CONNECTION_HPP
 
-/* STL */
+/* C++ versions of C headers */
 #include <cstddef> // std::size_t
+
+/* STL */
 #include <array> // std::array
+#include <string> // std::string
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
@@ -30,9 +33,9 @@ class Connection : public ENABLE_SHARED_FROM_THIS<Connection>,
 		/**
 		* @desc Constructs a Connection with the givne io_context & request handler.
 		* @param io_context The io_context to use.
-		* @param handler The request handler object to use.
+		* @param dbConfFilePath Path to configuration file containing DB vars. Used to construct ReqHandler.
 		**/
-		explicit Connection(boost::asio::io_context& io_context, mpp::ReqHandler& handler);
+		explicit Connection(boost::asio::io_context& io_context, std::string dbConfFilePath);
 	
 		/**
 		* @desc Fetches the socket associated with this Connection.
@@ -61,7 +64,7 @@ class Connection : public ENABLE_SHARED_FROM_THIS<Connection>,
 		void handleWrite(const ERROR_CODE& e, std::size_t bytesTransferred);
 
 		boost::asio::ip::tcp::socket socket; // We listen on this
-		mpp::ReqHandler& reqHandler; // Parses requests
+		mpp::ReqHandler reqHandler; // Parses requests. Each Connection object constructs its own copy because the connection to the DB will time out if the object lasts for too long.
 		std::array<char, 8192> buffer; // Stores data read from the socket
 		mpp::ReqParser reqParser;
 		mpp::Request req;
