@@ -133,11 +133,16 @@ class Client
 		**/
 		void readSingRepStatus();
 
+		/**
+		* @desc Reads a header from the socket and stores it in the reply.
+		**/
+		void readHeader();
+
 		/*** Properties ***/
 
 		bool active; // Whether or not we're active
 		std::string input; // User input (before validation)
-		boost::asio::io_context ioc; // Req'd by signal_set
+		boost::asio::io_context ioc; // Needed by Boost.Asio to talk to the OS
 		boost::asio::signal_set signals; // Used to catch signals that indicate that we should quit.
 		boost::asio::ip::tcp::resolver resolver; // Used to resolve the server's address
 		boost::asio::ip::tcp::socket sock; // The socket which we'll use to communicate
@@ -150,6 +155,7 @@ class Client
 		boost::asio::streambuf repBuf; // Holds the reply data to be parsed
 		mpp::RepParser repParser; // Parses a reply from the buffer
 		mpp::Reply rep; // The server's reply
+		std::unique_ptr<THREAD_CLASS> signalThread; // Used to handle signals, separately from the async. ops. thread
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.
 		#endif

@@ -155,8 +155,11 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			#ifdef DEBUG
 			std::cout << "Connection::handleRead: the parser successfully parsed an entire request" << std::endl;
 			#endif
-
 			reqHandler.handleReq(req, rep); // Handle a request - generate a reply according to what the client requested
+			#ifdef DEBUG
+			std::cout << "Connection::handleRead: reply to send is: " << std::endl
+			<< rep << std::endl;
+			#endif
 			boost::asio::async_write(
 				socket,
 				rep.toBuffers(),

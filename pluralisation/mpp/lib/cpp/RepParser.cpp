@@ -37,7 +37,15 @@ mpp::RepParser::RepParser() : curStat(initial_m), // Start off by expecting the 
 		{third_code_digit, "third_code_digit"},
 		{header_name, "header_name"},
 		{header_val, "header_val"},
-		{space_after_header_name, "space_after_header_name"}
+		{space_after_colon, "space_after_colon"}
+	},
+	charPrintStrings {
+		{' ', "space"},
+		{'\f', "form feed"},
+		{'\n', "line feed"},
+		{'\r', "carriage return"},
+		{'\t', "horizontal tab"},
+		{'\v', "vertical tab"}
 	}
 	#endif
 {
@@ -300,7 +308,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 			else if (std::isspace(static_cast<unsigned char>(input))) // Space character, finished reading
 			{
 				#ifdef DEBUG
-				std::cout << "mpp::RepParser::consume: patch: read space char '" << input << "'" << std::endl;
+				std::cout << "mpp::RepParser::consume: patch: read space char '" << charPrintStrings[input] << "'" << std::endl;
 				#endif
 				short patch;
 				(*pPatchSS) >> patch;
@@ -380,6 +388,10 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
 		case third_code_digit: // Expecting third digit in code #
 		{
+			#ifdef DEBUG
+			std::cout << "mpp::RepParser::consume: in state third_code_digit" << std::endl;
+			#endif
+
 			if (std::isdigit(static_cast<unsigned char>(input))) // Found a digit
 			{
 				(*pCodeSS) << input;
@@ -413,13 +425,14 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 			else if (std::isspace(static_cast<unsigned char>(input))) // Code terminator
 			{
 				#ifdef DEBUG
-				std::cout << "mpp::RepParser::consume: read space after third code digit, going to state ";
+				std::cout << "mpp::RepParser::consume: read space char " << charPrintStrings[input] << " after third code digit, going to state ";
 				#endif
-				curStat = header_name;
+				curStat = dont_care;
 				pHeaderNameSS.reset(new std::stringstream);
 				#ifdef DEBUG
 				std::cout << stateNames[curStat] << std::endl;
 				#endif
+				toReturn = boost::indeterminate; // Keep parsing
 			}
 
 			else // Not a digit or a space, invalid
@@ -430,6 +443,12 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 				toReturn = false; // Stop parsing
 			}
 
+			break;
+		}
+
+		case dont_care: // Used to handle characters that aren't invalid, but that we don't care about
+		{
+			toReturn = boost::indeterminate; // Ignore this char. & keep parsing
 			break;
 		}
 
@@ -459,6 +478,42 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 				toReturn = false;
 			}
 
+			break;
+		}
+
+		case space_after_colon:
+		{
+			if (std::isspace(static_cast<unsigned char>(input))) // Expected
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::RepParser::consume: space_after_colon: read " << charPrintStrings[input] << ", as expected." << std::endl;
+				#endif
+				curStat = header_val;
+				pHeaderValSS.reset(new std::stringstream);
+				#ifdef DEBUG
+				std::cout << "mpp::RepParser::consume: space_after_colon: going to state " << stateNames[curStat] << std::endl;
+				#endif
+			}
+
+			else // Error
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::RepParser::consume: space_after_colon: read '" << input << "' instead of a space" << std::endl;
+				#endif
+				toReturn = false;
+			}
+
+			break;
+		}
+
+		case header_val:
+		{
+			(*pHeaderValSS) << input; // Save it
+			/*
+			* Since Client uses read_until, we have no way of knowing when the header's value ends.
+			* Thus, the Client MUST call storeHeader() after each header. It knows that it has read a complete header line,
+			* because read_until with an argument of "\r\n" wouldn't have returned otherwise.
+			*/
 			break;
 		}
 	}
@@ -493,3 +548,16 @@ std::string mpp::RepParser::getStateName(mpp::RepParser::State stat)
 	return stateNames.at(stat); // Return the state's name or throw an exception
 }
 #endif
+
+/**
+* @desc Adds a header to the given reply.
+* @param rep The reply object to add a header to.
+**/
+void mpp::RepParser::storeHeader(mpp::Reply& rep) const
+{
+	/**
+	* TODO: Parse the header's value and store it as the appropriate type.
+	**/
+	rep.addHeader(pHeaderNameSS->str());
+	pHeaderNameSS.reset(new std::stringstream); // Prepare to read the next header
+}

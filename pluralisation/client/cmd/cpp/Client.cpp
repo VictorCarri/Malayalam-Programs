@@ -161,7 +161,14 @@ sigMsgs { // Construct the map of signal values to strings
 	workerThread = std::make_unique<THREAD_CLASS>( // Create the thread that keeps our I/O context running in the background
 		[this]()
 		{
-			ioc.run(); // Run the I/O context so that Asio will run
+			ioc.run(); // Run the I/O context so that work will run on this thread in the background
+		}
+	);
+	signalThread = std::make_unique<THREAD_CLASS>( // Create the thread that runs the signal handler in the background
+		[this]()
+		{
+			ioc.restart();
+			ioc.run(); // Run the I/O context so that work will run on this thread in the background
 		}
 	);
 }
@@ -187,7 +194,7 @@ bool Client::isActive() const
 
 /**
 * @desc Prompts the user for a Malayalam noun.
-*	It then fetches a space-terminated string and stores it in a property.
+	It then fetches a space-terminated string and stores it in a property.
 **/
 void Client::readInput()
 {
@@ -356,6 +363,10 @@ void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
 			}
 		}
 	);
+
+	#ifdef DEBUG
+	std::cout << "Client::isSingular ending" << std::endl;
+	#endif
 }
 
 /**
@@ -370,27 +381,30 @@ Client::~Client()
 	std::clog.flags(initFlags); // Reset flags
 	std::cout << "Client::~Client starting." << std::endl;
 	#endif
-	/*boost::asio::post(ioc, [this]()
-		{
-			try
-			{
-				sock.shutdown(boost::asio::ip::tcp::socket::shutdown_both); // Shutdown both the send and receive parts of the socket
-				sock.close(); // Close our socket
-				resolver.cancel(); // Cancel any pending resolution operations
-				signals.cancel(); // Cancel any pending signal-handling operations
-			}
-		}
-	);*/ // Destructors close the socket, cancel any pending resolution operations, and cancel any pending signal-handling operations
+
 	#ifdef DEBUG
-	std::cout << "Client::~Client: stopping our I/O context" << std::endl;
+	std::cout << "Client::~Client: stopping the I/O context for async ops" << std::endl;
 	#endif
 	ioc.stop(); // Stop any pending operations. Must be called so that our worker thread will be able to stop running.
+	#ifdef DEBUG
+	std::cout << "Client::~Client: stopped I/O context for async ops." << std::endl;
+	#endif
+
 	#ifdef DEBUG
 	std::cout << "Client::~Client: waiting for worker thread to join." << std::endl;
 	#endif
 	workerThread->join();
 	#ifdef DEBUG
 	std::cout << "Client::~Client: worker thread has joined." << std::endl;
+	#endif
+
+	#ifdef DEBUG
+	std::cout << "Client::~Client: waiting for signal-handling thread to join." << std::endl;
+	#endif
+	signalThread->join();
+	#ifdef DEBUG
+	std::cout << "Client::~Client: signal thread has joined." << std::endl
+	<< "Client::~Client ending." << std::endl;
 	#endif
 }
 
@@ -549,6 +563,19 @@ void Client::readSingRepStatus()
 					#ifdef DEBUG
 					std::cout << "Client::readSingRepStatus::lambda: need to read more data to finish parsing the reply, as expected" << std::endl;
 					#endif
+
+					mpp::Reply::Status repStat = rep.getStatus(); // Check the parsed status
+
+					if (repStat != mpp::Reply::singular && repStat != mpp::Reply::plural) // Not a valid response to an ISSING request
+					{
+						std::cerr << "Client::readSingRepStatus::lambda: error: response is not for an ISSING request." << std::endl;
+					}
+
+					else // Valid response
+					{
+						repParser.setState(mpp::RepParser::header_name); // We expect a header next
+						readHeader(); // Try to read a header, then check for more
+					}
 				}
 			}
 
@@ -563,5 +590,100 @@ void Client::readSingRepStatus()
 	);
 	#ifdef DEBUG
 	std::cout << "Client::readSingRepStatus finished." << std::endl;
+	#endif
+}
+
+/**
+* @desc Reads a header from the socket and stores it in the reply.
+**/
+void Client::readHeader()
+{
+	#ifdef DEBUG
+	std::cout << "Client::readHeader starting" << std::endl;
+	#endif
+
+	boost::asio::async_read_until(sock, repBuf, "\r\n", [this](const boost::system::error_code& ec, std::size_t bytesTrans)
+		{
+			if (!ec) // No error
+			{
+				typename boost::asio::streambuf::const_buffers_type datBufs = repBuf.data();
+				std::ostringstream dataSS; // Used to convert the data to a single string
+				std::size_t bytesInserted = 0; // # of bytes inserted into the stringstream
+
+				for (boost::asio::const_buffer buf : datBufs)
+				{
+					const char* curBufDat = static_cast<const char*>(buf.data()); // Fetch the data as a C string
+					#ifdef DEBUG
+					std::cout << "Client::readHeader::lambda: current buffer's contents are: \"";
+					#endif
+					std::size_t curBufSiz = buf.size();
+
+					for (std::size_t i = 0; i < curBufSiz; i++)
+					{
+						#ifdef DEBUG
+						std::cout << curBufDat[i];
+						#endif
+
+						if (bytesInserted < bytesTrans) // Can still insert data
+						{
+							dataSS << curBufDat[i];
+							++bytesInserted;
+						}
+					}
+
+					#ifdef DEBUG
+					std::cout << std::endl;
+					#endif
+				}
+
+				std::string data = dataSS.str();
+
+				#ifdef DEBUG
+				std::cout << "Client::readHeader::lambda: successfully read " << bytesTrans << " bytes of data" << std::endl;
+				#endif
+	
+				/* Parse the status line */
+				boost::tribool parseRes;
+				repParser.reset(); // Start the parser in its initial state
+				#ifdef DEBUG
+				std::cout << "Client::readHeader::lambda: data to parse: " << data << std::endl;
+				#endif
+				boost::tie(parseRes, boost::tuples::ignore) = repParser.parse(rep, data.cbegin(), data.cend()); // Parse the data in the buffer, but only up to the number of bytes transferred
+
+				if (parseRes) // Successfully parsed an entire reply - possible
+				{
+					#ifdef DEBUG
+					std::cout << "Client::readHeader: successfully parsed an entire reply." << std::endl;
+					#endif
+				}
+
+				else if (!parseRes) // Malformed reply - possible
+				{
+					#ifdef DEBUG
+					std::cout << "Client::readHeader: the reply is malformed." << std::endl;
+					#endif
+				}
+
+				else // More data needed - possible
+				{
+					#ifdef DEBUG
+					std::cout << "Client:: readHeader: need more data to finish parsing the reply." << std::endl;
+					#endif
+					//readHeader(); // Read the next header
+				}
+			}
+
+			else // An error occurred
+			{
+				std::cerr << "Client::readHeader::lambda: an error occurred while reading the server's response." << std::endl
+				<< "\tError value = " << ec.value() << std::endl
+				<< "\tError message = " << std::quoted(ec.message()) << std::endl
+				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+			}
+		}
+	);
+
+	#ifdef DEBUG
+	std::cout << "Client::readHeader endif" << std::endl;
 	#endif
 }

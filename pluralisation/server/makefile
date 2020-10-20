@@ -1,4 +1,4 @@
-exeName=malPlSrv
+exeName=mpp-server
 cppDir=./cpp
 files=IoContextPool Connection Server main
 compiler=g++-9

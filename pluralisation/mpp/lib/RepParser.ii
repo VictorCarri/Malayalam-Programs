@@ -71938,7 +71938,13 @@ namespace mpp
 
     first_code_digit,
     second_code_digit,
-    third_code_digit
+    third_code_digit,
+    dont_care,
+
+
+    header_name,
+    space_after_colon,
+    header_val
    };
 
 
@@ -72019,8 +72025,11 @@ namespace mpp
    std::unique_ptr<std::stringstream> pMinSS;
    std::unique_ptr<std::stringstream> pPatchSS;
    std::unique_ptr<std::stringstream> pCodeSS;
+   std::unique_ptr<std::stringstream> pHeaderNameSS;
+   std::unique_ptr<std::stringstream> pHeaderValSS;
 
    std::map<State, std::string> stateNames;
+   std::map<char, std::string> charPrintStrings;
 
  };
 };
@@ -72042,7 +72051,18 @@ mpp::RepParser::RepParser() : curStat(initial_m),
   {patch, "patch"},
   {first_code_digit, "first_code_digit"},
   {second_code_digit, "second_code_digit"},
-  {third_code_digit, "third_code_digit"}
+  {third_code_digit, "third_code_digit"},
+  {header_name, "header_name"},
+  {header_val, "header_val"},
+  {space_after_colon, "space_after_colon"}
+ },
+ charPrintStrings {
+  {' ', "space"},
+  {'\f', "form feed"},
+  {'\n', "line feed"},
+  {'\r', "carriage return"},
+  {'\t', "horizontal tab"},
+  {'\v', "vertical tab"}
  }
 
 {
@@ -72191,7 +72211,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
   case major:
   {
-   if (std::isdigit(input))
+   if (std::isdigit(static_cast<unsigned char>(input)))
    {
     (*pMajSS) << input;
 
@@ -72244,7 +72264,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
   case minor:
   {
-   if (std::isdigit(input))
+   if (std::isdigit(static_cast<unsigned char>(input)))
    {
     (*pMinSS) << input;
 
@@ -72290,7 +72310,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
   case patch:
   {
-   if (std::isdigit(input))
+   if (std::isdigit(static_cast<unsigned char>(input)))
    {
 
     std::cout << "mpp::RepParser::consume: patch: read digit " << input << std::endl;
@@ -72302,10 +72322,10 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
     toReturn = boost::indeterminate;
    }
 
-   else if (std::isspace(input))
+   else if (std::isspace(static_cast<unsigned char>(input)))
    {
 
-    std::cout << "mpp::RepParser::consume: patch: read space char '" << input << "'" << std::endl;
+    std::cout << "mpp::RepParser::consume: patch: read space char '" << charPrintStrings[input] << "'" << std::endl;
 
     short patch;
     (*pPatchSS) >> patch;
@@ -72345,7 +72365,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
   case first_code_digit:
   {
-   if (std::isdigit(input))
+   if (std::isdigit(static_cast<unsigned char>(input)))
    {
     (*pCodeSS) << input;
     curStat = second_code_digit;
@@ -72365,7 +72385,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
   case second_code_digit:
   {
-   if (std::isdigit(input))
+   if (std::isdigit(static_cast<unsigned char>(input)))
    {
     (*pCodeSS) << input;
     curStat = third_code_digit;
@@ -72385,7 +72405,11 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
   case third_code_digit:
   {
-   if (std::isdigit(input))
+
+   std::cout << "mpp::RepParser::consume: in state third_code_digit" << std::endl;
+
+
+   if (std::isdigit(static_cast<unsigned char>(input)))
    {
     (*pCodeSS) << input;
     short code;
@@ -72404,7 +72428,6 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
      std::cout << "mpp::RepParser::consume: reply's code is now " << rep.getStatText(rep.getStatus()) << std::endl;
 
      toReturn = boost::indeterminate;
-
     }
 
     else
@@ -72416,13 +72439,92 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
     }
    }
 
+   else if (std::isspace(static_cast<unsigned char>(input)))
+   {
+
+    std::cout << "mpp::RepParser::consume: read space char " << charPrintStrings[input] << " after third code digit, going to state ";
+
+    curStat = dont_care;
+    pHeaderNameSS.reset(new std::stringstream);
+
+    std::cout << stateNames[curStat] << std::endl;
+
+    toReturn = boost::indeterminate;
+   }
+
    else
    {
 
-    std::cout << "mpp::RepParser::consume: read '" << input << "' instead of a digit while attempting to read the code's second digit." << std::endl;
+    std::cout << "mpp::RepParser::consume: read '" << input << "' instead of a digit while attempting to read the code's third digit." << std::endl;
 
     toReturn = false;
    }
+
+   break;
+  }
+
+  case dont_care:
+  {
+   toReturn = boost::indeterminate;
+   break;
+  }
+
+  case header_name:
+  {
+   if (std::isalpha(static_cast<unsigned char>(input)) || input == '-')
+   {
+    (*pHeaderNameSS) << input;
+   }
+
+   else if (input == ':')
+   {
+
+    std::cout << "mpp::RepParser::consume: read '" << input << "' while reading a header name" << std::endl;
+
+    curStat = space_after_colon;
+
+    std::cout << "mpp::RepParser::consume: going to state " << stateNames[curStat] << std::endl;
+
+   }
+
+   else
+   {
+
+    std::cout << "mpp::RepParser::consume: header_name: read '" << input << "' instead of an alphabetic character or a dash" << std::endl;
+
+    toReturn = false;
+   }
+
+   break;
+  }
+
+  case space_after_colon:
+  {
+   if (std::isspace(static_cast<unsigned char>(input)))
+   {
+
+    std::cout << "mpp::RepParser::consume: space_after_colon: read " << charPrintStrings[input] << ", as expected." << std::endl;
+
+    curStat = header_val;
+    pHeaderValSS.reset(new std::stringstream);
+
+    std::cout << "mpp::RepParser::consume: space_after_colon: going to state " << stateNames[curStat] << std::endl;
+
+   }
+
+   else
+   {
+
+    std::cout << "mpp::RepParser::consume: space_after_colon: read '" << input << "' instead of a space" << std::endl;
+
+    toReturn = false;
+   }
+
+   break;
+  }
+
+  case header_val:
+  {
 
    break;
   }

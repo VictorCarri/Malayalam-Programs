@@ -52,6 +52,7 @@ namespace mpp
 				first_code_digit, // Expecting the first digit of the reply code
 				second_code_digit,
 				third_code_digit,
+				dont_care, // Used to ignore characters after the third code digit. The caller must manually set the parser's state before parsing headers
 
 				/* Reading headers */
 				header_name,
@@ -122,6 +123,12 @@ namespace mpp
 			std::string getStateName(State stat);
 			#endif
 
+			/**
+			* @desc Adds a header to the given reply.
+			* @param rep The reply object to add a header to.
+			**/
+			void storeHeader(Reply& rep) const;
+
 		private:
 			/**
 			* @desc Handles the current character in the input stream.
@@ -138,8 +145,10 @@ namespace mpp
 			std::unique_ptr<std::stringstream> pPatchSS; // Used to read the patch #
 			std::unique_ptr<std::stringstream> pCodeSS; // Used to build the string that'll be converted into a numeric code
 			std::unique_ptr<std::stringstream> pHeaderNameSS; // Used to read a header's name
+			std::unique_ptr<std::stringstream> pHeaderValSS; // Used to read a header's value
 			#ifdef DEBUG
 			std::map<State, std::string> stateNames; // Used for debugging
+			std::map<char, std::string> charPrintStrings; // Used to print special characters ('\n', '\r', etc.) as strings
 			#endif
 	}; // class RepParser
 }; // namespace mpp
