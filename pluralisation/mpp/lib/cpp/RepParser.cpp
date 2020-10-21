@@ -1,8 +1,11 @@
 /* C++ versions of C headers */
 #include <cctype> // std::isdigit, std::isspace
+#include <cstddef> // std::size_t
 
 /* STL */
 #include <sstream> // std::stringstream
+#include <string> // std::string
+#include <iomanip> // std::quoted
 #ifdef DEBUG
 #include <bitset> // std::bitset
 #include <iostream> // std::cout, std::endl
@@ -16,7 +19,11 @@
 
 /* MPP */
 #include "mpp/ver.hpp" // MPP protocol version info
+#include "mpp/exceptions/BadHeaderValue.hpp" // mpp::exceptions::BadHeaderValue, thrown if a header's value is invalid
 #include "mpp/RepParser.hpp" // Class def'n
+
+/* Macros that determine whether we use Boost or STD, based on compile-time definitions */
+#include "bosmacros/any.hpp" // ANY_CLASS macro
 
 /**
 * @desc Default constructor. Constructs the parser in a state such that it is ready to parse the beginning of a reply.
@@ -553,11 +560,33 @@ std::string mpp::RepParser::getStateName(mpp::RepParser::State stat)
 * @desc Adds a header to the given reply.
 * @param rep The reply object to add a header to.
 **/
-void mpp::RepParser::storeHeader(mpp::Reply& rep) const
+void mpp::RepParser::storeHeader(mpp::Reply& rep)
 {
-	/**
-	* TODO: Parse the header's value and store it as the appropriate type.
-	**/
-	rep.addHeader(pHeaderNameSS->str());
+	std::string headerName = pHeaderNameSS->str(); // Save the header name to check and store
+
+	if (headerName == "Content-Length") // Int value expected
+	{
+		std::size_t length;
+		(*pHeaderValSS) >> length; // Try to read the noun's length in bytes
+
+		if (pHeaderValSS->fail()) // Extraction failed for some reason
+		{
+			std::ostringstream ess;
+			ess << "Couldn't extract an std::size_t from the string " << std::quoted(pHeaderValSS->str()) << std::endl;
+			mpp::exceptions::BadHeaderValue mebhvex(ess.str());
+			throw mebhvex;
+		}
+
+		else // Extraction was successful
+		{
+			rep.addHeader(headerName, length); // Store the header and its std::size_t value in the reply
+		}
+	}
+
+	else // All other headers have string values
+	{
+		rep.addHeader(headerName, pHeaderValSS->str());
+	}
+
 	pHeaderNameSS.reset(new std::stringstream); // Prepare to read the next header
 }

@@ -1,3 +1,6 @@
+/* C++ versions of C headers */
+#include <cstddef> // std::size_t
+
 /* STL */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
@@ -78,11 +81,11 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 		/* Determine what type the value has, and cast it appropriately */
 		if (h.getName() == "Content-Length") // Int value
 		{
-			int length;
+			std::size_t length;
 	
 			try
 			{
-				length = ANY_CAST<int>(h.getValue()); // Fetch the length
+				length = ANY_CAST<std::size_t>(h.getValue()); // Fetch the length
 				std::ostringstream convSS; // Used to convert int to str
 				convSS << length;
 				val = convSS.str();
@@ -91,7 +94,7 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
-				ess << "mpp::Reply::toBuffers(): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
+				ess << "mpp::Reply::toBuffers(): the \"Content-Length\" header has a non-size_t value associated with it!" << std::endl
 				<< "Error: " << stdbace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue toThrow(ess.str());
 				throw toThrow;

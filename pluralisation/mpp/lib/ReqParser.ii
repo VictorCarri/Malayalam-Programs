@@ -83126,6 +83126,12 @@ namespace mpp
 
 
 
+   Status getStatus() const;
+
+
+
+
+
 
    void setStatus(short code);
 
@@ -83157,7 +83163,7 @@ namespace mpp
 
 
 
-   std::string getStatText(Status s);
+   std::string getStatText(Status s) const;
 
 
 

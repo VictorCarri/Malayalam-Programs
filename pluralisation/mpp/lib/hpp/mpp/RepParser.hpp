@@ -127,7 +127,7 @@ namespace mpp
 			* @desc Adds a header to the given reply.
 			* @param rep The reply object to add a header to.
 			**/
-			void storeHeader(Reply& rep) const;
+			void storeHeader(Reply& rep);
 
 		private:
 			/**

@@ -249,7 +249,6 @@ mpp::ReqHandler::ReqHandler(std::string cfPath) : dbInfo(cfPath), // Load DB inf
 	}
 {
 	endsInKaar = boost::make_u32regex(".*\\x{d15}\\x{d3e}\\x{d30}(\\x{d7b}|\\x{d3f})$"); // A regex that matches -കാരൻ or -കാരി
-	openDBConn();
 }
 
 /**
@@ -353,14 +352,15 @@ bool mpp::ReqHandler::isSingular(std::string noun)
 **/
 bool mpp::ReqHandler::inDB(std::string noun)
 {
-	#ifdef DEBUG
-	std::cout << "mpp::ReqHandler::inDB: noun to check is " << std::quoted(noun) << std::endl;
-	#endif
 	mariadb::u64 nRowsAff; // # of rows affected by the query. If == 1, the noun is in the DB.
-	bool toReturn;
+	bool toReturn = false; // Assume that it isn't in by default - which'll be true more often than not
 	int fno = 0; // Field # to load noun into in prepared statement
+
+	openDBConn(); // Open a connection for this call
+
 	#ifdef DEBUG
-	std::cout << "mpp::ReqHandler::inDB: field # = " << fno << std::endl;
+	std::cout << "mpp::ReqHandler::inDB: noun to check is " << std::quoted(noun) << std::endl
+	<< "\tfield # = " << fno << std::endl;
 	#endif
 
 	try
@@ -391,12 +391,26 @@ bool mpp::ReqHandler::inDB(std::string noun)
 
 	catch (mariadb::exception::connection& mece)
 	{
-		std::ostringstream ess;
+	/*	std::ostringstream ess;
 		ess << "mpp::ReqHandler::inDB: caught MariaDB connection exception while trying to execute query" << std::endl
 		<< "\tSELECT * FROM nouns WHERE noun=" << std::quoted(noun, '\'') << std::endl
 		<< "Exception: " << mece.what() << std::endl;
 		mpp::exceptions::DBError ex(ess.str());
-		throw ex;
+		throw ex;*/
+
+		try
+		{
+			openDBConn(); // Re-open the connection
+		}
+
+		catch (std::exception& secondEx) // Bail out if we can't re-establish the connection
+		{
+			std::ostringstream ess;
+			ess << "mpp::ReqHandler::inDB: caught MariaDB connection exception after failing to re-open the DB connection for a second time" << std::endl
+			<< "\tException: " << secondEx.what() << std::endl;
+			mpp::exceptions::DBError ex(ess.str());
+			throw ex;
+		}
 	}
 
 	catch (std::out_of_range& stdoore)
