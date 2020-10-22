@@ -1,7 +1,7 @@
 /** C++ versions of C headers **/
 #include <cctype> // std::tolower
 #include <cstddef> // std::size_t
-#include <csignal> // SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGTSTP
+#include <csignal> // SIGHUP, SIGINT, SIGQUIT, SIGTERM, SIGTSTP, SIGSEGV
 
 /** Standard C++ **/
 
@@ -77,7 +77,8 @@ sigMsgs { // Construct the map of signal values to strings
 	{SIGINT, "SIGINT"},
 	{SIGQUIT, "SIGQUIT"},
 	{SIGTERM, "SIGTERM"},
-	{SIGTSTP, "SIGTSTP"}
+	{SIGTSTP, "SIGTSTP"},
+	{SIGSEGV, "SIGSEGV"}
 }
 #ifdef DEBUG
 , initFlags(std::clog.flags()) // Save original clog flags
@@ -94,6 +95,7 @@ sigMsgs { // Construct the map of signal values to strings
 	/* Set up signal handling */
 	signals.add(SIGTERM); // Couldn't fit in ctor
 	signals.add(SIGTSTP); // Couldn't fit in ctor
+	signals.add(SIGSEGV);
 	signals.async_wait( // Handle signals when caught
 		[this](const boost::system::error_code& bsec, int sigNo)
 		{

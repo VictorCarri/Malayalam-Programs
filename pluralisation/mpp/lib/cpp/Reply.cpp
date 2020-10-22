@@ -1,6 +1,3 @@
-/* C++ versions of C headers */
-#include <cstddef> // std::size_t
-
 /* STL */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
@@ -81,11 +78,12 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 		/* Determine what type the value has, and cast it appropriately */
 		if (h.getName() == "Content-Length") // Int value
 		{
-			std::size_t length;
+			using lengthType = std::string::size_type;
+			lengthType length;
 	
 			try
 			{
-				length = ANY_CAST<std::size_t>(h.getValue()); // Fetch the length
+				length = ANY_CAST<lengthType>(h.getValue()); // Fetch the length
 				std::ostringstream convSS; // Used to convert int to str
 				convSS << length;
 				val = convSS.str();

@@ -1,3 +1,6 @@
+/* C++ versions of C headers */
+#include <cstddef> // std::size_t
+
 /* C++ Standard Library */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
