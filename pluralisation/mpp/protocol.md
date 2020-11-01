@@ -48,7 +48,7 @@ A response will be of the form:
 
 where {code} is a numeric code which follows the same format as HTTP codes. (2xx for OK, 4xx for client error, 5xx for server error).
 
-In BNR form:
+In BNF:
 
 Reply -> protLine headers argument
 protLine -> "MPP/" integer "." integer "." integer space code lineTerm

@@ -344,7 +344,7 @@ void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
 			if (!acErr) // No error
 			{
 				#ifdef DEBUG
-				std::cout << "Client::isSingular: async_connect succeeded." << std::endl
+				std::cout << "Client::isSingular::lambda async_connect succeeded." << std::endl
 				<< "\tEndpoint address: " << ep.address().to_string() << std::endl
 				<< "\tEndpoint capacity: " << ep.capacity() << std::endl
 				<< "\tEndpoint port: " << ep.port() << std::endl
@@ -507,7 +507,8 @@ void Client::readSingRepStatus()
 				{
 					const char* curBufDat = static_cast<const char*>(buf.data()); // Fetch the data as a C string
 					#ifdef DEBUG
-					std::cout << "Client::readSingRepStatus::lambda: current buffer's contents are: \"";
+					std::cout << "Client::readSingRepStatus::lambda: # of bytes inserted @ beginning = " << bytesInserted << std::endl
+					<< "\tCurrent buffer's contents are: \"";
 					#endif
 					std::size_t curBufSiz = buf.size();
 
@@ -525,7 +526,8 @@ void Client::readSingRepStatus()
 					}
 
 					#ifdef DEBUG
-					std::cout << std::endl;
+					std::cout << "\"" << std::endl
+					<< "Client::readSingRepStatus::lambda: no error: buf-reading for loop: # of bytes inserted = " << bytesInserted << std::endl;
 					#endif
 				}
 
@@ -671,7 +673,6 @@ void Client::readHeader()
 					#ifdef DEBUG
 					std::cout << "Client:: readHeader: need more data to finish parsing the reply." << std::endl;
 					#endif
-					//readHeader(); // Read the next header
 				}
 			}
 
@@ -686,6 +687,6 @@ void Client::readHeader()
 	);
 
 	#ifdef DEBUG
-	std::cout << "Client::readHeader endif" << std::endl;
+	std::cout << "Client::readHeader ending" << std::endl;
 	#endif
 }

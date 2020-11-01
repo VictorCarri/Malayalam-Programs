@@ -7,6 +7,7 @@
 /* STL */
 #include <array> // std::array
 #include <string> // std::string
+#include <vector> // std::vector
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable

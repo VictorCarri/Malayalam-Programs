@@ -46,7 +46,7 @@
 void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 {
 	std::string utf8Text("text/utf-8"); // Initialise the string once instead of using several temporaries
-	int zeroLengthInd = 0;
+	std::string::size_type zeroLengthInd(0);
 
 	switch (req.GETCOM_FUNC()) // Check what type of request it is
 	{

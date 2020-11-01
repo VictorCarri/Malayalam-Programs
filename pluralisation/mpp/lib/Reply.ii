@@ -64534,7 +64534,7 @@ mpp::Reply mpp::Reply::stockReply(mpp::Reply::Status stat)
 {
  mpp::Reply rep;
  rep.addHeader("Content-Type", std::string("text/plain"));
- rep.addHeader("Content-Length", 0);
+ rep.addHeader("Content-Length", static_cast<std::string::size_type>(0));
  rep.setStatus(stat);
  rep.setContent("");
  return rep;
@@ -64583,7 +64583,7 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
 {
  try
  {
-  os << "MPP/" << VER_MAJOR << VER_MINOR << VER_PATCH << " " << rep.statText.at(rep.stat) << "\r\n";
+  os << rep.statText.at(rep.stat) << "\r\n";
  }
 
  catch (std::out_of_range& stdoor)
@@ -64601,13 +64601,13 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
   {
    try
    {
-    os << std::any_cast<int>(h.getValue());
+    os << std::any_cast<std::string::size_type>(h.getValue());
    }
 
    catch (std::bad_any_cast& stdbace)
    {
     std::ostringstream ess;
-    ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
+    ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"Content-Length\" header has a value of non-std::string::sizde_type type associated with it!" << std::endl
     << "Error: " << stdbace.what() << std::endl;
     mpp::exceptions::BadHeaderValue toThrow(ess.str());
     throw toThrow;

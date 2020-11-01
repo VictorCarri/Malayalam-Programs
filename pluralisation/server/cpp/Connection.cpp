@@ -7,9 +7,13 @@
 #include <iomanip> // std::quoted
 #endif
 #include <bitset> // std::bitset
+#include <vector> // std::vector
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::io_context, boost::asio::buffer, boost::asio::async_write, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred, boost::asio::ip::tcp::socket::shutdown_both, boost::asio::async_read_until
+#include <boost/asio/io_context.hpp> // boost::asio::io_context
+#include <boost/asio/buffer.hpp> // boost::asio::buffer, boost::asio::const_buffer
+#include <boost/asio/write.hpp> // boost::asio::async_write
+#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket::shutdown_both
 #include <boost/logic/tribool.hpp> // boost::tribool
 #include <boost/logic/tribool_io.hpp> // operator<< for boost::tribool
 #include <boost/tuple/tuple.hpp> // boost::tie, boost::tuples::ignore
@@ -160,9 +164,11 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			std::cout << "Connection::handleRead: reply to send is: " << std::endl
 			<< rep << std::endl;
 			#endif
+			// TODO: store the buffers in a property so that they aren't destroyed before the async write end
+			std::vector<boost::asio::const_buffer> repBufs = rep.toBuffers(); // Fetch the buffers to write
 			boost::asio::async_write(
 				socket,
-				rep.toBuffers(),
+				repBufs
 				[lifetime = shared_from_this(), this](const ERROR_CODE& err, std::size_t bytesTrans)
 				{
 					handleWrite(err, bytesTrans);

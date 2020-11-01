@@ -170,7 +170,7 @@ mpp::Reply mpp::Reply::stockReply(mpp::Reply::Status stat)
 {
 	mpp::Reply rep;
 	rep.addHeader("Content-Type", std::string("text/plain"));
-	rep.addHeader("Content-Length", 0);
+	rep.addHeader("Content-Length", static_cast<std::string::size_type>(0));
 	rep.setStatus(stat);
 	rep.setContent("");
 	return rep;
@@ -219,7 +219,7 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
 {
 	try
 	{
-		os << "MPP/" << VER_MAJOR << VER_MINOR << VER_PATCH << " " << rep.statText.at(rep.stat) << "\r\n"; // Write the first line of the response
+		os << rep.statText.at(rep.stat) << "\r\n"; // Write the first line of the response
 	}
 
 	catch (std::out_of_range& stdoor)
@@ -233,17 +233,17 @@ std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
 		os << headerName << ": "; // Write the header's name and a colon to separate it from its value
 
 		/* Does the header's ANY_CLASS object contain a string or an int? */
-		if (headerName == "Content-Length") // Integer value
+		if (headerName == "Content-Length") // String length size value
 		{
 			try
 			{
-				os << ANY_CAST<int>(h.getValue()); // Fetch the length as an int and write it to the stream
+				os << ANY_CAST<std::string::size_type>(h.getValue()); // Fetch the length as an int and write it to the stream
 			}
 	
 			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
-				ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
+				ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"Content-Length\" header has a value of non-std::string::sizde_type type associated with it!" << std::endl
 				<< "Error: " << stdbace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue toThrow(ess.str());
 				throw toThrow;
