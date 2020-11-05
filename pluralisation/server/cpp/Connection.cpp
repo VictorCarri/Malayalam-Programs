@@ -165,7 +165,7 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			<< rep << std::endl;
 			#endif
 			// TODO: store the buffers in a property so that they aren't destroyed before the async write end
-			std::vector<boost::asio::const_buffer> repBufs = rep.toBuffers(); // Fetch the buffers to write
+			repBufs = rep.toBuffers(); // Fetch the buffers to write
 			boost::asio::async_write(
 				socket,
 				repBufs
@@ -173,6 +173,10 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 				{
 					handleWrite(err, bytesTrans);
 				}
+				/*[auto self = shared_from_this()](const ERROR_CODE& err, std::size_t bytesTrans)
+				{
+					self->handleWrite(err, bytesTrans);
+				}*/
 			);
 		}
 
@@ -185,9 +189,10 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			rep = mpp::Reply::stockReply(reqParser.getStatus()); // Generate a stock reply using the error code which the parser identified
 			rep.setContent(""); // Clear the reply's content
 			rep.clearHeaders(); // Clear the reply's headers
+			repBufs = rep.toBuffers();
 			boost::asio::async_write(
 				socket,
-				rep.toBuffers(),
+				repBufs,
 				[lifetime = shared_from_this(), this](const ERROR_CODE& err, std::size_t bTrans)
 				{
 					handleWrite(err, bTrans);

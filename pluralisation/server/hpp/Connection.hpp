@@ -11,7 +11,9 @@
 
 /* Boost */
 #include <boost/noncopyable.hpp> // boost::noncopyable
-#include <boost/asio.hpp> // boost::asio::io_context, boost::asio::ip::tcp::socket
+#include <boost/asio/io_context.hpp> // boost::asio::io_context
+#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 
 /* Our headers - Malayalam Pluralisation Protocol library */
 #include "mpp/ReqHandler.hpp" // Request handler
@@ -70,6 +72,7 @@ class Connection : public ENABLE_SHARED_FROM_THIS<Connection>,
 		mpp::ReqParser reqParser;
 		mpp::Request req;
 		mpp::Reply rep;
+		std::vector<boost::asio::const_buffer> repBufs;
 };
 
 typedef SHARED_PTR<Connection> ConnectionPtr;
