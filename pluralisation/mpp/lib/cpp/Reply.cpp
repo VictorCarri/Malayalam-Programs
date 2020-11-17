@@ -3,6 +3,9 @@
 #include <sstream> // std::ostringstream
 #include <utility> // std::exchange, std::move, std::swap
 #include <stdexcept> // std::out_of_range
+#ifdef DEBUG
+#include <iostream> // std::cout
+#endif
 
 /* Boost */
 #include <boost/asio/buffer.hpp> // boost::asio::const_buffer
@@ -66,13 +69,15 @@ void mpp::Reply::setStatus(mpp::Reply::Status s)
 **/
 std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 {
-	std::vector<boost::asio::const_buffer> buffers;
-	buffers.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
+	repBufs.clear();
+	repBufConts.clear();
+	repBufs.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
 
 	for (mpp::Header h : headers)
 	{
-		buffers.push_back(boost::asio::buffer(h.getName()));
-		buffers.push_back(boost::asio::buffer(nameValSep));
+		repBufConts.push_back(h.getName());
+		repBufs.push_back(boost::asio::buffer(repBufConts.back())); // TODO: push all strings to the vector before pushing buffers containing them, so that the memory the buffers reference won't get deleted
+		repBufs.push_back(boost::asio::buffer(nameValSep));
 		std::string val; // Used to store the value to push back
 	
 		/* Determine what type the value has, and cast it appropriately */
@@ -116,13 +121,26 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 			}
 		}
 	
-		buffers.push_back(boost::asio::buffer(val)); // Push back the value computed above
-		buffers.push_back(boost::asio::buffer(crlf));
+		repBufs.push_back(boost::asio::buffer(val)); // Push back the value computed above
+		repBufs.push_back(boost::asio::buffer(crlf));
 	}
 
-	buffers.push_back(boost::asio::buffer(crlf));
-	buffers.push_back(boost::asio::buffer(content));
-	return buffers;
+	repBufs.push_back(boost::asio::buffer(crlf));
+	repBufs.push_back(boost::asio::buffer(content));
+
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: # of buffers at end = " << buffers.size() << std::endl
+	<< "\tBuffers at end contain:" << std::endl;
+
+	for (auto buf : buffers)
+	{
+		std::cout << static_cast<const char*>(buf.data());
+	}
+
+	std::cout << "\tFinished writing buffers." << std::endl;
+	#endif
+
+	return repBufs;
 }
 
 /**

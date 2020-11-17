@@ -164,19 +164,25 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			std::cout << "Connection::handleRead: reply to send is: " << std::endl
 			<< rep << std::endl;
 			#endif
-			// TODO: store the buffers in a property so that they aren't destroyed before the async write end
 			repBufs = rep.toBuffers(); // Fetch the buffers to write
+			#ifdef DEBUG
+			std::cout << "\t# of reply buffers = " << repBufs.size() << std::endl
+			<< "Reply buffer contents: " << std::endl;
+
+			for (auto buf : repBufs)
+			{
+				std::cout << static_cast<const char*>(buf.data());
+			}
+	
+			std::cout << "server::Connection::handleRead: finished writing buffers to cout" << std::endl;
+			#endif
 			boost::asio::async_write(
 				socket,
-				repBufs
+				repBufs,
 				[lifetime = shared_from_this(), this](const ERROR_CODE& err, std::size_t bytesTrans)
 				{
 					handleWrite(err, bytesTrans);
 				}
-				/*[auto self = shared_from_this()](const ERROR_CODE& err, std::size_t bytesTrans)
-				{
-					self->handleWrite(err, bytesTrans);
-				}*/
 			);
 		}
 

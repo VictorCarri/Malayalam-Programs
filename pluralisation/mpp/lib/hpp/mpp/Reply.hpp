@@ -133,6 +133,8 @@ namespace mpp
 			std::string content; // The reply's content
 			const std::array<char, 2> crlf; // CR/LF sequence to be used in the reply
 			const std::array<char, 2> nameValSep; // Separates a header name from its value
+			std::vector<std::string> repBufConts; // Holds the contents of the buffers so that they won't contain garbage deleted strings
+			std::vector<boost::asio::const_buffer> repBufs; // Holds this reply as a vector of buffers. Made it a member so that it won't get deleted before the Reply goes out of scope.
 
 			/**
 			* Friend declaration to allow operator<< to access private members.
