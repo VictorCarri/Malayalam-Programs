@@ -502,20 +502,29 @@ void Client::readSingRepStatus()
 				typename boost::asio::streambuf::const_buffers_type datBufs = repBuf.data();
 				std::ostringstream dataSS; // Used to convert the data to a single string
 				std::size_t bytesInserted = 0; // # of bytes inserted into the stringstream
+				#ifdef DEBUG
+				std::size_t bufNum = 1;
+				#endif
 
 				for (boost::asio::const_buffer buf : datBufs)
 				{
 					const char* curBufDat = static_cast<const char*>(buf.data()); // Fetch the data as a C string
 					#ifdef DEBUG
-					std::cout << "Client::readSingRepStatus::lambda: # of bytes inserted @ beginning = " << bytesInserted << std::endl
+					std::cout << "Client::readSingRepStatus::lambda: # of bytes inserted @ beginning of for = " << bytesInserted << std::endl
 					<< "\tCurrent buffer's contents are: \"";
 					#endif
 					std::size_t curBufSiz = buf.size();
+					#ifdef DEBUG
+					std::cout << "\tCurrent buffer's size = " << curBufSiz << std::endl;
+					#endif
 
 					for (std::size_t i = 0; i < curBufSiz; i++)
 					{
 						#ifdef DEBUG
-						std::cout << curBufDat[i];
+						std::cout << "buffers[" << bufNum << "][" << i << "] = '" << curBufDat[i] << "'" << std::endl
+						<< "# of bytes inserted = " << bytesInserted << std::endl
+						<< "# of bytes transferred = " << bytesTrans << std::endl
+						<< "dataSS contents = " << std::quoted(dataSS.str()) << std::endl;
 						#endif
 
 						if (bytesInserted < bytesTrans) // Can still insert data
@@ -528,13 +537,15 @@ void Client::readSingRepStatus()
 					#ifdef DEBUG
 					std::cout << "\"" << std::endl
 					<< "Client::readSingRepStatus::lambda: no error: buf-reading for loop: # of bytes inserted = " << bytesInserted << std::endl;
+					++bufNum;
 					#endif
 				}
 
 				std::string data = dataSS.str();
 
 				#ifdef DEBUG
-				std::cout << "Client::readSingRepStatus::lambda: successfully read " << bytesTrans << " bytes of data" << std::endl;
+				std::cout << "Client::readSingRepStatus::lambda: successfully read " << bytesTrans << " bytes of data" << std::endl
+				<< "dataSS contents = " << std::quoted(dataSS.str()) << std::endl;
 				#endif
 	
 				/* Parse the status line */
