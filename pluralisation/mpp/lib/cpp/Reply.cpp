@@ -1,3 +1,6 @@
+/* C++ versions of C headers */
+#include <cstddef> // std::size_t
+
 /* STL */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
@@ -5,6 +8,7 @@
 #include <stdexcept> // std::out_of_range
 #ifdef DEBUG
 #include <iostream> // std::cout
+#include <iomanip> // std::quoted
 #endif
 
 /* Boost */
@@ -69,19 +73,47 @@ void mpp::Reply::setStatus(mpp::Reply::Status s)
 **/
 std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 {
+	/* TODO: Push all buffer contents to contents vector before pushing any buffers to the buffers vector */
 	repBufs.clear();
 	repBufConts.clear();
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: buffers @ begin are: " << std::endl;
+	printRepBufs(); // Make a copy just to avoid having the string being destroyed
+	std::cout << "mpp::Reply::toBuffers: buffer contents vector contains: ";
+	printRepBufConts();
+	#endif
+
 	repBufs.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: buffers after pushing status text are: " << std::endl;
+	printRepBufs();
+	#endif
+
+	repBufs.push_back(boost::asio::buffer(crlf));
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: buffers after pushing CRLF after status text are: " << std::endl;
+	printRepBufs();
+	#endif
 
 	for (mpp::Header h : headers)
 	{
-		repBufConts.push_back(h.getName());
-		repBufs.push_back(boost::asio::buffer(repBufConts.back())); // TODO: push all strings to the vector before pushing buffers containing them, so that the memory the buffers reference won't get deleted
+		repBufConts.push_front(h.getName());
+		repBufs.push_back(boost::asio::buffer(repBufConts.front()));
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing header name are: " << std::endl;
+		printRepBufs();
+		std::cout << "mpp::Reply::toBuffers: reply buffer contents after pushing header name are: " << std::endl;
+		printRepBufConts();
+		#endif
 		repBufs.push_back(boost::asio::buffer(nameValSep));
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing colon separator are: " << std::endl;
+		printRepBufs();
+		#endif
 		std::string val; // Used to store the value to push back
 	
 		/* Determine what type the value has, and cast it appropriately */
-		if (h.getName() == "Content-Length") // Int value
+		if (repBufConts.front() == "Content-Length") // Int value
 		{
 			using lengthType = std::string::size_type;
 			lengthType length;
@@ -120,23 +152,34 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 				throw toThrow;
 			}
 		}
-	
-		repBufs.push_back(boost::asio::buffer(val)); // Push back the value computed above
+
+		repBufConts.push_front(val);
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: reply buffer contents list after pushing header value contains:" << std::endl;
+		printRepBufConts();
+		#endif
+		repBufs.push_back(boost::asio::buffer(repBufConts.front())); // Push back the value computed above
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing header value are: " << std::endl;
+		printRepBufs();
+		#endif
 		repBufs.push_back(boost::asio::buffer(crlf));
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing CRLF after header are: " << std::endl;
+		printRepBufs();
+		#endif
 	}
 
 	repBufs.push_back(boost::asio::buffer(crlf));
-	repBufs.push_back(boost::asio::buffer(content));
-
 	#ifdef DEBUG
-	std::cout << "mpp::Reply::toBuffers: # of buffers at end = " << buffers.size() << std::endl
+	std::cout << "mpp::Reply::toBuffers: buffers after pushing final CRLF are: " << std::endl;
+	printRepBufs();
+	#endif
+	repBufs.push_back(boost::asio::buffer(content));
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: # of buffers at end = " << repBufs.size() << std::endl
 	<< "\tBuffers at end contain:" << std::endl;
-
-	for (auto buf : buffers)
-	{
-		std::cout << static_cast<const char*>(buf.data());
-	}
-
+	printRepBufs();
 	std::cout << "\tFinished writing buffers." << std::endl;
 	#endif
 
@@ -324,3 +367,42 @@ mpp::Reply::Status mpp::Reply::getStatus() const
 {
 	return stat;
 }
+
+#ifdef DEBUG
+/**
+* @desc This method prints the reply buffers.
+**/
+void mpp::Reply::printRepBufs()
+{
+	std::size_t bufNum = 1;
+
+	for (auto buf : repBufs)
+	{
+		std::size_t bufSiz = buf.size();
+		const char* bufDat = static_cast<const char*>(buf.data());
+		std::cout << bufNum << ")\t";
+
+		for (std::size_t i = 0; i < bufSiz; i++)
+		{
+			std::cout << bufDat[i];
+		}
+
+		std::cout << std::endl;
+		++bufNum;
+	}
+}
+
+/**
+* @desc This method prints the reply buffer contents held in the vector of strings.
+**/
+void mpp::Reply::printRepBufConts()
+{
+	std::size_t contNum = 1;
+
+	for (auto str : repBufConts)
+	{
+		std::cout << contNum << ")\t" << str << std::endl;
+		++contNum;
+	}
+}
+#endif

@@ -1,5 +1,6 @@
 /* C++ versions of C headers */
 #include <cstdint> // std::uintmax_t
+#include <cstddef> // std::size_t
 
 /* Standard C++ */
 #ifdef DEBUG
@@ -166,12 +167,23 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 			#endif
 			repBufs = rep.toBuffers(); // Fetch the buffers to write
 			#ifdef DEBUG
-			std::cout << "\t# of reply buffers = " << repBufs.size() << std::endl
-			<< "Reply buffer contents: " << std::endl;
+			std::cout << "Connection::handleRead: # of reply buffers = " << repBufs.size() << std::endl
+			<< "Connection::handleRead: reply buffer contents: " << std::endl;
+			unsigned short bufNum = 1;
 
 			for (auto buf : repBufs)
 			{
-				std::cout << static_cast<const char*>(buf.data());
+				const char* bufDat = static_cast<const char*>(buf.data());
+				std::size_t bufSiz = buf.size();
+				std::cout << bufNum << ")\t";
+
+				for (std::size_t i = 0; i < bufSiz; i++)
+				{
+					std::cout << bufDat[i];
+				}
+
+				std::cout << std::endl;
+				++bufNum;
 			}
 	
 			std::cout << "server::Connection::handleRead: finished writing buffers to cout" << std::endl;

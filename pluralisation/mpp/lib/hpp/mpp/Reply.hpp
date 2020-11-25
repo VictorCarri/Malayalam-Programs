@@ -127,13 +127,25 @@ namespace mpp
 			void clearHeaders();
 	
 		private:
+			#ifdef DEBUG
+			/**
+			* @desc This method prints the reply buffers.
+			**/
+			void printRepBufs();
+
+			/**
+			* @desc This method prints the reply buffer contents held in the vector of strings.
+			**/
+			void printRepBufConts();
+			#endif
+
 			Status stat; // This reply's status
 			std::forward_list<mpp::Header> headers; // List of headers to send with the reply
 			std::map<Status, std::string> statText; // Text for each status
 			std::string content; // The reply's content
 			const std::array<char, 2> crlf; // CR/LF sequence to be used in the reply
 			const std::array<char, 2> nameValSep; // Separates a header name from its value
-			std::vector<std::string> repBufConts; // Holds the contents of the buffers so that they won't contain garbage deleted strings
+			std::forward_list<std::string> repBufConts; // Holds the contents of the buffers so that they won't contain garbage deleted strings
 			std::vector<boost::asio::const_buffer> repBufs; // Holds this reply as a vector of buffers. Made it a member so that it won't get deleted before the Reply goes out of scope.
 
 			/**
