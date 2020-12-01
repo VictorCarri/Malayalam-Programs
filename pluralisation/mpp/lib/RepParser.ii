@@ -72522,12 +72522,26 @@ namespace mpp
    void clearHeaders();
 
   private:
+
+
+
+
+   void printRepBufs();
+
+
+
+
+   void printRepBufConts();
+
+
    Status stat;
    std::forward_list<mpp::Header> headers;
    std::map<Status, std::string> statText;
    std::string content;
    const std::array<char, 2> crlf;
    const std::array<char, 2> nameValSep;
+   std::forward_list<std::string> repBufConts;
+   std::vector<boost::asio::const_buffer> repBufs;
 
 
 
@@ -73116,9 +73130,17 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
   case header_name:
   {
+
+   std::cout << "mpp::RepParser::consume: in header_name case" << std::endl;
+
+
    if (std::isalpha(static_cast<unsigned char>(input)) || input == '-')
    {
+
+    std::cout << "mpp::RepParser::consume: current character '" << input << "' is an alphabetic character or a dash" << std::endl;
+
     (*pHeaderNameSS) << input;
+    toReturn = boost::indeterminate;
    }
 
    else if (input == ':')
@@ -73130,6 +73152,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
     std::cout << "mpp::RepParser::consume: going to state " << stateNames[curStat] << std::endl;
 
+    toReturn = boost::indeterminate;
    }
 
    else
@@ -73155,6 +73178,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
     std::cout << "mpp::RepParser::consume: space_after_colon: going to state " << stateNames[curStat] << std::endl;
 
+    toReturn = boost::indeterminate;
    }
 
    else
@@ -73171,6 +73195,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
   case header_val:
   {
    (*pHeaderValSS) << input;
+   toReturn = boost::indeterminate;
 
 
 

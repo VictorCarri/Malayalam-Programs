@@ -588,6 +588,8 @@ void Client::readSingRepStatus()
 
 					else // Valid response
 					{
+						std::size_t offset = 0;
+						repBuf.consume(bytesTrans + offset); // Consume the data & the \r\n before the next async_read, so that it won't return immediately upon seeing them
 						repParser.setState(mpp::RepParser::header_name); // We expect a header next
 						readHeader(); // Try to read a header, then check for more
 					}
@@ -621,9 +623,16 @@ void Client::readHeader()
 		{
 			if (!ec) // No error
 			{
+				#ifdef DEBUG
+				std::cout << "Client::readHeader: successfully transferred " << bytesTrans << " bytes" << std::endl;
+				#endif
+
 				typename boost::asio::streambuf::const_buffers_type datBufs = repBuf.data();
 				std::ostringstream dataSS; // Used to convert the data to a single string
 				std::size_t bytesInserted = 0; // # of bytes inserted into the stringstream
+				#ifdef DEBUG
+				std::size_t bufNum = 1;
+				#endif
 
 				for (boost::asio::const_buffer buf : datBufs)
 				{
@@ -636,7 +645,10 @@ void Client::readHeader()
 					for (std::size_t i = 0; i < curBufSiz; i++)
 					{
 						#ifdef DEBUG
-						std::cout << curBufDat[i];
+						std::cout << "buffers[" << bufNum << "][" << i << "] = '" << curBufDat[i] << "'" << std::endl
+						<< "# of bytes inserted = " << bytesInserted << std::endl
+						<< "# of bytes transferred = " << bytesTrans << std::endl
+						<< "dataSS contents = " << std::quoted(dataSS.str()) << std::endl;
 						#endif
 
 						if (bytesInserted < bytesTrans) // Can still insert data
@@ -647,7 +659,9 @@ void Client::readHeader()
 					}
 
 					#ifdef DEBUG
-					std::cout << std::endl;
+					std::cout << "\"" << std::endl
+					<< "Client::readSingRepStatus::lambda: no error: buf-reading for loop: # of bytes inserted = " << bytesInserted << std::endl;
+					++bufNum;
 					#endif
 				}
 
@@ -659,7 +673,6 @@ void Client::readHeader()
 	
 				/* Parse the status line */
 				boost::tribool parseRes;
-				repParser.reset(); // Start the parser in its initial state
 				#ifdef DEBUG
 				std::cout << "Client::readHeader::lambda: data to parse: " << data << std::endl;
 				#endif

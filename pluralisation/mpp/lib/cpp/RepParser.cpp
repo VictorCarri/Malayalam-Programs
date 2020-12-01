@@ -461,9 +461,17 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 
 		case header_name:
 		{
+			#ifdef DEBUG
+			std::cout << "mpp::RepParser::consume: in header_name case" << std::endl;
+			#endif
+
 			if (std::isalpha(static_cast<unsigned char>(input)) || input == '-') // Headers may only contain alphabetic characters and dashes
 			{
+				#ifdef DEBUG
+				std::cout << "mpp::RepParser::consume: current character '" << input << "' is an alphabetic character or a dash" << std::endl;
+				#endif
 				(*pHeaderNameSS) << input; // Store it
+				toReturn = boost::indeterminate; // Keep parsing
 			}
 
 			else if (input == ':') // Terminator
@@ -475,6 +483,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 				#ifdef DEBUG
 				std::cout << "mpp::RepParser::consume: going to state " << stateNames[curStat] << std::endl;
 				#endif
+				toReturn = boost::indeterminate; // Keep parsing
 			}
 
 			else // Invalid character
@@ -500,6 +509,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 				#ifdef DEBUG
 				std::cout << "mpp::RepParser::consume: space_after_colon: going to state " << stateNames[curStat] << std::endl;
 				#endif
+				toReturn = boost::indeterminate; // Keep parsing
 			}
 
 			else // Error
@@ -516,6 +526,7 @@ boost::tribool mpp::RepParser::consume(mpp::Reply& rep, char input)
 		case header_val:
 		{
 			(*pHeaderValSS) << input; // Save it
+			toReturn = boost::indeterminate; // Indicate that we might read more
 			/*
 			* Since Client uses read_until, we have no way of knowing when the header's value ends.
 			* Thus, the Client MUST call storeHeader() after each header. It knows that it has read a complete header line,
