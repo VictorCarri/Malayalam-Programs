@@ -670,33 +670,47 @@ void Client::readHeader()
 				#ifdef DEBUG
 				std::cout << "Client::readHeader::lambda: successfully read " << bytesTrans << " bytes of data" << std::endl;
 				#endif
+
+				if (data == "\r\n") // No more headers, only content
+				{
+					std::cout << "Found \r\n while parsing headers, checking whether there's any content" << std::endl;
+				}
+
+				else
+				{
+		
+					/* Parse the header line */
+					boost::tribool parseRes;
+					#ifdef DEBUG
+					std::cout << "Client::readHeader::lambda: data to parse: " << data << std::endl;
+					#endif
+					boost::tie(parseRes, boost::tuples::ignore) = repParser.parse(rep, data.cbegin(), data.cend()); // Parse the data in the buffer, but only up to the number of bytes transferred
 	
-				/* Parse the status line */
-				boost::tribool parseRes;
-				#ifdef DEBUG
-				std::cout << "Client::readHeader::lambda: data to parse: " << data << std::endl;
-				#endif
-				boost::tie(parseRes, boost::tuples::ignore) = repParser.parse(rep, data.cbegin(), data.cend()); // Parse the data in the buffer, but only up to the number of bytes transferred
-
-				if (parseRes) // Successfully parsed an entire reply - possible
-				{
-					#ifdef DEBUG
-					std::cout << "Client::readHeader: successfully parsed an entire reply." << std::endl;
-					#endif
-				}
-
-				else if (!parseRes) // Malformed reply - possible
-				{
-					#ifdef DEBUG
-					std::cout << "Client::readHeader: the reply is malformed." << std::endl;
-					#endif
-				}
-
-				else // More data needed - possible
-				{
-					#ifdef DEBUG
-					std::cout << "Client:: readHeader: need more data to finish parsing the reply." << std::endl;
-					#endif
+					if (parseRes) // Successfully parsed an entire reply - possible
+					{
+						#ifdef DEBUG
+						std::cout << "Client::readHeader: successfully parsed an entire reply." << std::endl;
+						#endif
+						repParser.storeHeader(rep); // Store the header in the reply
+						repBuf.consume(bytesTrans); // Consume the data we read so that we won't get stuck in a loop reading it forever
+					}
+	
+					else if (!parseRes) // Malformed reply - possible
+					{
+						#ifdef DEBUG
+						std::cout << "Client::readHeader: the reply is malformed." << std::endl;
+						#endif
+					}
+	
+					else // More data needed - possible
+					{
+						#ifdef DEBUG
+						std::cout << "Client:: readHeader: need more data to finish parsing the reply." << std::endl;
+						#endif
+						repParser.storeHeader(rep); // Store the header in the reply
+						repBuf.consume(bytesTrans); // Consume the data we read so that we won't get stuck in a loop reading it forever
+						readHeader(); // Try to read another header. If we see an empty line, we know that there's nothing more to read but content
+					}
 				}
 			}
 
