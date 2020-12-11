@@ -4,8 +4,9 @@
 /* STL */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
-#include <utility> // std::exchange, std::move, std::swap
+#include <utility> // std::exchange, std::move, std::swap, std::pair
 #include <stdexcept> // std::out_of_range
+#include <algorithm> // std::find_if
 #ifdef DEBUG
 #include <iostream> // std::cout
 #include <iomanip> // std::quoted
@@ -73,7 +74,6 @@ void mpp::Reply::setStatus(mpp::Reply::Status s)
 **/
 std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 {
-	/* TODO: Push all buffer contents to contents vector before pushing any buffers to the buffers vector */
 	repBufs.clear();
 	repBufConts.clear();
 	#ifdef DEBUG
@@ -406,3 +406,19 @@ void mpp::Reply::printRepBufConts()
 	}
 }
 #endif
+
+/**
+* @desc Determines whether this Reply has a header with the given name.
+* @param name The name of the header to check for.
+* @return True if this reply contains a header with the given name, false otherwise.
+**/
+bool mpp::Reply::hasHeader(std::string name)
+{
+	auto endIt = headers.cend(); // To check if find_if found anything
+	auto res = std::find_if(headers.cbegin(), headers.cend(), [&name](mpp::Header h) -> bool
+		{
+			return h.getName() == name;
+		}
+	);
+	return res != endIt; // find_if will return something other than the end iterator if it found a header with the given name
+}

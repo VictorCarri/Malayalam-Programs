@@ -41,6 +41,7 @@
 /* MPP library */
 #include "mpp/Request.hpp" // mpp::Request
 #include "mpp/RepParser.hpp" // mpp::RepParser::State
+#include "mpp/Reply.gpp" // mpp::Reply, mpp::Reply::Status
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
@@ -673,7 +674,18 @@ void Client::readHeader()
 
 				if (data == "\r\n") // No more headers, only content
 				{
-					std::cout << "Found \r\n while parsing headers, checking whether there's any content" << std::endl;
+					std::cout << "Found '\\r\\n' while parsing headers, checking whether the reply has any content." << std::endl;
+					mpp::Reply::Status repStat = rep.getStatus();
+
+					if (repStat != mpp::Reply::pluralForm && repStat != mpp::Reply::singularForm) // The reply shouldn't have any content
+					{
+						// TODO: Print appropriate text based on server's response
+					}
+
+					else // The reply should contain the opposite form of what the user requested
+					{
+						// Todo: print the opposite form and whether it's singular or plural
+					}
 				}
 
 				else

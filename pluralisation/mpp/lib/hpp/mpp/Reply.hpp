@@ -125,6 +125,13 @@ namespace mpp
 			* @desc Clears this Reply object's list of headers.
 			**/
 			void clearHeaders();
+
+			/**
+			* @desc Determines whether this Reply has a header with the given name.
+			* @param name The name of the header to check for.
+			* @return True if this reply contains a header with the given name, false otherwise.
+			**/
+			bool hasHeader(std::string name);
 	
 		private:
 			#ifdef DEBUG
