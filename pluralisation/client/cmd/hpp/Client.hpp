@@ -138,6 +138,16 @@ class Client
 		**/
 		void readHeader();
 
+		/**
+		* @desc Handles a reply with no content (the majority of them).
+		**/
+		void handleNoContentReply();
+
+		/**
+		* @desc Prints the reply to a FOF query.
+		**/
+		void printOppositeForm();
+
 		/*** Properties ***/
 
 		bool active; // Whether or not we're active

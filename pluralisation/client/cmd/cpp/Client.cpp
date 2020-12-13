@@ -41,7 +41,7 @@
 /* MPP library */
 #include "mpp/Request.hpp" // mpp::Request
 #include "mpp/RepParser.hpp" // mpp::RepParser::State
-#include "mpp/Reply.gpp" // mpp::Reply, mpp::Reply::Status
+#include "mpp/Reply.hpp" // mpp::Reply, mpp::Reply::Status
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
@@ -679,12 +679,12 @@ void Client::readHeader()
 
 					if (repStat != mpp::Reply::pluralForm && repStat != mpp::Reply::singularForm) // The reply shouldn't have any content
 					{
-						// TODO: Print appropriate text based on server's response
+						handleNoContentReply();
 					}
 
 					else // The reply should contain the opposite form of what the user requested
 					{
-						// Todo: print the opposite form and whether it's singular or plural
+						printOppositeForm();
 					}
 				}
 
@@ -738,5 +738,39 @@ void Client::readHeader()
 
 	#ifdef DEBUG
 	std::cout << "Client::readHeader ending" << std::endl;
+	#endif
+}
+
+/**
+* @desc Handles a reply with no content (the majority of them).
+**/
+void Client::handleNoContentReply()
+{
+	#ifdef DEBUG
+	std::cout << "Client::handleNoContentReply running" << std::endl;
+	#endif
+
+	switch (rep.getStatus())
+	{
+		case mpp::Reply::singular: // Positive reply to an ISSING query
+		{
+			std::cout << "The noun " << std::quoted(input) << " is singular" << std::endl;
+			break;
+		}
+
+		default:
+		{
+			std::cout << "Unknown status with no content" << std::endl;
+		}
+	}
+}
+
+/**
+* @desc Prints the reply to a FOF query.
+**/
+void Client::printOppositeForm()
+{
+	#ifdef DEBUG
+	std::cout << "Client::printOppositeForm running" << std::endl;
 	#endif
 }
