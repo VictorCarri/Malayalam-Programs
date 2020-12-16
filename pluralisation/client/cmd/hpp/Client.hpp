@@ -172,7 +172,7 @@ class Client
 
 		/* Version #s */
 		int major = 1;
-		int minor = 9; // Asking the user for a noun, reading input, checking for exit, signal handling, validating UTF-8, validating that input is Malayalam text, sending the iSSING request, parsing the ISSING reply's status, parsing the ISSING reply's headers
+		int minor = 10; // Asking the user for a noun, reading input, checking for exit, signal handling, validating UTF-8, validating that input is Malayalam text, sending the iSSING request, parsing the ISSING reply's status, parsing the ISSING reply's headers, detecting the end of the headers & calling the ISSING callback
 		int patch = 5;
 };
 

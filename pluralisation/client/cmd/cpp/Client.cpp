@@ -19,6 +19,7 @@
 #include <string_view> // std::string_view
 #include <iomanip> // std::quoted
 #include <vector> // std::vector
+#include <functional> // std::function
 
 /* Boost */
 #include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver
@@ -328,6 +329,8 @@ bool Client::isInputValidMalayalam() const
 void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
 {
 	isCB = issingCallback; // Save the callback for later
+
+	#ifdef DEBUG
 	int eNo = 1; // Endpoint #
 
 	for (boost::asio::ip::tcp::endpoint endpoint : resolveResults)
@@ -339,6 +342,7 @@ void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
 		<< "\tSize: " << endpoint.size() << std::endl;
 		++eNo;
 	}
+	#endif
 
 	boost::asio::async_connect(sock, resolveResults, [this](const boost::system::error_code& acErr, const boost::asio::ip::tcp::endpoint& ep)
 		{
@@ -677,20 +681,29 @@ void Client::readHeader()
 					std::cout << "Found '\\r\\n' while parsing headers, checking whether the reply has any content." << std::endl;
 					mpp::Reply::Status repStat = rep.getStatus();
 
-					if (repStat != mpp::Reply::pluralForm && repStat != mpp::Reply::singularForm) // The reply shouldn't have any content
+					switch (repStat)
 					{
-						handleNoContentReply();
-					}
+						case mpp::Reply::singular:
+						{
+							isCB(true, input);
+							break;
+						}
 
-					else // The reply should contain the opposite form of what the user requested
-					{
-						printOppositeForm();
+						case mpp::Reply::plural:
+						{
+							isCB(false, input);
+							break;
+						}
+			
+						default:
+						{
+							std::cout << "Unknown reply status " << repStat << std::endl;
+						}
 					}
 				}
 
 				else
 				{
-		
 					/* Parse the header line */
 					boost::tribool parseRes;
 					#ifdef DEBUG

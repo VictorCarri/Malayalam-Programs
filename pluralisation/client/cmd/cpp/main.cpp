@@ -54,7 +54,7 @@ int main()
 					std::cout << "Determining whether or not the current noun is singular..." << std::endl;
 					c.isSingular([](bool isSing, std::string noun)
 						{
-							std::cout << "The noun " << std::quoted(noun) << " is " << (isSing ? "singular" : "plural") << std::endl;
+							std::cout << "main: isSingular lambda: The noun " << std::quoted(noun) << " is " << (isSing ? "singular" : "plural") << std::endl;
 						}
 					); // Have the client query the server, and call our lambda when it finishes
 				}
