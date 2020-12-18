@@ -128,6 +128,7 @@ void mpp::ReqParser::reset()
 
 	pSSHeaderVal.reset(new std::stringstream); // Reset the header stringstream
 	pNounSS.reset(new std::stringstream); // Reset the noun's stringstream
+	mNBytes = 0; // Reset expected # of bytes in noun
 }
 
 /**
@@ -1024,6 +1025,13 @@ boost::tribool mpp::ReqParser::consume(mpp::Request& req, char input)
 
 				#ifdef DEBUG
 				std::cout << "ReqParser::consume: noun: too much data!" << std::endl;
+				#endif
+			}
+
+			else // No data to read
+			{
+				#ifdef DEBUG
+				std::cout << "mpp::ReqParser::consume: no data to read." << std::endl;
 				#endif
 			}
 

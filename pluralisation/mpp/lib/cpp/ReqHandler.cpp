@@ -556,7 +556,7 @@ std::vector<std::string> mpp::ReqHandler::findPlural(std::string noun)
 		#ifdef DEBUG
 		std::cout << "mpp::ReqHandler::findPlural: the noun " << std::quoted(noun) << " has an exceptional plural" << std::endl;
 		#endif
-		exceptionStmt->set_string(0, noun); // Load the noun into the string
+		exceptionStmt->set_string(0, noun); // Load the noun into the statement
 
 		try
 		{
@@ -944,9 +944,10 @@ bool mpp::ReqHandler::isVowelStem(std::string noun)
 	ARRAY_CLASS<boost::smatch, 2> what;
 	bool doesntEndInChillu = boost::u32regex_match(noun, what.at(what.size()-1), boost::make_u32regex(".*[^\\x{d7a}-\\x{d7f}]$"));
 	bool doesntEndInSchwa = boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*[^\\x{d4d}]$"));
-	bool isIva = (noun == u8"\u0d07\u0d35"); // iva is a special case - it's a vowel stme, but it's plural
+	bool isIva = (noun == u8"\u0d07\u0d35"); // iva is a special case - it's a vowel stem, but it's plural
 	bool isAva = (noun == u8"\u0d05\u0d35"); // ava is also a special case, for the same reason as iva
-	return doesntEndInChillu && doesntEndInSchwa && !(isIva || isAva); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa AND must NOT be (iva OR ava)
+	//return doesntEndInChillu && doesntEndInSchwa && !(isIva || isAva); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa AND must NOT be (iva OR ava)
+	return doesntEndInChillu && doesntEndInSchwa && !isIva && !isAva; // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa AND must NOT be (iva OR ava)
 }
 
 /**
