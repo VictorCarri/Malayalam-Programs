@@ -107,7 +107,6 @@ class Client
 		/**
 		* @desc Determines whether or not the current noun is singular by sending a request to the server.
 		* @param issingCallback A callback that will be called once the entire chain of asynchronous operations finishes.
-		* @return True if the noun is singular, false otherwise.
 		**/
 		void isSingular(std::function<void(bool, std::string)> issingCallback);
 

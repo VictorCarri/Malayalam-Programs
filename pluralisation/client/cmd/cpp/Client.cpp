@@ -753,37 +753,3 @@ void Client::readHeader()
 	std::cout << "Client::readHeader ending" << std::endl;
 	#endif
 }
-
-/**
-* @desc Handles a reply with no content (the majority of them).
-**/
-void Client::handleNoContentReply()
-{
-	#ifdef DEBUG
-	std::cout << "Client::handleNoContentReply running" << std::endl;
-	#endif
-
-	switch (rep.getStatus())
-	{
-		case mpp::Reply::singular: // Positive reply to an ISSING query
-		{
-			std::cout << "The noun " << std::quoted(input) << " is singular" << std::endl;
-			break;
-		}
-
-		default:
-		{
-			std::cout << "Unknown status with no content" << std::endl;
-		}
-	}
-}
-
-/**
-* @desc Prints the reply to a FOF query.
-**/
-void Client::printOppositeForm()
-{
-	#ifdef DEBUG
-	std::cout << "Client::printOppositeForm running" << std::endl;
-	#endif
-}
