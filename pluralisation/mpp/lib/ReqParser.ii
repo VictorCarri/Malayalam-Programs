@@ -83203,13 +83203,34 @@ namespace mpp
 
    void clearHeaders();
 
+
+
+
+
+
+   bool hasHeader(std::string name);
+
   private:
+
+
+
+
+   void printRepBufs();
+
+
+
+
+   void printRepBufConts();
+
+
    Status stat;
    std::forward_list<mpp::Header> headers;
    std::map<Status, std::string> statText;
    std::string content;
    const std::array<char, 2> crlf;
    const std::array<char, 2> nameValSep;
+   std::forward_list<std::string> repBufConts;
+   std::vector<boost::asio::const_buffer> repBufs;
 
 
 
@@ -85836,6 +85857,7 @@ void mpp::ReqParser::reset()
 
  pSSHeaderVal.reset(new std::stringstream);
  pNounSS.reset(new std::stringstream);
+ mNBytes = 0;
 }
 
 
@@ -86732,6 +86754,13 @@ boost::tribool mpp::ReqParser::consume(mpp::Request& req, char input)
 
 
     std::cout << "ReqParser::consume: noun: too much data!" << std::endl;
+
+   }
+
+   else
+   {
+
+    std::cout << "mpp::ReqParser::consume: no data to read." << std::endl;
 
    }
 

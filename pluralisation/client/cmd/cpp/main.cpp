@@ -5,9 +5,13 @@
 
 /* Our headers */
 #include "Client.hpp" // Client class def'n
+//#include "callbacks/IsSingular.hpp" // Callback for ISSING requests
 
 int main()
 {
+	/* Setup callbacks */
+	//callbacks::IsSingular isCB;
+
 	/* Client setup */
 	#ifdef DEBUG
 	std::cout << "main: constructing Client" << std::endl;
@@ -15,6 +19,9 @@ int main()
 	Client c; // The class that encapsulates our client
 	#ifdef DEBUG
 	std::cout << "main: constructed Client" << std::endl
+
+
+	
 	<< "main: starting client" << std::endl;
 	#endif
 	c.start(); // Tell the client that we're ready to start using it

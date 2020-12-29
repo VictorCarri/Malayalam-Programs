@@ -40,9 +40,10 @@
 #include "vuu/CodepointsInRange.hpp" // vuu::CodepointsInRange, to determine whether all code-points in the list are in the valid range for Malayalam
 
 /* MPP library */
-#include "mpp/Request.hpp" // mpp::Request
+#include "mpp/Request.hpp" // mpp::Request, mpp::Request::Command
 #include "mpp/RepParser.hpp" // mpp::RepParser::State
 #include "mpp/Reply.hpp" // mpp::Reply, mpp::Reply::Status
+#include "mpp/ver.hpp" // MPP version info
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
@@ -694,7 +695,44 @@ void Client::readHeader()
 							isCB(false, input);
 							break;
 						}
-			
+
+						case mpp::Reply::badReq:
+						{
+							std::cerr << "The request was malformed." << std::endl;
+							break;
+						}
+				
+						case mpp::Reply::badMajor:
+						{
+							std::cerr << "The server didn't recognize the major version #" << mpp::VER_MAJOR << std::endl;
+							break;
+						}
+				
+						case mpp::Reply::badMinor:
+						{
+							std::cerr << "The server didn't recognize the minor version #" << mpp::VER_MINOR << std::endl;
+							break;
+						}
+				
+						case mpp::Reply::badPatch:
+						{
+							std::cerr << "The server didn't recognize the patch version #" << mpp::VER_PATCH << std::endl;
+							break;
+						}
+
+						case mpp::Reply::unknownVerb:
+						{
+							mpp::Request::Command c = curReq.GETCOM_FUNC(); // Fetch the current command
+							std::cerr << "The server didn't recognize the verb " << std::quoted(param) << std::endl;
+							break;
+						}
+				
+						case mpp::Reply::invUTF8:
+						{
+							std::cerr << "The input string " << std::quoted(param) << " isn't fully valid UTF-8" << std::endl;
+							break;
+						}
+							
 						default:
 						{
 							std::cout << "Unknown reply status " << repStat << std::endl;
