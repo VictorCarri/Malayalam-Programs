@@ -679,65 +679,8 @@ void Client::readHeader()
 
 				if (data == "\r\n") // No more headers, only content
 				{
-					std::cout << "Found '\\r\\n' while parsing headers, checking whether the reply has any content." << std::endl;
-					mpp::Reply::Status repStat = rep.getStatus();
-
-					switch (repStat)
-					{
-						case mpp::Reply::singular:
-						{
-							isCB(true, input);
-							break;
-						}
-
-						case mpp::Reply::plural:
-						{
-							isCB(false, input);
-							break;
-						}
-
-						case mpp::Reply::badReq:
-						{
-							std::cerr << "The request was malformed." << std::endl;
-							break;
-						}
-				
-						case mpp::Reply::badMajor:
-						{
-							std::cerr << "The server didn't recognize the major version #" << mpp::VER_MAJOR << std::endl;
-							break;
-						}
-				
-						case mpp::Reply::badMinor:
-						{
-							std::cerr << "The server didn't recognize the minor version #" << mpp::VER_MINOR << std::endl;
-							break;
-						}
-				
-						case mpp::Reply::badPatch:
-						{
-							std::cerr << "The server didn't recognize the patch version #" << mpp::VER_PATCH << std::endl;
-							break;
-						}
-
-						case mpp::Reply::unknownVerb:
-						{
-							mpp::Request::Command c = curReq.GETCOM_FUNC(); // Fetch the current command
-							std::cerr << "The server didn't recognize the verb " << std::quoted(param) << std::endl;
-							break;
-						}
-				
-						case mpp::Reply::invUTF8:
-						{
-							std::cerr << "The input string " << std::quoted(param) << " isn't fully valid UTF-8" << std::endl;
-							break;
-						}
-							
-						default:
-						{
-							std::cout << "Unknown reply status " << repStat << std::endl;
-						}
-					}
+					std::cout << "Client::readHeader: found '\\r\\n' while parsing headers, handling reply." << std::endl;
+					handleReply();
 				}
 
 				else
@@ -790,4 +733,92 @@ void Client::readHeader()
 	#ifdef DEBUG
 	std::cout << "Client::readHeader ending" << std::endl;
 	#endif
+}
+
+/**
+* Handles the reply from the server.
+**/
+void Client::handleReply()
+{
+	mpp::Reply::Status repStat = rep.getStatus();
+
+	switch (repStat)
+	{
+		/* Reply to an ISSING request */
+		case mpp::Reply::singular:
+		{
+			isCB(true, input);
+			break;
+		}
+
+		case mpp::Reply::plural:
+		{
+			isCB(false, input);
+			break;
+		}
+
+		/* Handle client errors */
+		case mpp::Reply::badReq:
+		{
+			std::cerr << "The request was malformed." << std::endl;
+			break;
+		}
+
+		case mpp::Reply::badMajor:
+		{
+			std::cerr << "The server didn't recognize the major version #" << mpp::VER_MAJOR << std::endl;
+			break;
+		}
+
+		case mpp::Reply::badMinor:
+		{
+			std::cerr << "The server didn't recognize the minor version #" << mpp::VER_MINOR << std::endl;
+			break;
+		}
+
+		case mpp::Reply::badPatch:
+		{
+			std::cerr << "The server didn't recognize the patch version #" << mpp::VER_PATCH << std::endl;
+			break;
+		}
+
+		case mpp::Reply::unknownVerb:
+		{
+			mpp::Request::Command c = curReq.GETCOM_FUNC(); // Fetch the current command
+			
+			switch (c)
+			{
+				case mpp::Request::ISSING:
+				{
+					std::cerr << "The server claims not to understand an ISSING request." << std::endl;
+					break;
+				}
+
+				case mpp::Request::FOF:
+				{
+					std::cerr << "The server claims not to understand a FOF request." << std::endl;
+					break;
+				}
+
+				case mpp::Request::INVALID:
+				{
+					std::cerr << "The client tried to send an invalid request to the server." << std::endl;
+					break;
+				}
+			}
+	
+			break;
+		}
+
+		case mpp::Reply::invUTF8:
+		{
+			std::cerr << "The input string " << std::quoted(input) << " isn't fully valid UTF-8" << std::endl;
+			break;
+		}
+			
+		default:
+		{
+			std::cout << "Unknown reply status " << repStat << std::endl;
+		}
+	}
 }
