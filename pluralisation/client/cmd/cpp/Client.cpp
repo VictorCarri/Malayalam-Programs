@@ -327,7 +327,7 @@ bool Client::isInputValidMalayalam() const
 * @param issingCallback A callback that will be called once the entire chain of asynchronous operations finishes.
 * @return True if the noun is singular, false otherwise.
 **/
-void Client::isSingular(std::function<void(bool, std::string)> issingCallback)
+void Client::isSingular(std::function<void(bool, std::string, Client* c)> issingCallback)
 {
 	isCB = issingCallback; // Save the callback for later
 
@@ -747,13 +747,13 @@ void Client::handleReply()
 		/* Reply to an ISSING request */
 		case mpp::Reply::singular:
 		{
-			isCB(true, input);
+			isCB(true, input, this);
 			break;
 		}
 
 		case mpp::Reply::plural:
 		{
-			isCB(false, input);
+			isCB(false, input, this);
 			break;
 		}
 

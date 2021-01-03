@@ -59,7 +59,7 @@ int main()
 				if (c.isInputValidMalayalam()) // All of the Unicode code-points are in the Malayalam range
 				{
 					std::cout << "Determining whether or not the current noun is singular..." << std::endl;
-					c.isSingular([](bool isSing, std::string noun)
+					c.isSingular([](bool isSing, std::string noun, Client* c)
 						{
 							std::cout << "main: isSingular lambda: The noun " << std::quoted(noun) << " is " << (isSing ? "singular" : "plural") << std::endl;
 						}
