@@ -108,7 +108,7 @@ class Client
 		* @desc Determines whether or not the current noun is singular by sending a request to the server.
 		* @param issingCallback A callback that will be called once the entire chain of asynchronous operations finishes.
 		**/
-		void isSingular(std::function<void(bool, std::string, Client*)> issingCallback);
+		void isSingular(std::function<void(bool, std::string)> issingCallback);
 
 	private:
 		/*** Methods ***/
@@ -153,7 +153,7 @@ class Client
 		std::unique_ptr<THREAD_CLASS> workerThread; // The thread which keeps our I/O context running
 		std::map<int, std::string> sigMsgs; // Stores messages to be printed upon catching a particular signal
 		typename boost::asio::ip::tcp::resolver::results_type resolveResults; // Stores the results of the async_resolve operation
-		std::function< void (bool, std::string, Client* )> isCB; // The callback that will be called once the sequence of operations involved in isSingular is complete.
+		std::function< void (bool, std::string)> isCB; // The callback that will be called once the sequence of operations involved in isSingular is complete.
 		std::vector<boost::asio::const_buffer> reqBufs; // Holds the request buffers so that they won't be destroyed when a method ends and the vector goes out of scope.
 		mpp::Request curReq; // The current request
 		boost::asio::streambuf repBuf; // Holds the reply data to be parsed

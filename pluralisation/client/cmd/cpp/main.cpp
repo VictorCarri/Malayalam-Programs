@@ -59,9 +59,15 @@ int main()
 				if (c.isInputValidMalayalam()) // All of the Unicode code-points are in the Malayalam range
 				{
 					std::cout << "Determining whether or not the current noun is singular..." << std::endl;
-					c.isSingular([](bool isSing, std::string noun, Client* c)
+					c.isSingular([&c](bool isSing, std::string noun)
 						{
 							std::cout << "main: isSingular lambda: The noun " << std::quoted(noun) << " is " << (isSing ? "singular" : "plural") << std::endl;
+							/*c.findOppositeForm(
+								[isSing, noun](std::string oppForm)
+								{
+									std::cout << "main: isSingular lambda: the " << (isSing ? "plural" : "singular") << " form of the noun " << std::quoted(noun) << " is " << oppForm << std::endl;
+								}
+							);*/
 						}
 					); // Have the client query the server, and call our lambda when it finishes
 				}
