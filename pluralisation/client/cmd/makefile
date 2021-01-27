@@ -36,7 +36,7 @@ compOpts=$(incDirs) $(addprefix -O,3 s) -std=$(std) $(warnOpts) $(boostOrStd) -p
 cppDir=./cpp
 
 # Compiler to use
-compiler=g++-9
+compiler=g++-10
 
 # Directory where object files are stored
 objDir=./obj
@@ -78,7 +78,7 @@ mariadbLibs=$(shell mariadb_config --libs) $(shell mariadb_config --libs_sys)
 # boost_thread-mt-d-x64 - Boost.Thread
 # commonLibs - Needed by all builds
 # mariadbLibs - MariaDB libraries. Kept outside "-l" prefixing function because they're already prefixed
-dbgLibs=$(addprefix -l,$(addsuffix -debug,mpp vuu) $(addprefix boost_,$(addsuffix -mt-d-x64,thread program_options filesystem locale regex)) $(commonLibs)) $(mariadbLibs)
+dbgLibs=$(addprefix -l,$(addsuffix -debug,mpp vuu) $(addprefix boost_,$(addsuffix -gcc10-mt-d-x64-1_75,thread program_options filesystem locale regex)) $(commonLibs)) $(mariadbLibs)
 
 # Libraries for the production builds
 # vuu - Production build of my Unicode utilities
@@ -90,7 +90,7 @@ dbgLibs=$(addprefix -l,$(addsuffix -debug,mpp vuu) $(addprefix boost_,$(addsuffi
 # boost_thread-mt-x64 - Boost.Thread
 # commonLibs - Needed by all builds
 # mariadbLibs - MariaDB libraries. Kept outside "-l" prefixing function because they're already prefixed
-prodLibs=$(addprefix -l,mpp vuu $(addprefix boost_,$(addsuffix -mt-x64,thread program_options filesystem locale regex)) $(commonLibs)) $(mariadbLibs)
+prodLibs=$(addprefix -l,mpp vuu $(addprefix boost_,$(addsuffix -gcc10-mt-x64-1_75,thread program_options filesystem locale regex)) $(commonLibs)) $(mariadbLibs)
 
 # Additional directories to search for libraries
 # /home/victor/lib/vuu - my Unicode utilities library

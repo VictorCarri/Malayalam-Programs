@@ -1,7 +1,7 @@
 exeName=mpp-server
 cppDir=./cpp
 files=IoContextPool Connection Server main
-compiler=g++-9
+compiler=g++-10
 objDir=./obj
 dbgStatObjs=$(addprefix $(objDir)/debug/static/,$(addsuffix .o,$(files)))
 dbgDynObjs=$(addprefix $(objDir)/debug/dynamic/,$(addsuffix .o,$(files)))
@@ -16,10 +16,10 @@ commonLibs=pthread mariadbclientpp
 mariadbLibs=$(shell mariadb_config --libs) $(shell mariadb_config --libs_sys)
 
 # Libraries that are specific to the debug build
-dbgLibs=$(addprefix -l,mpp-debug vuu-debug $(addprefix boost_,$(addsuffix -mt-d-x64,filesystem program_options thread locale regex)) $(commonLibs)) $(mariadbLibs)
+dbgLibs=$(addprefix -l,mpp-debug vuu-debug $(addprefix boost_,$(addsuffix -gcc10-mt-d-x64-1_75,filesystem program_options thread locale regex)) $(commonLibs)) $(mariadbLibs)
 
 # Libraries that are specific to the production build
-prodLibs=$(addprefix -l,mpp vuu $(addprefix boost_,$(addsuffix -mt-x64,filesystem program_options thread locale regex)) $(commonLibs)) $(mariadbLibs)
+prodLibs=$(addprefix -l,mpp vuu $(addprefix boost_,$(addsuffix -gcc10-mt-x64-1_75,filesystem program_options thread locale regex)) $(commonLibs)) $(mariadbLibs)
 
 # Debug build options
 dbgOpts=-DDEBUG $(addprefix -g,gdb3 gnu-pubnames variable-location-views inline-points) -Og -fvar-tracking-assignments -save-temps

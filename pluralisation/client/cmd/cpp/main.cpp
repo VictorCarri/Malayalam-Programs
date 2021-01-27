@@ -5,7 +5,6 @@
 
 /* Our headers */
 #include "Client.hpp" // Client class def'n
-//#include "callbacks/IsSingular.hpp" // Callback for ISSING requests
 
 int main()
 {
@@ -62,12 +61,12 @@ int main()
 					c.isSingular([&c](bool isSing, std::string noun)
 						{
 							std::cout << "main: isSingular lambda: The noun " << std::quoted(noun) << " is " << (isSing ? "singular" : "plural") << std::endl;
-							/*c.findOppositeForm(
-								[isSing, noun](std::string oppForm)
+							c.findOppositeForm(
+								[isSing, &noun](std::string oppForm)
 								{
-									std::cout << "main: isSingular lambda: the " << (isSing ? "plural" : "singular") << " form of the noun " << std::quoted(noun) << " is " << oppForm << std::endl;
+									std::cout << "main: findOppositeForm lambda: the " << (isSing ? "plural" : "singular") << " form of the noun " << std::quoted(noun) << " is " << oppForm << std::endl;
 								}
-							);*/
+							);
 						}
 					); // Have the client query the server, and call our lambda when it finishes
 				}

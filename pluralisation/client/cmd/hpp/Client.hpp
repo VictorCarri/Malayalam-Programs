@@ -110,6 +110,12 @@ class Client
 		**/
 		void isSingular(std::function<void(bool, std::string)> issingCallback);
 
+		/**
+		* @desc Finds the opposite form of a given noun.
+		* @param fofCallback A callback that will be called once the chain of asynchronous operations involved in a FOF request finishes successfully.
+		**/
+		void findOppositeForm(std::function<void(std::string)> fofCallback);
+
 	private:
 		/*** Methods ***/
 
@@ -142,6 +148,16 @@ class Client
 		**/
 		void handleReply();
 
+		/**
+		* @desc Sends the FOF request to the server after findOppositeForm establishes a connection.
+		**/
+		void sendFofReq();
+
+		/**
+		* @desc Resets our socket. Called at the end of each request and on destruction.
+		**/
+		void resetSocket();
+
 		/*** Properties ***/
 
 		bool active; // Whether or not we're active
@@ -160,6 +176,8 @@ class Client
 		mpp::RepParser repParser; // Parses a reply from the buffer
 		mpp::Reply rep; // The server's reply
 		std::unique_ptr<THREAD_CLASS> signalThread; // Used to handle signals, separately from the async. ops. thread
+		std::function<void(std::string)> fofCB; // The callback that will be called once the chain of async. ops. involved in a FOF request finishes.
+		const std::string contentType; // Holds the content-type for all our text (text/plain;charset=utf-8)
 		#ifdef DEBUG
 		std::ios_base::fmtflags initFlags; // The initial flags of std::cout. We save them in the constructor, and restore them in the destructor.
 		#endif

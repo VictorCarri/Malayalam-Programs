@@ -82,7 +82,8 @@ sigMsgs { // Construct the map of signal values to strings
 	{SIGTERM, "SIGTERM"},
 	{SIGTSTP, "SIGTSTP"},
 	{SIGSEGV, "SIGSEGV"}
-}
+},
+contentType("text/plain;charset=utf-8")
 #ifdef DEBUG
 , initFlags(std::clog.flags()) // Save original clog flags
 #endif
@@ -417,8 +418,7 @@ Client::~Client()
 }
 
 /**
-* @desc A callback that handles a successful connection to the server.
-*	As its name implies, it sends the ISSING request to the server.
+* @desc A callback that handles a successful connection to the server for an ISSING request by sending that request.
 **/
 void Client::sendSingReq()
 {
@@ -427,19 +427,19 @@ void Client::sendSingReq()
 	#endif
 
 	/* Build the request */
-	curReq.SETCOM_FUNC(mpp::Request::ISSING); // Make it an ISSING curRequest
-	curReq.setNoun(input); // The noun to send is our input
+	curReq.SETCOM_FUNC(mpp::Request::ISSING); // Use whatever command we were given
 	curReq.clearHeaders(); // Clear any headers that were set for the last request
-	curReq.addHeader("Content-Type", std::string("text/plain;charset=utf-8")); // The noun is a plaintext UTF-8 string
+	curReq.addHeader("Content-Type", contentType); // The noun is a plaintext UTF-8 string
 	curReq.addHeader("Content-Length", input.length()); // The server's parser needs to know how long the string is to read it over the network
+	curReq.setNoun(input); // The noun to send is our input
 	#ifdef DEBUG
-	std::cout << "Client::sendSingReq: curRequest to send is " << std::endl
+	std::cout << "Client::sendReq: curRequest to send is " << std::endl
 	<< curReq;
 	#endif
 	reqBufs = curReq.toBuffers(); // Store the buffers in a member variable so that they won't go out of scope before the asynchronous write completes
 
 	#ifdef DEBUG
-	std::cout << "Client::sendSingReq: buffers are: " << std::endl;
+	std::cout << "Client::sendReq: buffers are: " << std::endl;
 
 	/* Print the buffers' contents, just in case */
 	for (boost::asio::const_buffer buf : reqBufs)
@@ -477,6 +477,8 @@ void Client::sendSingReq()
 					#ifdef DEBUG
 					std::cout << "Client::sendSingReq::lambda: calling readSingRepStatus" << std::endl;
 					#endif
+
+					/* We pass the command because each type of request elicits different possible responses */
 					readSingRepStatus();
 				}
 			}
@@ -740,6 +742,8 @@ void Client::readHeader()
 **/
 void Client::handleReply()
 {
+	resetSocket(); // For the next chain of sends/receives
+
 	mpp::Reply::Status repStat = rep.getStatus();
 
 	switch (repStat)
@@ -820,5 +824,150 @@ void Client::handleReply()
 		{
 			std::cout << "Unknown reply status " << repStat << std::endl;
 		}
+	}
+}
+
+/**
+* @desc Finds the opposite form of a given noun.
+* @param fofCallback A callback that will be called once the chain of asynchronous operations involved in a FOF request finishes successfully.
+**/
+void Client::findOppositeForm(std::function<void(std::string)> fofCallback)
+{
+	fofCB = fofCallback; // Save the callback for later
+
+	#ifdef DEBUG
+	int eNo = 1; // Endpoint #
+
+	for (boost::asio::ip::tcp::endpoint endpoint : resolveResults)
+	{
+		std::clog << "Client::findOppositeForm: details on endpoint #" << eNo << std::endl
+		<< "\tAddress: " << endpoint.address().to_string() << std::endl
+		<< "\tCapacity: " << endpoint.capacity() << std::endl
+		<< "\tPort: " << endpoint.port() << std::endl
+		<< "\tSize: " << endpoint.size() << std::endl;
+		++eNo;
+	}
+	#endif
+
+	boost::asio::async_connect(sock, resolveResults, [this](const boost::system::error_code& acErr, const boost::asio::ip::tcp::endpoint& ep)
+		{
+			if (!acErr) // No error
+			{
+				#ifdef DEBUG
+				std::cout << "Client::findOppositeForm::lambda async_connect succeeded." << std::endl
+				<< "\tEndpoint address: " << ep.address().to_string() << std::endl
+				<< "\tEndpoint capacity: " << ep.capacity() << std::endl
+				<< "\tEndpoint port: " << ep.port() << std::endl
+				<< "\tEndpoint size: " << ep.size() << std::endl;
+				#endif
+				sendFofReq(); // Send the FOF request to the server
+			}
+
+			else // Error occurred
+			{
+				std::cerr << "Client::findOppositeForm::async_connect lambda: a system error occurred" << std::endl
+				<< "\tValue = " << acErr.value() << std::endl
+				<< "\tMessage = " << std::quoted(acErr.message()) << std::endl
+				<< "\tThe operation " << (acErr.failed() ? "failed" : "didn't fail") << std::endl
+				<< "\tAddress: " << ep.address().to_string() << std::endl
+				<< "\tCapacity: " << ep.capacity() << std::endl
+				<< "\tPort: " << ep.port() << std::endl;
+			}
+		}
+	);
+
+	#ifdef DEBUG
+	std::cout << "Client::findOppositeForm ending" << std::endl;
+	#endif
+}
+
+/**
+* @desc Sends the FOF request to the server after findOppositeForm establishes a connection.
+**/
+void Client::sendFofReq()
+{
+	#ifdef DEBUG
+	std::cout << "Client::sendFofReq: callback called from findOppositeForm lambda." << std::endl;
+	#endif
+
+	/* Build the request */
+	curReq.SETCOM_FUNC(mpp::Request::FOF); // Issue a request to find the opposite form
+	curReq.clearHeaders(); // Clear any headers that were set for the last request
+	curReq.addHeader("Content-Type", contentType); // The noun is a plaintext UTF-8 string
+	curReq.addHeader("Content-Length", input.length()); // The server's parser needs to know how long the string is to read it over the network
+	curReq.setNoun(input); // The noun to send is our input
+	#ifdef DEBUG
+	std::cout << "Client::sendFofReq: curRequest to send is " << std::endl
+	<< curReq;
+	#endif
+	reqBufs = curReq.toBuffers(); // Store the buffers in a member variable so that they won't go out of scope before the asynchronous write completes
+
+	#ifdef DEBUG
+	std::cout << "Client::sendFofReq: buffers are: " << std::endl;
+
+	/* Print the buffers' contents, just in case */
+	for (boost::asio::const_buffer buf : reqBufs)
+	{
+		std::size_t bufSiz = buf.size();
+		const unsigned char* bufDat = static_cast<const unsigned char*>(buf.data());
+		
+		for (std::size_t i = 0; i < bufSiz; i++)
+		{
+			std::cout << bufDat[i];
+		}
+
+		std::cout << std::endl;
+	}
+
+	std::cout << std::endl;
+	#endif
+
+	boost::asio::async_write(sock, reqBufs, [this](const boost::system::error_code& ec, std::size_t bytesTransferred)
+		{
+			if (!ec) // No error
+			{
+				#ifdef DEBUG
+				std::cout << "Client::sendFofReq::lambda: sent " << bytesTransferred << " bytes" << std::endl
+				<< "\tRequest was " << curReq.size() << " bytes long" << std::endl;
+				#endif
+				
+				if (bytesTransferred < curReq.size()) // The entire request wasn't sent
+				{
+					std::cerr << "Client::sendFofReq::lambda: only " << bytesTransferred << " bytes of a request that was " << curReq.size() << " bytes long were transferred." << std::endl;
+				}
+
+				else
+				{
+					#ifdef DEBUG
+					std::cout << "Client::sendFofReq::lambda: sent request." << std::endl;
+					#endif
+				}
+			}
+
+			else // An error occurred
+			{
+				std::cerr << "Client::sendFofReq::lambda: an error occurred while sending the request to the server." << std::endl
+				<< "\tError value = " << ec.value() << std::endl
+				<< "\tError message = " << std::quoted(ec.message()) << std::endl
+				<< "\tThe operation " << (ec.failed() ? "failed" : "didn't fail") << std::endl;
+			}
+		}
+	);
+}
+
+/**
+* @desc Resets our socket. Called at the end of each request and on destruction.
+**/
+void Client::resetSocket()
+{
+	try
+	{
+		sock.close(); // Close the socket
+		sock.shutdown(boost::asio::ip::tcp::socket::shutdown_both); // Shutdown any pending sends or receives
+	}
+
+	catch (boost::system::system_error& bsse) // Error while resetting socket
+	{
+		std::cerr << "Error while resetting socket: " << bsse.what()  << std::endl;
 	}
 }
