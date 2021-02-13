@@ -83693,6 +83693,14 @@ namespace mpp
    void writeToStream(std::ostream& os) const;
 
 
+
+
+
+
+   void printBufs(std::string ctx) const;
+
+
+
    Command c;
    std::forward_list<mpp::Header> headers;
    std::string noun;
@@ -83815,12 +83823,7 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
  bufs.clear();
 
 
- std::cout << "mpp::Request::toBuffers: bufs after being cleared:" << std::endl;
-
- for (boost::asio::const_buffer buf : bufs)
- {
-  std::cout << static_cast<const unsigned char*>(buf.data());
- }
+ printBufs("being cleared");
 
 
  flss << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " " << verbNames.at(c);
@@ -83828,21 +83831,26 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
  bufs.push_back(boost::asio::buffer(sdata.back()));
 
 
- std::cout << "mpp::Request::toBuffers: bufs after adding protocol line: " << std::endl;
-
- for (boost::asio::const_buffer buf : bufs)
- {
-  std::cout << static_cast<const unsigned char*>(buf.data());
- }
+ printBufs("adding protocol line");
 
 
  bufs.push_back(boost::asio::buffer(crlf));
+
+
+ printBufs("adding CRLF after protocol line");
+
 
  for (mpp::Header h : headers)
  {
   sdata.push_back(h.getName());
   bufs.push_back(boost::asio::buffer(sdata.back()));
+
+  printBufs("adding header name");
+
   bufs.push_back(boost::asio::buffer(nameValSep));
+
+  printBufs("adding separator between header name and value");
+
   std::string val;
 
 
@@ -83850,7 +83858,7 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
   {
    try
    {
-    int ival = std::any_cast<typename std::string::size_type>(h.getValue());
+    typename std::string::size_type ival = std::any_cast<typename std::string::size_type>(h.getValue());
     std::ostringstream convSS;
     convSS << ival;
     val = convSS.str();
@@ -83885,11 +83893,23 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
 
   sdata.push_back(val);
   bufs.push_back(boost::asio::buffer(sdata.back()));
+
+  printBufs("adding header value");
+
   bufs.push_back(boost::asio::buffer(crlf));
+
+  printBufs("adding CRLF after header line");
+
  }
 
  bufs.push_back(boost::asio::buffer(crlf));
+
+ printBufs("pushing final CRLF");
+
  bufs.push_back(boost::asio::buffer(noun));
+
+ printBufs("adding noun");
+
  return bufs;
 }
 
@@ -83990,4 +84010,21 @@ void mpp::Request::writeToStream(std::ostream& os) const
 void mpp::Request::clearHeaders()
 {
  headers.clear();
+}
+
+
+
+
+
+
+void mpp::Request::printBufs(std::string ctx) const
+{
+
+ std::cout << "mpp::Request::toBuffers: bufs after " << ctx << ": " << std::endl;
+
+ for (boost::asio::const_buffer buf : bufs)
+ {
+  std::cout << static_cast<const unsigned char*>(buf.data());
+ }
+
 }

@@ -84830,6 +84830,14 @@ namespace mpp
    void writeToStream(std::ostream& os) const;
 
 
+
+
+
+
+   void printBufs(std::string ctx) const;
+
+
+
    Command c;
    std::forward_list<mpp::Header> headers;
    std::string noun;

@@ -101,6 +101,14 @@ namespace mpp
 			**/
 			void writeToStream(std::ostream& os) const;
 
+			#ifdef DEBUG
+			/**
+			* @desc Prints the buffers' current values with the given string added for additional context.
+			* @param ctx The additional contextual info needed for debugging.
+			**/
+			void printBufs(std::string ctx) const;
+			#endif
+
 			/*** Properties ***/
 			Command c; // The command which this request asks the server to perform
 			std::forward_list<mpp::Header> headers; // A list of request headers

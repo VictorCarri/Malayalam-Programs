@@ -433,13 +433,13 @@ void Client::sendSingReq()
 	curReq.addHeader("Content-Length", input.length()); // The server's parser needs to know how long the string is to read it over the network
 	curReq.setNoun(input); // The noun to send is our input
 	#ifdef DEBUG
-	std::cout << "Client::sendReq: curRequest to send is " << std::endl
+	std::cout << "Client::sendSingReq: curRequest to send is " << std::endl
 	<< curReq;
 	#endif
 	reqBufs = curReq.toBuffers(); // Store the buffers in a member variable so that they won't go out of scope before the asynchronous write completes
 
 	#ifdef DEBUG
-	std::cout << "Client::sendReq: buffers are: " << std::endl;
+	std::cout << "Client::sendSingReq: buffers are: " << std::endl;
 
 	/* Print the buffers' contents, just in case */
 	for (boost::asio::const_buffer buf : reqBufs)

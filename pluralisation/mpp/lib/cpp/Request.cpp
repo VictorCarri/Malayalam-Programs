@@ -117,12 +117,7 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
 	bufs.clear(); // Clear any old buffers
 
 	#ifdef DEBUG
-	std::cout << "mpp::Request::toBuffers: bufs after being cleared:" << std::endl;
-
-	for (boost::asio::const_buffer buf : bufs)
-	{
-		std::cout << static_cast<const unsigned char*>(buf.data());
-	}
+	printBufs("being cleared");
 	#endif
 
 	flss << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " " << verbNames.at(c); // Create the first line
@@ -130,21 +125,26 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
 	bufs.push_back(boost::asio::buffer(sdata.back())); // Push back the first line
 
 	#ifdef DEBUG
-	std::cout << "mpp::Request::toBuffers: bufs after adding protocol line: " << std::endl;
-
-	for (boost::asio::const_buffer buf : bufs)
-	{
-		std::cout << static_cast<const unsigned char*>(buf.data());
-	}
+	printBufs("adding protocol line");
 	#endif
 
 	bufs.push_back(boost::asio::buffer(crlf)); // End this line
+
+	#ifdef DEBUG
+	printBufs("adding CRLF after protocol line");
+	#endif
 
 	for (mpp::Header h : headers) // Loop through the list of headers
 	{
 		sdata.push_back(h.getName());
 		bufs.push_back(boost::asio::buffer(sdata.back())); // First, send the header's name
+		#ifdef DEBUG
+		printBufs("adding header name");
+		#endif
 		bufs.push_back(boost::asio::buffer(nameValSep)); // Then, add the separator
+		#ifdef DEBUG
+		printBufs("adding separator between header name and value");
+		#endif
 		std::string val; // Will represent the value that we fetch from the ANY_CLASS that contains the header's value
 
 		/* Determine what type the header's value is */
@@ -152,7 +152,7 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
 		{
 			try
 			{
-				int ival = ANY_CAST<typename std::string::size_type>(h.getValue()); // Try to cast the header's value to an int
+				typename std::string::size_type ival = ANY_CAST<typename std::string::size_type>(h.getValue()); // Try to cast the header's value to an int
 				std::ostringstream convSS; // Used to convert the int to a string
 				convSS << ival; // Insert the int to be converted
 				val = convSS.str(); // Store the converted string
@@ -187,11 +187,23 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
 
 		sdata.push_back(val);
 		bufs.push_back(boost::asio::buffer(sdata.back())); // Add the header's value
+		#ifdef DEBUG
+		printBufs("adding header value");
+		#endif
 		bufs.push_back(boost::asio::buffer(crlf)); // End this header line
+		#ifdef DEBUG
+		printBufs("adding CRLF after header line");
+		#endif
 	} // for
 
 	bufs.push_back(boost::asio::buffer(crlf)); // End the headers
+	#ifdef DEBUG
+	printBufs("pushing final CRLF");
+	#endif
 	bufs.push_back(boost::asio::buffer(noun)); // Add the noun
+	#ifdef DEBUG
+	printBufs("adding noun");
+	#endif
 	return bufs;
 }
 
@@ -293,3 +305,21 @@ void mpp::Request::clearHeaders()
 {
 	headers.clear();
 }
+
+#ifdef DEBUG
+/**
+* @desc Prints the buffers' current values with the given string added for additional context.
+* @param ctx The additional contextual info needed for debugging.
+**/
+void mpp::Request::printBufs(std::string ctx) const
+{
+	#ifdef DEBUG
+	std::cout << "mpp::Request::toBuffers: bufs after " << ctx << ": " << std::endl;
+
+	for (boost::asio::const_buffer buf : bufs)
+	{
+		std::cout << static_cast<const unsigned char*>(buf.data());
+	}
+	#endif
+}
+#endif
