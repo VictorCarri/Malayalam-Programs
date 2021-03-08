@@ -83836,7 +83836,7 @@ std::vector<boost::asio::const_buffer> mpp::Request::toBuffers()
 
  bufs.push_back(boost::asio::buffer(crlf));
 
-
+ std::cout << "CRLF buffer = " << static_cast<int>(crlf[0]) << ", " << static_cast<int>(crlf[1]) << std::endl;
  printBufs("adding CRLF after protocol line");
 
 
@@ -84019,7 +84019,6 @@ void mpp::Request::clearHeaders()
 
 void mpp::Request::printBufs(std::string ctx) const
 {
-
  std::cout << "mpp::Request::toBuffers: bufs after " << ctx << ": " << std::endl;
 
  for (boost::asio::const_buffer buf : bufs)
@@ -84027,4 +84026,5 @@ void mpp::Request::printBufs(std::string ctx) const
   std::cout << static_cast<const unsigned char*>(buf.data());
  }
 
+ std::cout << std::endl;
 }

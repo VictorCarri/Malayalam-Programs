@@ -22,7 +22,7 @@
 #include <functional> // std::function
 
 /* Boost */
-#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver
+#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::resolver::results_type, boost::asio::ip::tcp::endpoint, boost::asio::ip::tcp::resolver
 #include <boost/asio/write.hpp> // boost::asio::async_write
 #include <boost/asio/connect.hpp> // boost::asio::async_connect
 #include <boost/asio/read.hpp> // boost::asio::async_read
@@ -132,7 +132,7 @@ contentType("text/plain;charset=utf-8")
 
 	std::string_view hostView(host); // Convert host to a string_view for async_resolve
 	std::string_view portView = portSS.str(); // Convert port string to a string view
-	resolver.async_resolve(hostView, portView, [this, &host, &portSS](const boost::system::error_code& resErr, typename boost::asio::ip::tcp::resolver::results_type results)
+	resolver.async_resolve(hostView, portView, [this, host, portSS](const boost::system::error_code& resErr, typename boost::asio::ip::tcp::resolver::results_type results)
 		{
 			if (!resErr) // No error
 			{

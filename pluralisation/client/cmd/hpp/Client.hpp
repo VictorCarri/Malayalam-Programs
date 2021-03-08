@@ -19,7 +19,7 @@
 /* Boost */
 #include <boost/asio/signal_set.hpp> // boost::asio::signal_set
 #include <boost/asio/io_context.hpp> // boost::asio::io_context
-#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket, boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::endpoint
+#include <boost/asio/ip/tcp.hpp> // boost::asio::ip::tcp::socket, boost::asio::ip::tcp::resolver, boost::asio::ip::tcp::resolver::results_type, boost::asio::ip::tcp::endpoint
 #include <boost/asio/buffer.hpp> // boost::asio::const_buffer, boost::asio::mutable_buffer
 #include <boost/asio/streambuf.hpp> // boost::asio::streambuf
 #include <boost/system/error_code.hpp> // boost::system::error_code
