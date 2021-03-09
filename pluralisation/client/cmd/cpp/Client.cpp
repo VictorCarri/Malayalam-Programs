@@ -132,7 +132,7 @@ contentType("text/plain;charset=utf-8")
 
 	std::string_view hostView(host); // Convert host to a string_view for async_resolve
 	std::string_view portView = portSS.str(); // Convert port string to a string view
-	resolver.async_resolve(hostView, portView, [this, host, portSS](const boost::system::error_code& resErr, typename boost::asio::ip::tcp::resolver::results_type results)
+	resolver.async_resolve(hostView, portView, [this, &host, &portSS](const boost::system::error_code& resErr, typename boost::asio::ip::tcp::resolver::results_type results)
 		{
 			if (!resErr) // No error
 			{

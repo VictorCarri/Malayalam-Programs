@@ -125,43 +125,16 @@ void Connection::handleRead(const ERROR_CODE& e, std::size_t bytesTransferred)
 		OFSTREAM binDumpStrm(binReqPath); // Open path of file containing binary values
 		std::cout << "Connection::handleRead: the file " << binReqPath << " is " << (binDumpStrm.is_open() ? "open" : "closed") << std::endl;
 
-		/*for (std::size_t i = 0; i < bytesTransferred; i++)
-		{
-			writeStrm << buffer[i] << "a";
-			std::cout << "Connection::handleRead: Wrote '" << buffer[i] << "' to file " << reqPath << std::endl;
-			std::bitset<8> charBits(static_cast<unsigned long long>(buffer[i]));
-			binDumpStrm << charBits << "A";
-			std::cout << "Connection::handleRead: Wrote " << charBits << " to file " << binReqPath << std::endl;
+        for (std::size_t i = 0; i < bytesTransferred; i++) // Write each byte to each of the files and stdout
+        {
+            std::cout << buffer[i];
+            writeStrm << buffer[i];
+		    std::bitset<8> charBits(static_cast<unsigned long long>(buffer[i]));
+            binDumpStrm << charBits << " ";
+        }
 
-			if (i != bytesTransferred-1) // Write spaces after every char except the last
-			{
-				binDumpStrm << " ";
-				std::cout << " ";
-			}
-
-			std::cout << "Connection::handleRead: size of file " << reqPath << " is " << FILESYSTEM_SIZE(reqPath) << std::endl
-			<< "Connection::handleRead: size of file " << binReqPath << " is " << FILESYSTEM_SIZE(binReqPath) << std::endl;
-		}*/
-		std::for_each_n(buffer.cbegin(), bytesTransferred-1, [&](char c)
-			{
-				writeStrm << c << "a";
-				std::cout << "Connection::handleRead: Wrote '" << c << "' to file " << reqPath << std::endl;
-				std::bitset<8> charBits(static_cast<unsigned long long>(c));
-				binDumpStrm << charBits << "A";
-				std::cout << "Connection::handleRead: Wrote " << charBits << " to file " << binReqPath << std::endl;
-				binDumpStrm << " ";
-				std::cout << " ";
-				std::cout << "Connection::handleRead: size of file " << reqPath << " is " << FILESYSTEM_SIZE(reqPath) << std::endl
-				<< "Connection::handleRead: size of file " << binReqPath << " is " << FILESYSTEM_SIZE(binReqPath) << std::endl;
-			}
-		);
-		std::cout << buffer.back() << "a";
-		std::cout << "Connection::handleRead: Wrote '" << buffer.back() << "' to file " << reqPath << std::endl;
-		std::bitset<8> charBits(static_cast<unsigned long long>(buffer.back()));
-		binDumpStrm << charBits << "A";
-		std::cout << "Connection::handleRead: Wrote " << charBits << " to file " << binReqPath << std::endl
-		<< "Connection::handleRead: size of file " << reqPath << " is " << FILESYSTEM_SIZE(reqPath) << std::endl
-		<< "Connection::handleRead: size of file " << binReqPath << " is " << FILESYSTEM_SIZE(binReqPath) << std::endl;
+		std::cout << "Connection::handleRead: size of file " << reqPath << " after writing is " << FILESYSTEM_SIZE(reqPath) << std::endl
+		<< "Connection::handleRead: size of file " << binReqPath << " after writing is " << FILESYSTEM_SIZE(binReqPath) << std::endl;
 		#endif
 
 		/* Parse a request and check what state the parser is in */
