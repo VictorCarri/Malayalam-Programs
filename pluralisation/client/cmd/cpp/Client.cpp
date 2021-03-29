@@ -434,7 +434,8 @@ void Client::sendSingReq()
 	curReq.setNoun(input); // The noun to send is our input
 	#ifdef DEBUG
 	std::cout << "Client::sendSingReq: curRequest to send is " << std::endl
-	<< curReq;
+	<< curReq
+    << std::endl;
 	#endif
 	reqBufs = curReq.toBuffers(); // Store the buffers in a member variable so that they won't go out of scope before the asynchronous write completes
 
@@ -742,7 +743,7 @@ void Client::readHeader()
 **/
 void Client::handleReply()
 {
-	resetSocket(); // For the next chain of sends/receives
+	resetVars(); // For the next chain of sends/receives
 
 	mpp::Reply::Status repStat = rep.getStatus();
 
@@ -898,7 +899,8 @@ void Client::sendFofReq()
 	curReq.setNoun(input); // The noun to send is our input
 	#ifdef DEBUG
 	std::cout << "Client::sendFofReq: curRequest to send is " << std::endl
-	<< curReq;
+	<< curReq
+    << std::endl;
 	#endif
 	reqBufs = curReq.toBuffers(); // Store the buffers in a member variable so that they won't go out of scope before the asynchronous write completes
 
@@ -956,14 +958,15 @@ void Client::sendFofReq()
 }
 
 /**
-* @desc Resets our socket. Called at the end of each request and on destruction.
+* @desc Resets our socket and reply buffer. Called at the end of each request and on destruction.
 **/
-void Client::resetSocket()
+void Client::resetVars()
 {
 	try
 	{
 		sock.close(); // Close the socket
 		sock.shutdown(boost::asio::ip::tcp::socket::shutdown_both); // Shutdown any pending sends or receives
+        repBuf.consume(repBuf.size()); // Clear all data read from the previous response
 	}
 
 	catch (boost::system::system_error& bsse) // Error while resetting socket

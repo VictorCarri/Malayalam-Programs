@@ -154,9 +154,9 @@ class Client
 		void sendFofReq();
 
 		/**
-		* @desc Resets our socket. Called at the end of each request and on destruction.
+		* @desc Resets our socket and reply buffer. Called at the end of each request and on destruction.
 		**/
-		void resetSocket();
+		void resetVars();
 
 		/*** Properties ***/
 

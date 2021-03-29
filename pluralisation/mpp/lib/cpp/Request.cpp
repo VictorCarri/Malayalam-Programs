@@ -320,6 +320,6 @@ void mpp::Request::printBufs(std::string ctx) const
 		std::cout << static_cast<const unsigned char*>(buf.data());
 	}
 
-	std::cout << std::endl;
+	std::cout << std::endl << std::endl;
 }
 #endif
