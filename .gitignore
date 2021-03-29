@@ -2,3 +2,6 @@
 obj/*
 malPlSrv
 malPlSrv-debug
+*.ii
+*.s
+*.o

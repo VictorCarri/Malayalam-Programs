@@ -18,9 +18,6 @@ int main()
 	Client c; // The class that encapsulates our client
 	#ifdef DEBUG
 	std::cout << "main: constructed Client" << std::endl
-
-
-	
 	<< "main: starting client" << std::endl;
 	#endif
 	c.start(); // Tell the client that we're ready to start using it
@@ -58,7 +55,8 @@ int main()
 				if (c.isInputValidMalayalam()) // All of the Unicode code-points are in the Malayalam range
 				{
 					std::cout << "Determining whether or not the current noun is singular..." << std::endl;
-					c.isSingular([&c](bool isSing, std::string noun)
+					c.isSingular(
+						[&c](bool isSing, std::string noun)
 						{
 							std::cout << "main: isSingular lambda: The noun " << std::quoted(noun) << " is " << (isSing ? "singular" : "plural") << std::endl;
 							c.findOppositeForm(

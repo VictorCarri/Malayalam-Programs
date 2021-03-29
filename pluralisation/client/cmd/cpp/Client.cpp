@@ -593,6 +593,7 @@ void Client::readSingRepStatus()
 					if (repStat != mpp::Reply::singular && repStat != mpp::Reply::plural) // Not a valid response to an ISSING request
 					{
 						std::cerr << "Client::readSingRepStatus::lambda: error: response is not for an ISSING request." << std::endl;
+						handleReply(); // Cleanup
 					}
 
 					else // Valid response
@@ -966,11 +967,15 @@ void Client::resetVars()
 	{
 		sock.close(); // Close the socket
 		sock.shutdown(boost::asio::ip::tcp::socket::shutdown_both); // Shutdown any pending sends or receives
-        repBuf.consume(repBuf.size()); // Clear all data read from the previous response
 	}
 
 	catch (boost::system::system_error& bsse) // Error while resetting socket
 	{
 		std::cerr << "Error while resetting socket: " << bsse.what()  << std::endl;
 	}
+
+       	repBuf.consume(repBuf.size()); // Clear all data read from the previous response. Doesn't throw, according to docs.
+	#ifdef DEBUG
+	std::cout << "Client::resetVars: repBuf's size is " << repBuf.size() << " after its contents were consumed." << std::endl;
+	#endif
 }
