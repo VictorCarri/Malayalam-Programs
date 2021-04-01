@@ -48,6 +48,17 @@ void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 	std::string utf8Text("text/utf-8"); // Initialise the string once instead of using several temporaries
 	std::string::size_type zeroLengthInd(0);
 
+	/* We always add a header that specifies whether or not the noun was in our database, so that the client knows whether the response was generated or not. */
+	if (inDB(req.getNoun()))
+	{
+		rep.addHeader("Noun-In-DB", "true");
+	}
+
+	else
+	{
+		rep.addHeader("Noun-In-DB", "false");
+	}
+
 	switch (req.GETCOM_FUNC()) // Check what type of request it is
 	{
 		case Request::FOF: // "F"ind "O"pposite "F"orm
@@ -93,6 +104,7 @@ void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 						);
 						pfStrm << pluralForms.back();
 						rep.addHeader("Content-Length", pfStrm.str().length());
+						rep.addHeader("Multiple-Forms", pluralForms.size()); // Send the # of possible plurals so that the client knows
 						rep.addHeader("Delimiter", delim);
 						#ifdef DEBUG
 						std::cout << "mpp::ReqHandler::handleReq::FOF:> 1 plural: content = " << std::quoted(pfStrm.str()) << std::endl;
@@ -176,6 +188,7 @@ void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 						);
 						sfsStrm << singularForms.back();
 						rep.addHeader("Content-Length", sfsStrm.str().length());
+						rep.addHeader("Multiple-Forms", singularForms.size());
 						rep.addHeader("Delimiter", delim);
 						#ifdef DEBUG
 						std::cout << "mpp::ReqHandler::handleReq::FOF:> 1 singular form: content = " << std::quoted(sfsStrm.str()) << std::endl;
