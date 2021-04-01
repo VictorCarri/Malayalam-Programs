@@ -14,8 +14,7 @@
 /* Boost */
 #include <boost/tuple/tuple.hpp> // boost::tuple
 #include <boost/logic/tribool.hpp> // boost::tribool, boost::indeterminate
-#include <boost/locale.hpp> // boost::locale::generator
-#include <boost/logic/tribool_io.hpp>
+#include <boost/logic/tribool_io.hpp> // operator<< for boost::logic::tribool
 
 /* Our headers */
 #include "bosmacros/array.hpp" // ARRAY_CLASS macro
@@ -25,7 +24,7 @@
 namespace mpp
 {
 	/*
-	* Parses a request uses a buffer of data obtained by the server.
+	* Parses a request from network data into a Request object.
 	*/
 	class ReqParser
 	{
@@ -39,19 +38,28 @@ namespace mpp
 			* Reset to initial parser state.
 			**/
 			void reset();
-	
+
+			/**
+			* @desc What actually parses the request.
+			* @param req The Request object to set values on.
+			* @param begin An iterator to the beginning of the current input bytes.
+			* @param begin A past-the-end iterator for the current input bytes.
+			* @return A pair of a tribool (true = full request parsed, false = invalid request, indeterminate = incomplete request); and an iterator to the last piece of data parsed.
+			**/	
 			template<typename InputIterator>
 			boost::tuple<boost::tribool, InputIterator> parse(Request& req, InputIterator begin, InputIterator end)
 			{
+				boost::tribool res;
+
 				while (begin != end)
 				{
 					#ifdef DEBUG
-					std::cout << "ReqParser::parse: Character at begin = ";
+					std::cout << "mpp::ReqParser::parse: Character at begin = ";
 					std::wcout << *begin;
 					std::cout << std::endl;
 					#endif
 	
-					boost::tribool res = consume(req, *begin++);
+					res = consume(req, *begin++);
 					
 					if (res || !res)
 					{
@@ -64,11 +72,11 @@ namespace mpp
 				}
 	
 				#ifdef DEBUG
-				std::cout << "ReqParser::parse: reached end of input." << std::endl
+				std::cout << "mpp::ReqParser::parse: reached end of input." << std::endl
 				<< "\tReturning (" << boost::indeterminate << ", " << *begin << ")" << std::endl;
 				#endif
 	
-				boost::tribool res = boost::indeterminate;
+				res = boost::indeterminate;
 				return boost::make_tuple(res, begin);
 			}
 	
@@ -141,7 +149,6 @@ namespace mpp
 			const ARRAY_CLASS<short, 3> version; // Current parser/server version
 			ARRAY_CLASS<std::unique_ptr<std::stringstream>, 3> verSS; // Used to store textual versions of version #s for each part of the version string (VER_MAJOR.VER_MINOR.VER_PATCH) until we need to convert them to numbers for comparison
 			std::map<std::string, State> verbInfo; // Maps a verb to its state. The keys are iterated to check recognised verbs. The values are only used to determine which state to jump to next after parsing the first character of the verb.
-			boost::locale::generator gen; // Used to switch between US English and Malayalam locales
 			std::unique_ptr<std::stringstream> pSSHeaderName; // Use a pointer so that we can easily reset the stringstream
 			std::unique_ptr<std::stringstream> pSSHeaderVal; // Use a pointer so that we can easily reset the stringstream
 			int mNBytes; // # of bytes in Malayalam noun.

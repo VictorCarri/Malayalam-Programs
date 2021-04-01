@@ -1,3 +1,6 @@
+/* C++ versions of C headers */
+#include <cstddef> // std::size_t
+
 /* C++ Standard Library */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
@@ -18,7 +21,6 @@
 #include <boost/logic/tribool_fwd.hpp> // boost::logic::tribool fwd declarations
 #include <boost/logic/tribool.hpp> // boost::logic::tribool
 #include <boost/logic/tribool_io.hpp> // operator<< def'ns for boost::logic::tribool
-#include <boost/filesystem/path.hpp> // boost::filesystem::path
 
 /* MariaDB++ */
 #include <mariadb++/account.hpp> // mariadb::account::create, mariadb::account_ref
@@ -27,7 +29,7 @@
 #include <mariadb++/exceptions.hpp> // mariadb::exception::connection
 
 /* Our headers */
-#include "mpp/bosmacros/array.hpp" // ARRAY_CLASS macro
+#include "bosmacros/array.hpp" // ARRAY_CLASS macro
 #include "mpp/Request.hpp" // Represents a request
 #include "mpp/Reply.hpp" // Represents a reply
 #include "mpp/Header.hpp" // Represents a (name, value) pair
@@ -44,7 +46,7 @@
 void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 {
 	std::string utf8Text("text/utf-8"); // Initialise the string once instead of using several temporaries
-	int zeroLengthInd = 0;
+	std::string::size_type zeroLengthInd(0);
 
 	switch (req.GETCOM_FUNC()) // Check what type of request it is
 	{
@@ -240,7 +242,7 @@ void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 * 	2) Opens a connection to the DB.
 * @param cfPath The path to the DB config file.
 **/
-mpp::ReqHandler::ReqHandler(std::string cfPath) : dbInfo(boost::filesystem::path(cfPath)), // Load DB info from the path or throw an exception
+mpp::ReqHandler::ReqHandler(std::string cfPath) : dbInfo(cfPath), // Load DB info from the path or throw an exception
 	declRegs { // Set up array of regexes used to guess what declension a noun falls into
 		boost::make_u32regex(".*\\x{d7b}$"), // an-stem
 		boost::make_u32regex(".*\\x{d02}$"), // am-stem
@@ -250,7 +252,6 @@ mpp::ReqHandler::ReqHandler(std::string cfPath) : dbInfo(boost::filesystem::path
 	}
 {
 	endsInKaar = boost::make_u32regex(".*\\x{d15}\\x{d3e}\\x{d30}(\\x{d7b}|\\x{d3f})$"); // A regex that matches -കാരൻ or -കാരി
-	openDBConn();
 }
 
 /**
@@ -354,14 +355,15 @@ bool mpp::ReqHandler::isSingular(std::string noun)
 **/
 bool mpp::ReqHandler::inDB(std::string noun)
 {
-	#ifdef DEBUG
-	std::cout << "mpp::ReqHandler::inDB: noun to check is " << std::quoted(noun) << std::endl;
-	#endif
 	mariadb::u64 nRowsAff; // # of rows affected by the query. If == 1, the noun is in the DB.
-	bool toReturn;
+	bool toReturn = false; // Assume that it isn't in by default - which'll be true more often than not
 	int fno = 0; // Field # to load noun into in prepared statement
+
+	openDBConn(); // Open a connection for this call
+
 	#ifdef DEBUG
-	std::cout << "mpp::ReqHandler::inDB: field # = " << fno << std::endl;
+	std::cout << "mpp::ReqHandler::inDB: noun to check is " << std::quoted(noun) << std::endl
+	<< "\tfield # = " << fno << std::endl;
 	#endif
 
 	try
@@ -392,12 +394,26 @@ bool mpp::ReqHandler::inDB(std::string noun)
 
 	catch (mariadb::exception::connection& mece)
 	{
-		std::ostringstream ess;
+	/*	std::ostringstream ess;
 		ess << "mpp::ReqHandler::inDB: caught MariaDB connection exception while trying to execute query" << std::endl
 		<< "\tSELECT * FROM nouns WHERE noun=" << std::quoted(noun, '\'') << std::endl
 		<< "Exception: " << mece.what() << std::endl;
 		mpp::exceptions::DBError ex(ess.str());
-		throw ex;
+		throw ex;*/
+
+		try
+		{
+			openDBConn(); // Re-open the connection
+		}
+
+		catch (std::exception& secondEx) // Bail out if we can't re-establish the connection
+		{
+			std::ostringstream ess;
+			ess << "mpp::ReqHandler::inDB: caught MariaDB connection exception after failing to re-open the DB connection for a second time" << std::endl
+			<< "\tException: " << secondEx.what() << std::endl;
+			mpp::exceptions::DBError ex(ess.str());
+			throw ex;
+		}
 	}
 
 	catch (std::out_of_range& stdoore)
@@ -540,7 +556,7 @@ std::vector<std::string> mpp::ReqHandler::findPlural(std::string noun)
 		#ifdef DEBUG
 		std::cout << "mpp::ReqHandler::findPlural: the noun " << std::quoted(noun) << " has an exceptional plural" << std::endl;
 		#endif
-		exceptionStmt->set_string(0, noun); // Load the noun into the string
+		exceptionStmt->set_string(0, noun); // Load the noun into the statement
 
 		try
 		{
@@ -928,9 +944,10 @@ bool mpp::ReqHandler::isVowelStem(std::string noun)
 	ARRAY_CLASS<boost::smatch, 2> what;
 	bool doesntEndInChillu = boost::u32regex_match(noun, what.at(what.size()-1), boost::make_u32regex(".*[^\\x{d7a}-\\x{d7f}]$"));
 	bool doesntEndInSchwa = boost::u32regex_match(noun, what.back(), boost::make_u32regex(".*[^\\x{d4d}]$"));
-	bool isIva = (noun == u8"\u0d07\u0d35"); // iva is a special case - it's a vowel stme, but it's plural
+	bool isIva = (noun == u8"\u0d07\u0d35"); // iva is a special case - it's a vowel stem, but it's plural
 	bool isAva = (noun == u8"\u0d05\u0d35"); // ava is also a special case, for the same reason as iva
-	return doesntEndInChillu && doesntEndInSchwa && !(isIva || isAva); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa AND must NOT be (iva OR ava)
+	//return doesntEndInChillu && doesntEndInSchwa && !(isIva || isAva); // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa AND must NOT be (iva OR ava)
+	return doesntEndInChillu && doesntEndInSchwa && !isIva && !isAva; // A vowel-stem must NOT end in a chillu AND must NOT end in a schwa AND must NOT be (iva OR ava)
 }
 
 /**

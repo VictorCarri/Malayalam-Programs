@@ -5,7 +5,7 @@
 #include <string> // std::string
 
 /* Boost or STL? */
-#include "mpp/bosmacros/any.hpp" // ANY_CLASS
+#include "bosmacros/any.hpp" // ANY_CLASS
 
 namespace mpp
 {

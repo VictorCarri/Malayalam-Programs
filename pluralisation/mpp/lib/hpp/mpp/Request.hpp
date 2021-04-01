@@ -4,10 +4,17 @@
 /* STL */
 #include <forward_list> // std::forward_list
 #include <string> // std::string
+#include <vector> // std::vector
+#include <map> // std::map
+#include <array> // std::array
+#include <ostream> // std::ostream
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS macro
 #include "mpp/Header.hpp" // Header class
+
+/* Boost */
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 
 /* Because I keep switching */
 #define GETCOM_FUNC getCommand
@@ -20,10 +27,12 @@ namespace mpp
 		public:
 			enum Command
 			{
+				INVALID = 0, // A Request object is initialised to use this 
 				FOF, // Find opposite form (singular -> plural, plural -> singular),
 				ISSING, // Determine whether or not the current form is singular
-				INVALID // A Request object is initialised to use this 
 			};
+
+			typedef ANY_CLASS any_type ; // To make things easier for library clients
 	
 			/**
 			* @desc Default constructor. Initialises the command to an invalid one.
@@ -65,12 +74,64 @@ namespace mpp
 			* @return This request's noun.
 			**/
 			std::string getNoun() const;
-	
+
+			/**
+			* @desc Converts the Request object to a sequence of constant buffers, suitable for network transport.
+			* @return A vector of constant buffers, containing text that represents this Request object.
+			**/
+			std::vector<boost::asio::const_buffer> toBuffers();
+
+			/**
+			* @desc Calculates the size of the request as a string.
+			* @return The size of this request as a string.
+			**/
+			typename std::string::size_type size() const;
+
+			/**
+			* @desc Clears our list of headers.
+			**/
+			void clearHeaders();
+
 		private:
+			/*** Methods ***/
+
+			/**
+			* @desc Write ourselves to a stream.
+			* @param os The stream to write to.
+			**/
+			void writeToStream(std::ostream& os) const;
+
+			#ifdef DEBUG
+			/**
+			* @desc Prints the buffers' current values with the given string added for additional context.
+			* @param ctx The additional contextual info needed for debugging.
+			**/
+			void printBufs(std::string ctx) const;
+			#endif
+
+			/*** Properties ***/
 			Command c; // The command which this request asks the server to perform
 			std::forward_list<mpp::Header> headers; // A list of request headers
 			std::string noun; // The noun given with this request
-	};
-};
+			std::map<Command, std::string> verbNames; // Maps a verb enum to a string describing it for network transport
+			const std::array<char, 2> crlf; // Used to represent the sequence "\r\n"
+			const std::array<char, 2> nameValSep; // Contains the ':' and space that separate a header name from its value
+			std::vector<boost::asio::const_buffer> bufs; // Holds the request when converted to buffers. Made a member to prevent it from being deleted before the Request ends, since that causes errors when we try to send the buffers over the network.
+			std::vector<std::string> sdata; // Holds string data so that the buffers that refer to them won't contain garbage
 
+			/**
+			* Friend declaration to allow operator<< to access private members.
+			**/
+			friend std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
+	}; // class Request
+
+	/**
+	* @desc An overload for the insertion operator that prints an MPP request.
+	* @param os The output stream to write to.
+	* @param req The mpp::Request object to write.
+	* @return A reference to the output stream, to allow chaining of operator<<.
+	**/
+	std::ostream& operator<<(std::ostream& os, const mpp::Request& req);
+
+}; // namespace mpp
 #endif // MPP_REQUEST_HPP

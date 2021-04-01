@@ -1,8 +1,8 @@
 #ifndef MPP_DATA_DBINFO_HPP
 #define MPP_DATA_DBINFO_HPP
 
-/* Boost */
-#include <boost/filesystem.hpp> // boost::filesystem::path
+/* Our headers */
+#include "bosmacros/filesystem.hpp" // FILESYSTEM_PATH macro
 
 namespace mpp
 {
@@ -21,7 +21,7 @@ namespace mpp
 				*	The expected keys are "db" (DB name), "user" (DB user), "password" (DB password), and "host" (DB host).
 				* @param cfPath The path of the file to load data from.
 				**/
-				DBInfo(boost::filesystem::path cfPath);
+				DBInfo(FILESYSTEM_PATH cfPath);
 
 				/**
 				* @desc Fetches the name of the user to use when connecting to the DB.

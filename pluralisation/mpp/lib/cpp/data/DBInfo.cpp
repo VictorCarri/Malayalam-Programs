@@ -7,10 +7,13 @@
 #endif
 
 /* Boost */
-#include <boost/filesystem.hpp> // boost::filesystem::ifstream, boost::filesystem::exists, boost::filesystem::path
-#include <boost/program_options.hpp> // boost::program_options::options_description, boost:program_options::value, boost::program_options::variables_map, boost::program_options::store, boost::program_options::notify, boost::program_options::parse_config_file
+#include <boost/program_options/options_description.hpp> // boost::program_options::options_description
+#include <boost/program_options/value_semantic.hpp> // boost::program_options::value
+#include <boost/program_options/variables_map.hpp> // boost::program_options::variables_map, boost::program_options::store, boost::program_options::notify
+#include <boost/program_options/parsers.hpp> // boost::program_options::parse_config_file
 
 /* Our headers */
+#include "bosmacros/filesystem.hpp" // FILESYSTEM_EXISTS and IFSTREAM macros
 #include "mpp/exceptions/MissingDBConfFile.hpp" // Thrown if the file @ the given path DNE
 #include "mpp/exceptions/MissingDBInfo.hpp" // Throw if the configuration file doesn't contain all of the needed data
 #include "mpp/data/DBInfo.hpp" // Class def'n
@@ -21,10 +24,10 @@
 *	The expected keys are "db" (DB name), "user" (DB user), "password" (DB password), and "host" (DB host).
 * @param cfPath The path of the file to load data from.
 **/
-mpp::data::DBInfo::DBInfo(boost::filesystem::path cfPath)
+mpp::data::DBInfo::DBInfo(FILESYSTEM_PATH cfPath)
 {
 	/* Step 1: check for the existence of the given file */
-	if (!boost::filesystem::exists(cfPath)) // Can't load data
+	if (!FILESYSTEM_EXISTS(cfPath)) // Can't load data
 	{
 		std::ostringstream ess; // Used to create the error message
 		ess << "mpp::data::DBInfo::DBInfo: the file named by the given config path (" << cfPath << ") doesn't exist!";
@@ -54,7 +57,7 @@ mpp::data::DBInfo::DBInfo(boost::filesystem::path cfPath)
 	#endif
 
 	/* Step 3: open config file */
-	boost::filesystem::ifstream confStrm(cfPath); // Now that we know that the path exists, we can open a stream to read it
+	IFSTREAM confStrm(cfPath); // Now that we know that the path exists, we can open a stream to read it
 
 	if (!confStrm.is_open() || !confStrm.good()) // Some kind of error
 	{

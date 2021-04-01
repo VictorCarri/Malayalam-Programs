@@ -1,13 +1,22 @@
+/* C++ versions of C headers */
+#include <cstddef> // std::size_t
+
 /* STL */
 #include <string> // std::string
 #include <sstream> // std::ostringstream
-#include <utility> // std::exchange, std::move, std::swap
+#include <utility> // std::exchange, std::move, std::swap, std::pair
+#include <stdexcept> // std::out_of_range
+#include <algorithm> // std::find_if
+#ifdef DEBUG
+#include <iostream> // std::cout
+#include <iomanip> // std::quoted
+#endif
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::const_buffer
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 
 /* Our headers */
-#include "mpp/bosmacros/any.hpp" // ANY_CLASS, BAD_ANY_CAST, ANY_CAST
+#include "bosmacros/any.hpp" // ANY_CLASS, BAD_ANY_CAST, ANY_CAST
 #include "mpp/ver.hpp" // MPP protocol version
 #include "mpp/exceptions/BadHeaderValue.hpp" // Exception thrown when the type of a header's value doesn't match the expected one
 #include "mpp/Header.hpp" // Header class
@@ -26,7 +35,7 @@ mpp::Reply::Reply() :
 	nameValSep {':', ' '}
 {
 	std::ostringstream verSS; // Used to build version string
-	verSS << "MPP/" << mpp::VER_MAJOR << mpp::VER_MINOR << mpp::VER_PATCH << " ";
+	verSS << "MPP/" << mpp::VER_MAJOR << "." << mpp::VER_MINOR << "." << mpp::VER_PATCH << " ";
 
 	/** Set up status text map **/
 
@@ -35,6 +44,8 @@ mpp::Reply::Reply() :
 	statText[plural] = verSS.str() + "201 Plural";
 	statText[pluralForm] = verSS.str() + "202 Plural Form";
 	statText[singularForm] = verSS.str() + "203 Singular Form";
+	statText[noPlural] = verSS.str() + "204 No Plural Form";
+	statText[noSingular] = verSS.str() + "205 No Singular Form";
 
 	/* Set up error (4xx) responses */
 	statText[badReq] = verSS.str() + "400 Bad Request";
@@ -43,8 +54,6 @@ mpp::Reply::Reply() :
 	statText[badPatch] = verSS.str() + "403 Unrecognised Protocol Patch Number";
 	statText[unknownVerb] = verSS.str() + "404 Unrecognised Verb";
 	statText[invUTF8] = verSS.str() + "405 Malformed UTF-8 Input";
-	statText[noPlural] = verSS.str() + "406 No Plural Form";
-	statText[noSingular] = verSS.str() + "407 No Singular Form";
 
 	/* Set up invalid status text */
 	statText[invalid] = "Error: invalid Reply object!";
@@ -65,23 +74,53 @@ void mpp::Reply::setStatus(mpp::Reply::Status s)
 **/
 std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 {
-	std::vector<boost::asio::const_buffer> buffers;
-	buffers.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
+	repBufs.clear();
+	repBufConts.clear();
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: buffers @ begin are: " << std::endl;
+	printRepBufs(); // Make a copy just to avoid having the string being destroyed
+	std::cout << "mpp::Reply::toBuffers: buffer contents vector contains: ";
+	printRepBufConts();
+	#endif
+
+	repBufs.push_back(boost::asio::buffer(statText[stat])); // Add the status text first
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: buffers after pushing status text are: " << std::endl;
+	printRepBufs();
+	#endif
+
+	repBufs.push_back(boost::asio::buffer(crlf));
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: buffers after pushing CRLF after status text are: " << std::endl;
+	printRepBufs();
+	#endif
 
 	for (mpp::Header h : headers)
 	{
-		buffers.push_back(boost::asio::buffer(h.getName()));
-		buffers.push_back(boost::asio::buffer(nameValSep));
+		repBufConts.push_front(h.getName());
+		repBufs.push_back(boost::asio::buffer(repBufConts.front()));
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing header name are: " << std::endl;
+		printRepBufs();
+		std::cout << "mpp::Reply::toBuffers: reply buffer contents after pushing header name are: " << std::endl;
+		printRepBufConts();
+		#endif
+		repBufs.push_back(boost::asio::buffer(nameValSep));
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing colon separator are: " << std::endl;
+		printRepBufs();
+		#endif
 		std::string val; // Used to store the value to push back
 	
 		/* Determine what type the value has, and cast it appropriately */
-		if (h.getName() == "Content-Length") // Int value
+		if (repBufConts.front() == "Content-Length") // Int value
 		{
-			int length;
+			using lengthType = std::string::size_type;
+			lengthType length;
 	
 			try
 			{
-				length = ANY_CAST<int>(h.getValue()); // Fetch the length
+				length = ANY_CAST<lengthType>(h.getValue()); // Fetch the length
 				std::ostringstream convSS; // Used to convert int to str
 				convSS << length;
 				val = convSS.str();
@@ -90,7 +129,7 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
-				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"Content-Length\" header has a non-integer value associated with it!" << std::endl
+				ess << "mpp::Reply::toBuffers(): the \"Content-Length\" header has a non-size_t value associated with it!" << std::endl
 				<< "Error: " << stdbace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue toThrow(ess.str());
 				throw toThrow;
@@ -107,20 +146,44 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
 			{
 				std::ostringstream ess;
-				ess << "mpp::functors::HeaderBufferAdder::operator(): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
+				ess << "mpp::Reply::toBuffers(): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
 				<< "Error: " << stdbace.what() << std::endl;
 				mpp::exceptions::BadHeaderValue toThrow(ess.str());
 				throw toThrow;
 			}
 		}
-	
-		buffers.push_back(boost::asio::buffer(val)); // Push back the value computed above
-		buffers.push_back(boost::asio::buffer(crlf));
+
+		repBufConts.push_front(val);
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: reply buffer contents list after pushing header value contains:" << std::endl;
+		printRepBufConts();
+		#endif
+		repBufs.push_back(boost::asio::buffer(repBufConts.front())); // Push back the value computed above
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing header value are: " << std::endl;
+		printRepBufs();
+		#endif
+		repBufs.push_back(boost::asio::buffer(crlf));
+		#ifdef DEBUG
+		std::cout << "mpp::Reply::toBuffers: buffers after pushing CRLF after header are: " << std::endl;
+		printRepBufs();
+		#endif
 	}
 
-	buffers.push_back(boost::asio::buffer(crlf));
-	buffers.push_back(boost::asio::buffer(content));
-	return buffers;
+	repBufs.push_back(boost::asio::buffer(crlf));
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: buffers after pushing final CRLF are: " << std::endl;
+	printRepBufs();
+	#endif
+	repBufs.push_back(boost::asio::buffer(content));
+	#ifdef DEBUG
+	std::cout << "mpp::Reply::toBuffers: # of buffers at end = " << repBufs.size() << std::endl
+	<< "\tBuffers at end contain:" << std::endl;
+	printRepBufs();
+	std::cout << "\tFinished writing buffers." << std::endl;
+	#endif
+
+	return repBufs;
 }
 
 /**
@@ -135,7 +198,7 @@ void mpp::Reply::addHeader(mpp::Header toAdd)
 * @desc Fetches the string associated with the given status.
 * @param s THe status to fetch a string for.
 **/
-std::string mpp::Reply::getStatText(mpp::Reply::Status s)
+std::string mpp::Reply::getStatText(mpp::Reply::Status s) const
 {
 	return statText.at(s);
 }
@@ -167,8 +230,8 @@ void mpp::Reply::addHeader(std::string name, ANY_CLASS val)
 mpp::Reply mpp::Reply::stockReply(mpp::Reply::Status stat)
 {
 	mpp::Reply rep;
-	rep.addHeader("Content-Type", ANY_CLASS(std::string("text/plain")));
-	rep.addHeader("Content-Length", ANY_CLASS(0));
+	rep.addHeader("Content-Type", std::string("text/plain"));
+	rep.addHeader("Content-Length", static_cast<std::string::size_type>(0));
 	rep.setStatus(stat);
 	rep.setContent("");
 	return rep;
@@ -205,4 +268,157 @@ mpp::Reply& mpp::Reply::operator=(const mpp::Reply& other)
 	statText = other.statText;
 	content = other.content;
 	return *this; // Allow chaining
+}
+
+/**
+* @desc An overload for the insertion operator that prints an MPP reply.
+* @param os The output stream to write to.
+* @param req The mpp::Reply object to write.
+* @return A reference to the output stream, to allow chaining of operator<<.
+**/
+std::ostream& mpp::operator<<(std::ostream& os, const mpp::Reply& rep)
+{
+	try
+	{
+		os << rep.statText.at(rep.stat) << "\r\n"; // Write the first line of the response
+	}
+
+	catch (std::out_of_range& stdoor)
+	{
+		os << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): caught std::out_of_range while trying to write the name of the status " << rep.stat << std::endl;
+	}
+
+	for (mpp::Header h : rep.headers)
+	{
+		std::string headerName = h.getName();
+		os << headerName << ": "; // Write the header's name and a colon to separate it from its value
+
+		/* Does the header's ANY_CLASS object contain a string or an int? */
+		if (headerName == "Content-Length") // String length size value
+		{
+			try
+			{
+				os << ANY_CAST<std::string::size_type>(h.getValue()); // Fetch the length as an int and write it to the stream
+			}
+	
+			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
+			{
+				std::ostringstream ess;
+				ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"Content-Length\" header has a value of non-std::string::sizde_type type associated with it!" << std::endl
+				<< "Error: " << stdbace.what() << std::endl;
+				mpp::exceptions::BadHeaderValue toThrow(ess.str());
+				throw toThrow;
+			}
+		}
+
+		else // String value
+		{
+			try
+			{
+				os << ANY_CAST<std::string>(h.getValue()); // Fetch the header's value as a string and write it to the stream
+			}
+	
+			catch (BAD_ANY_CAST& stdbace) // Rethrow it as a library error
+			{
+				std::ostringstream ess;
+				ess << "mpp::operator<<(std::ostream& os, const mpp::Reply& rep): the \"" << h.getName() << "\" header has a non-string value associated with it!" << std::endl
+				<< "Error: " << stdbace.what() << std::endl;
+				mpp::exceptions::BadHeaderValue toThrow(ess.str());
+				throw toThrow;
+			}
+		}
+
+		os << "\r\n"; // End this header line
+	}
+	
+	os << "\r\n"; // End the headers
+
+	if (!rep.content.empty()) // There is content
+	{
+		os << rep.content; // Write it
+	}
+
+	return os;
+}
+
+/**
+* @desc Clears this Reply object's list of headers.
+**/
+void mpp::Reply::clearHeaders()
+{
+	headers.clear();
+}
+
+/**
+* @desc Attempts to set the Reply's status to that of the numeric code given.
+*	RepParser ensures that the numeric code is in the valid range for the enumeration.
+* @param code The code to set.
+**/
+void mpp::Reply::setStatus(short code)
+{
+	setStatus(static_cast<mpp::Reply::Status>(code)); // Convert it to an enum value (which we know will be valid)
+}
+
+/**
+* @desc Fetches the reply's status.
+* @return This reply's status.
+**/
+mpp::Reply::Status mpp::Reply::getStatus() const
+{
+	return stat;
+}
+
+#ifdef DEBUG
+/**
+* @desc This method prints the reply buffers.
+**/
+void mpp::Reply::printRepBufs()
+{
+	std::size_t bufNum = 1;
+
+	for (auto buf : repBufs)
+	{
+		std::size_t bufSiz = buf.size();
+		const char* bufDat = static_cast<const char*>(buf.data());
+		std::cout << bufNum << ")\t";
+
+		for (std::size_t i = 0; i < bufSiz; i++)
+		{
+			std::cout << bufDat[i];
+		}
+
+		std::cout << std::endl;
+		++bufNum;
+	}
+}
+
+/**
+* @desc This method prints the reply buffer contents held in the vector of strings.
+**/
+void mpp::Reply::printRepBufConts()
+{
+	std::size_t contNum = 1;
+
+	for (auto str : repBufConts)
+	{
+		std::cout << contNum << ")\t" << str << std::endl;
+		++contNum;
+	}
+}
+#endif
+
+/**
+* @desc Determines whether this Reply has a header with the given name.
+* @param name The name of the header to check for.
+* @return True if this reply contains a header with the given name, false otherwise.
+**/
+bool mpp::Reply::hasHeader(std::string name)
+{
+	auto endIt = headers.cend(); // To check if find_if found anything
+	auto res = std::find_if(headers.cbegin(), headers.cend(), [&name](mpp::Header h) -> bool
+		{
+			return h.getName() == name;
+		}
+	);
+	return res != endIt; // find_if will return something other than the end iterator if it found a header with the given name
 }

@@ -6,9 +6,10 @@
 #include <vector> // std::vector
 #include <forward_list> // std::forward_list
 #include <array> // std::array
+#include <map> // std::map
 
 /* Boost */
-#include <boost/asio.hpp> // boost::asio::const_buffer
+#include <boost/asio/buffer.hpp> // boost::asio::const_buffer
 
 /* Our headers */
 #include "bosmacros/any.hpp" // ANY_CLASS
@@ -29,6 +30,8 @@ namespace mpp
 				plural, // Negative response to an ISSING query
 				pluralForm, // Responding to a FOF query with the plural form of singular input
 				singularForm, // Responding to a FOF query with the singular form of plural input
+				noPlural, // The given noun in a FOF query that seeks the plural form has no plural form, according to the DB
+				noSingular, // The given noun in a FOF query that seeks the singular form has no singular form, according to the DB
 
 				/* Client error (4xx) codes */
 				badReq = 400, // Malformed request
@@ -37,12 +40,23 @@ namespace mpp
 				badPatch, // Bad patch #
 				unknownVerb, // Unrecognised MPP verb
 				invUTF8, // Invalid UTF-8 characters in input
-				noPlural, // The given noun in a FOF query that seeks the plural form has no plural form, according to the DB
-				noSingular, // The given noun in a FOF query that seeks the singular form has no singular form, according to the DB
 
 				/* Other */
-				invalid = -1 // Used when a Reply is default-constructed.
+				invalid = -1 // Used when a Reply is default-constructed, or when an invalid code is set
 			};
+
+			/**
+			* @desc Fetches the reply's status.
+			* @return This reply's status.
+			**/
+			Status getStatus() const;
+
+			/**
+			* @desc Attempts to set the Reply's status to that of the numeric code given.
+			*	RepParser ensures that the numeric code is in the valid range for the enumeration.
+			* @param code The code to set.
+			**/
+			void setStatus(short code);
 	
 			/**
 			* @desc Sets a reply's status.
@@ -72,7 +86,7 @@ namespace mpp
 			* @desc Fetches the string associated with the given status.
 			* @param s THe status to fetch a string for.
 			**/
-			std::string getStatText(Status s);
+			std::string getStatText(Status s) const;
 
 			/**
 			* @desc Sets the content to send with the reply.
@@ -106,15 +120,54 @@ namespace mpp
 			* @return A reference to this.
 			**/
 			Reply& operator=(const Reply& other);
+
+			/**
+			* @desc Clears this Reply object's list of headers.
+			**/
+			void clearHeaders();
+
+			/**
+			* @desc Determines whether this Reply has a header with the given name.
+			* @param name The name of the header to check for.
+			* @return True if this reply contains a header with the given name, false otherwise.
+			**/
+			bool hasHeader(std::string name);
 	
 		private:
+			#ifdef DEBUG
+			/**
+			* @desc This method prints the reply buffers.
+			**/
+			void printRepBufs();
+
+			/**
+			* @desc This method prints the reply buffer contents held in the vector of strings.
+			**/
+			void printRepBufConts();
+			#endif
+
 			Status stat; // This reply's status
 			std::forward_list<mpp::Header> headers; // List of headers to send with the reply
 			std::map<Status, std::string> statText; // Text for each status
 			std::string content; // The reply's content
 			const std::array<char, 2> crlf; // CR/LF sequence to be used in the reply
 			const std::array<char, 2> nameValSep; // Separates a header name from its value
+			std::forward_list<std::string> repBufConts; // Holds the contents of the buffers so that they won't contain garbage deleted strings
+			std::vector<boost::asio::const_buffer> repBufs; // Holds this reply as a vector of buffers. Made it a member so that it won't get deleted before the Reply goes out of scope.
+
+			/**
+			* Friend declaration to allow operator<< to access private members.
+			**/
+			friend std::ostream& operator<<(std::ostream& os, const mpp::Reply& req);
 	};
+
+	/**
+	* @desc An overload for the insertion operator that prints an MPP reply.
+	* @param os The output stream to write to.
+	* @param req The mpp::Reply object to write.
+	* @return A reference to the output stream, to allow chaining of operator<<.
+	**/
+	std::ostream& operator<<(std::ostream& os, const Reply& req);
 };
 
 #endif // MPP_REPLY_HPP

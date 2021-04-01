@@ -3,7 +3,7 @@
 #include <string> // std::string
 
 /* Our headers */
-#include "mpp/bosmacros/any.hpp" // ANY_CLASS
+#include "bosmacros/any.hpp" // ANY_CLASS
 #include "mpp/Header.hpp" // Class def'n
 
 /**

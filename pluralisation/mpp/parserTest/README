@@ -1,0 +1,3 @@
+This directory contains a test program that drives the logic library.
+It parses a test request, which is written in a UTF-8 encoded text file
+whose path is passed as a positional argument.
