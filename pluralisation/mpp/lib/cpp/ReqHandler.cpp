@@ -49,15 +49,7 @@ void mpp::ReqHandler::handleReq(const mpp::Request& req, mpp::Reply& rep)
 	std::string::size_type zeroLengthInd(0);
 
 	/* We always add a header that specifies whether or not the noun was in our database, so that the client knows whether the response was generated or not. */
-	if (inDB(req.getNoun()))
-	{
-		rep.addHeader("Noun-In-DB", "true");
-	}
-
-	else
-	{
-		rep.addHeader("Noun-In-DB", "false");
-	}
+	rep.addHeader("Noun-In-DB", inDB(req.getNoun()));
 
 	switch (req.GETCOM_FUNC()) // Check what type of request it is
 	{

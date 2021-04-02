@@ -135,6 +135,8 @@ std::vector<boost::asio::const_buffer> mpp::Reply::toBuffers()
 				throw toThrow;
 			}
 		}
+
+		/* TODO: the header Noun-In-DB should have a boolean value */
 	
 		else // String value
 		{
