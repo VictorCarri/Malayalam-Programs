@@ -273,6 +273,25 @@ void mpp::Request::writeToStream(std::ostream& os) const
 			}
 		}
 
+		else if (h.getName() == "Noun-In-DB") // This should contain a Boolean value
+		{
+			try
+			{
+				bool bVal = ANY_CAST<bool>(h.getValue()); // Try to convert the any to a boolean
+				std::ostringstream convSS; // To convert the boolean to a string
+				convSS << bVal; // Convert the boolean to a string
+				val = convSS.str(); // Store the converted string
+			}
+
+			catch (BAD_ANY_CAST& bace) // Not a Boolean - error
+			{
+				std::ostringstream ess;
+				ess << "mpp::Request::writeToStream: the header named " << std::quoted(h.getName()) << " should contain a value of type " << std::quoted("bool") << ", but doesn't!" << std::endl;
+				mpp::exceptions::BadHeaderValue mebhv(ess.str());
+				throw mebhv;
+			}
+		}
+
 		else // String value
 		{
 			try
